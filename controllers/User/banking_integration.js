@@ -23,6 +23,9 @@ const exec = promisify(execCb);
 
   return `${yyyy}${mm}${dd}${hh}${min}${ss}`;
 };
+const generateRandom16Digit = () => {
+  return crypto.randomBytes(8).toString("hex").slice(0, 16);
+};
 
 // Main function
 const sendEncryptedRequest = async () => {
@@ -34,7 +37,6 @@ const sendEncryptedRequest = async () => {
     beneIFSC: "KKBK0005310",
     amount: "1",
     tranRefNo: timestamp,
-    tranRefNo: "IMPSTesting02",
     paymentRef: "IMPSTransferP2A",
     senderName: "Girdhar Mishra",
     mobile: "8423197351",
@@ -49,8 +51,8 @@ const sendEncryptedRequest = async () => {
   );
 
   // AES session key and IV
-  const sessionKey = "1234567890123457";
-  const iv = "1234567890123456";
+  const sessionKey = generateRandom16Digit();
+  const iv = generateRandom16Digit();
 
   // Public key encryption
   const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
