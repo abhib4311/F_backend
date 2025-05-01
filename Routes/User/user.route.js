@@ -88,7 +88,7 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
-router.post("/auto-payment",authenticateUser,sendEncryptedRequest)
+router.post("/auto-payment",sendEncryptedRequest)
 
 // ---------------------------------------------------------------------------------//
 // Post loan Routes
