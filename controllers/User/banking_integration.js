@@ -157,6 +157,133 @@ const sendEncryptedRequest = async () => {
   }
 };
 
+
+
+const status_check = async () => {
+  const timestamp = getCurrentTimestamp();
+
+  const requestParams = {
+    
+      transRefNo: 20250501191601,
+      date: "2/05/2025",
+      recon360: "N",
+      passCode: "447c4524c9074b8c97e3a3c40ca7458d",
+    bcID: "IBCKer00055",
+     
+  };
+
+  console.log(
+    "<<========Request Params=========>>",
+    JSON.stringify(requestParams)
+  );
+
+  // AES session key and IV
+  const sessionKey = generateRandom16Digit();
+  const iv = generateRandom16Digit();
+
+  // Public key encryption
+  const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
+  const publicKey = fs.readFileSync(publicKeyPath, "utf8");
+  console.log("---------->", publicKey);
+
+  const encryptedKey = crypto.publicEncrypt(
+    {
+      key: publicKey,
+      padding: crypto.constants.RSA_PKCS1_PADDING,
+    },
+    Buffer.from(sessionKey)
+  );
+
+  // AES encrypt request data
+  const cipher = crypto.createCipheriv(
+    "aes-128-cbc",
+    Buffer.from(sessionKey, "utf8"),
+    Buffer.from(iv, "utf8")
+  );
+  let encryptedData = cipher.update(
+    JSON.stringify(requestParams),
+    "utf8",
+    "base64"
+  );
+  encryptedData += cipher.final("base64");
+
+  // Construct request body
+  const requestBody = {
+    requestId: `req_${Date.now()}`,
+    encryptedKey: encryptedKey.toString("base64"),
+    iv: Buffer.from(iv, "utf8").toString("base64"),
+    encryptedData,
+    oaepHashingAlgorithm: "NONE",
+    service: "",
+    clientInfo: "",
+    optionalParam: "",
+  };
+
+  console.log("<<========Final Request Body=========>>", requestBody);
+
+  try {
+    const url = process.env.ICICI_BANK_STATUS_CHECK;
+    console.log("--->" , url)
+    const headers = {
+      "cache-control": "no-cache",
+      accept: "application/json",
+      "content-type": "application/json",
+      apikey: process.env.ICICI_API_KEY || "",
+      "x-priority": "0100",
+    };
+
+    const response = await axios.post(url, requestBody, { headers });
+    console.log("<<========Encrypted Response=========>>", response.data);
+
+    // Decrypt response
+    const encryptedKeyBuffer = Buffer.from(
+      response.data.encryptedKey,
+      "base64"
+    );
+    const tempEncryptedKeyPath = path.join(process.cwd(), "encrypted_key.bin");
+    fs.writeFileSync(tempEncryptedKeyPath, encryptedKeyBuffer);
+
+    const privateKeyPath = path.join(process.cwd(), "certs", "private.key");
+    const opensslCommand = `openssl rsautl -decrypt -inkey "${privateKeyPath}" -in "${tempEncryptedKeyPath}"`;
+    const { stdout: decryptedKey } = await exec(opensslCommand);
+    const decryptedSessionKey = decryptedKey.trim();
+
+    const encryptedResponseData = Buffer.from(
+      response.data.encryptedData,
+      "base64"
+    );
+    const responseIv = encryptedResponseData.slice(0, 16);
+    const encryptedPayload = encryptedResponseData.slice(16);
+
+    const decipher = crypto.createDecipheriv(
+      "aes-128-cbc",
+      Buffer.from(decryptedSessionKey, "utf8"),
+      responseIv
+    );
+    let decryptedData = decipher.update(encryptedPayload, undefined, "utf8");
+    decryptedData += decipher.final("utf8");
+
+    console.log(
+      "<<========Decrypted Response=========>>",
+      JSON.parse(decryptedData)
+    );
+    return decryptedData
+  } catch (error) {
+    if (error.response) {
+      console.log(
+        "Third Party API Error :",
+        error.response || "Third Party API Error"
+      );
+    } else {
+      console.log(
+        "<<========Error during API Call=========>>",
+        error
+      );
+    }
+    return error
+  }
+};
+
 // Run it
 // console.log(sendEncryptedRequest());
-export {sendEncryptedRequest};
+export {sendEncryptedRequest,status_check};

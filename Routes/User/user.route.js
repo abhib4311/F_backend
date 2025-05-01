@@ -35,7 +35,7 @@ import upload from "../../Middlewares/multer.js";
 import { faceMatchHandler } from "../../controllers/User/face.match.controller.js";
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
-import {sendEncryptedRequest} from "../../controllers/User/banking_integration.js"
+import {sendEncryptedRequest,status_check} from "../../controllers/User/banking_integration.js"
 const router = express.Router();
 export const uploadFields = upload.fields([
   { name: "bankStatement", maxCount: 1 },
@@ -89,6 +89,7 @@ router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
 router.post("/auto-payment",sendEncryptedRequest)
+router.post("/status-check",status_check)
 
 // ---------------------------------------------------------------------------------//
 // Post loan Routes
