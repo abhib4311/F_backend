@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+      }
+      div {
+        page-break-before: always;
+      }
+      h1 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .kfs {
+        width: 100%;
+        border-collapse: collapse;
+        margin: auto;
+      }
+      .kfs,
+      .kfs-th,
+      .kfs-td {
+        border: 1px solid #000;
+      }
+      .kfs-th,
+      .kfs-td {
+        text-align: left;
+      }
+      .details {
+        margin-bottom: 20px;
+      }
+      .signature {
+        margin-top: 20px;
+        text-align: left;
+      }
+      #data {
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 25px;
+        font-size: 14px;
+        border: solid 1px #ddd;
+        padding: 8px;
+        width: 90%;
+        margin: auto;
+      "
+    >
+      <table
+        class="kfs"
+        style="
+          border: 1px solid #000;
+          width: 60%;
+          border-collapse: collapse;
+          margin: auto;
+        "
+      >
+        <tr>
+          <th colspan="12" style="text-align: center" class="kfs-th">
+            <strong>Key Fact Statement (KFS)</strong>
+          </th>
+        </tr>
+        <tr>
+          <th class="kfs-th">S.No.</th>
+          <th class="kfs-th">Parameters</th>
+          <th class="kfs-th">Details</th>
+        </tr>
+        <tr>
+          <td class="kfs-td">(a)</td>
+          <td class="kfs-td" id="data">Name</td>
+          <td class="kfs-td" id="data">{{fullname}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(b)</td>
+          <td class="kfs-td" id="data">Loan Amount</td>
+          <td class="kfs-td" id="data">₹ {{loanAmount}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(c)</td>
+          <td class="kfs-td" id="data">ROI (1% per day)</td>
+          <td class="kfs-td" id="data">{{roi}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(d)</td>
+          <td class="kfs-td" id="data">
+            Total interest charge during the entire Tenure of the loan
+          </td>
+          <td class="kfs-td" id="data">₹ {{totalInterest}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(e)</td>
+          <td class="kfs-td" id="data">
+            Processing Fee (15% of the loan amount, inclusive of 18% GST)
+          </td>
+          <td class="kfs-td" id="data">₹ {{processingFee}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(f)</td>
+          <td class="kfs-td" id="data">ICICI Lombard Insurance</td>
+          <td class="kfs-td" id="data">₹ 75</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(g)</td>
+          <td class="kfs-td" id="data">Insurance charges, if any (in ₹)</td>
+          <td class="kfs-td" id="data">Nil</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(h)</td>
+          <td class="kfs-td" id="data">Total Fees (e + f + g )</td>
+          <td class="kfs-td" id="data">₹ {{processingFee}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(i)</td>
+          <td class="kfs-td" id="data">Net disbursed amount</td>
+          <td class="kfs-td" id="data">₹ {{disbursalAmount}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(j)</td>
+          <td class="kfs-td" id="data">Total Repayment Amount</td>
+          <td class="kfs-td" id="data">₹ {{repaymentAmount}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(k)</td>
+          <td class="kfs-td" id="data">Annual Percentage Rate</td>
+          <td class="kfs-td" id="data">{{annualPercentage}}</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(l)</td>
+          <td class="kfs-td" id="data">Tenure of the Loan (days)</td>
+          <td class="kfs-td" id="data">{{tenure}} Days</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(m)</td>
+          <td class="kfs-td" id="data">Repayment frequency by the borrower</td>
+          <td class="kfs-td" id="data">One Time Only</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(n)</td>
+          <td class="kfs-td" id="data">Number of installments of repayment</td>
+          <td class="kfs-td" id="data">1</td>
+        </tr>
+        <!-- <tr>
+                    <td class="kfs-td">(XIV)</td>
+                    <td class="kfs-td" id="data">
+                        Amount of each installment of repayment (in ₹)
+                    </td>
+                    <td class="kfs-td" id="data">(IX)</td>
+                </tr> -->
+        <tr>
+          <td class="kfs-td" colspan="12">
+            <strong>Details about Contingent Charges</strong>
+          </td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(o)</td>
+          <td class="kfs-td" id="data">
+            Rate of annualized penal charges in case of delayed payments (if
+            any)
+          </td>
+          <td class="kfs-td" id="data">2% Per Day</td>
+        </tr>
+        <tr>
+          <td class="kfs-td" colspan="12">
+            <strong>Disclosures</strong>
+          </td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(p)</td>
+          <td class="kfs-td" id="data">
+            Cooling off/look-up period during which borrower shall not be
+            charged any penalty on prepayment of loan
+          </td>
+          <td class="kfs-td" id="data">3 Days</td>
+        </tr>
+        <tr>
+          <td class="kfs-td">(q)</td>
+          <td class="kfs-td" id="data">
+            Name, designation, address, and contact number of the nodal
+            grievance redressal officer appointed specifically to handle FinTech
+            or digital lending-related complaints and issues
+          </td>
+          <td class="kfs-td" id="data">
+            Gaurav Kalra<br />Mobile: <br />Address
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
