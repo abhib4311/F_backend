@@ -34,12 +34,12 @@ const sendEncryptedRequest = async () => {
     beneIFSC: "KKBK0005310",
     amount: "1",
     tranRefNo: timestamp,
-    tranRefNo: "IMPSTesting04",
-    paymentRef: "IMPSTransferP2B",
+    tranRefNo: "IMPSTesting02",
+    paymentRef: "IMPSTransferP2A",
     senderName: "Girdhar Mishra",
     mobile: "8423197351",
     retailerCode: "rcode",
-    passCode: "447c4524c9074b8c97e3a3c40ca7458e",
+    passCode: "447c4524c9074b8c97e3a3c40ca7458d",
     bcID: "IBCKer00055",
   };
 
@@ -50,7 +50,7 @@ const sendEncryptedRequest = async () => {
 
   // AES session key and IV
   const sessionKey = "1234567890123457";
-  const iv = "1234567890123457";
+  const iv = "1234567890123456";
 
   // Public key encryption
   const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
