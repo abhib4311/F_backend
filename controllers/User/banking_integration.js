@@ -31,19 +31,21 @@ const generateRandom16Digit = () => {
 const sendEncryptedRequest = async () => {
   const timestamp = getCurrentTimestamp();
 
-  const requestParams = {
-    localTxnDtTime: timestamp,
-    beneAccNo: "9547383416",
-    beneIFSC: "KKBK0005310",
-    amount: "1",
-    tranRefNo: timestamp,
-    paymentRef: "IMPSTransferP2A",
-    senderName: "Girdhar Mishra",
-    mobile: "8423197351",
-    retailerCode: "rcode",
-    passCode: "447c4524c9074b8c97e3a3c40ca7458d",
-    bcID: "IBCKer00055",
-  };
+  
+    const requestParams = {
+      "localTxnDtTime": timestamp,
+  "beneAccNo": "123456041",
+  "beneIFSC": "NPCI0000001",
+  "amount": "1.00",
+  "tranRefNo": timestamp,
+  "paymentRef": "IMPSTransferP2A",
+  "senderName": "Pratik Mundhe",
+  "mobile": "9999988888",
+  "retailerCode": "rcode",
+  "passCode": "447c4524c9074b8c97e3a3c40ca7458d",
+  "bcID": "IBCKer00055",
+    };
+  
 
   console.log(
     "<<========Request Params=========>>",

@@ -54,7 +54,7 @@ router.post("/verify-email-otp", authenticateUser, verifyEmailOTP); // Done
 
 // Upload Bank Statement (Step:2)
 router.post("/upload-bank-statement", authenticateUser, uploadBankStatement);
-router.post("/upload-bank-statement", authenticateUser, uploadBankStatement);
+// router.post("/upload-bank-statement", authenticateUser, uploadBankStatement); 
 router.post("/process-bank-statement", authenticateUser, processBankStatement);
 router.post(
   "/callback-bank-statement",
