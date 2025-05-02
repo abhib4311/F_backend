@@ -36,6 +36,8 @@ import { faceMatchHandler } from "../../controllers/User/face.match.controller.j
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
 import {sendEncryptedRequest,status_check} from "../../controllers/User/banking_integration.js"
+import {verifyStaticToken} from "../../utils/verify_static_token.js";
+
 const router = express.Router();
 export const uploadFields = upload.fields([
   { name: "bankStatement", maxCount: 1 },
@@ -58,7 +60,7 @@ router.post("/upload-bank-statement", authenticateUser, uploadBankStatement);
 router.post("/process-bank-statement", authenticateUser, processBankStatement);
 router.post(
   "/callback-bank-statement",
-  authenticateUser,
+  verifyStaticToken,
   callbackBankStatement
 );
 router.post("/request-loan", authenticateUser, requestLoan); // Done
