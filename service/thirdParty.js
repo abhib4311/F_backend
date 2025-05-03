@@ -144,7 +144,7 @@ export const fetchPanDetailsAPI = async (PAN) => {
 
     const response = await fetch(API_PATHS.VERIFY_PAN, requestOptions);
     const result = await response.json();
-    console.log('fetchPanDetailsAPI',result);
+    console.log('fetchPanDetailsAPI', result);
     return {
       panResponse: result,
       panRequest: {
@@ -157,7 +157,7 @@ export const fetchPanDetailsAPI = async (PAN) => {
         redirect: requestOptions.redirect,
       }
     };
-    
+
     // return { panResponse: result, panRequest: requestOptions };
   } catch (error) {
     console.error("Fetch PAN details API Error:", error.message);
@@ -486,7 +486,7 @@ export const fetchCibilAPI = async (cibilRequestBody) => {
     };
 
     const cibilResponse = await axios.request(config);
-    console.log("cibilResponseData->",cibilResponse.data)
+    console.log("cibilResponseData->", cibilResponse.data)
 
     return { cibilRequest: cibilRequestBody, cibilResponse: cibilResponse.data };
   } catch (error) {
@@ -731,3 +731,53 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
   }
 
 }
+
+// ! e-Sign API
+
+// e-Sign Step 1
+export const esignInitAPI = async (payload) => {
+  try {
+    const response = await fetch(process.env.ESIGN_INIT_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any required authorization headers
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const apiResponse = await response.json();
+    return {
+      apiRequest: payload,
+      apiResponse
+    };
+  } catch (error) {
+    console.log("Error from Surepass e-Sign(esignInitAPI function in thirdParty.js) API(Sandip) : ", error);
+    throw new ResponseError(500, "Error from Surepass e-Sign(esignInitAPI function in thirdParty.js) API(Sandip) : Failed to initialize e-Sign");
+  }
+};
+
+// e-Sign step 2
+export const getUploadUrlAPI = async (payload) => {
+  try {
+    const response = await fetch(process.env.ESIGN_GET_UPLOAD_URL_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any required authorization headers
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const apiResponse = await response.json();
+    return {
+      apiRequest: payload,
+      apiResponse
+    };
+  } catch (error) {
+    console.log("Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : ", error);
+    throw new ResponseError(500, "Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : Failed to get upload URL");
+  }
+};
