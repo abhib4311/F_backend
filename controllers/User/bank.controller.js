@@ -457,7 +457,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         ? process.env.BRE_API_URL
         : process.env.BRE_API_URL_DEV;
     const breResponse = await fetch(
-      "https://bre.blinkrloan.com/v1/api/cibil",
+      "http://bre.fundobaba.com/v1/api/cibil",
       breRequestConfig
     );
 
