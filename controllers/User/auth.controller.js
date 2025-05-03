@@ -33,6 +33,7 @@ import { calculateRepaymentDate } from "../../utils/calculateTenure.js";
 
 dotenv.config();
 import asyncHandler from "../../utils/asyncHandler.js";
+import { dummyCIBIL } from '../../constants/dummyCIBIL.js';
 
 const prisma = new PrismaClient();
 
@@ -597,8 +598,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
   console.log("/user/add-employement", req.body);
   const { employee_type, company_name, salary_date, net_salary } = req.body;
   const userId = req.user.id;
-  console.log("userid->",userId);
-
+  // console.log("req.body---->>>",req.body)
   await prisma.$transaction(
     async (prisma) => {
       // Fetch latest lead once and reuse
@@ -676,20 +676,17 @@ export const addEmployement = asyncHandler(async (req, res) => {
 
       const cibilRequestBody = {
         name: fullName,
-       
-        gender: cust.gender?.toLowerCase() === "male" ? "2" : "1",
+        gender: cust.gender?.toLowerCase() === "m" ? "male" : "female",
         pan: cust.pan,
         mobile: cust.mobile,
-        
-        
       };
       
-
+// console.log("cibilRequestBody---->>>",cibilRequestBody)
       // CIBIL API handling
-      const { cibilResponse, cibilRequest } = await fetchCibilAPI(
-        cibilRequestBody
-      );
-      
+      // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
+      //   cibilRequestBody
+      // );
+      const cibilResponse = dummyCIBIL;
 
       // Batch database operations
       const [apiLog, leadLog, updatedLead] = await Promise.all([
@@ -698,7 +695,8 @@ export const addEmployement = asyncHandler(async (req, res) => {
             pan: lead.pan,
             api_type: API_TYPE.CREDIT_REPORT,
             api_provider: 1,
-            api_request: cibilRequest,
+        // api_request: cibilRequest,   FOR REAL CIBIL API call
+            api_request: cibilRequestBody,    //FOR DUMMY CIBIL API call
             api_response: cibilResponse,
             api_status: true,
             lead_id: lead.id,
@@ -717,17 +715,18 @@ export const addEmployement = asyncHandler(async (req, res) => {
           where: { id: lead.id },
           data: {
             lead_stage: LEAD_STAGE.ADD_EMPLOYEMENT,
-            credit_score: cibilScore,
+            credit_score: cibilResponse?.data?.creditScore,
             is_person_salaried: true,
             is_employee_type_filled: true,
-            elegible_loan_amount: 7000,
+            elegible_loan_amount: 7000,     //TODO: change this value based on credit score
+            salary_date: new Date(salary_date),
           },
         }),
         prisma.customer.update({
           where: { id: userId },
           data: {
-            credit_score: cibilScore,
-            employement_type: employee_type.Employee_Type,
+            credit_score: cibilResponse?.data?.creditScore,
+            employement_type: employee_type,
             company_name,
             salary_date: new Date(salary_date),
             net_monthly_salary: parseInt(net_salary),
@@ -745,10 +744,11 @@ export const addEmployement = asyncHandler(async (req, res) => {
       });
 
       return res.status(200).json({
-        cibilScore,
+        credit_score: cibilResponse?.data?.creditScore,
         message: "Employement added successfully",
         current_stage: updatedLead.lead_stage,
         elegible_loan_amount: updatedLead.elegible_loan_amount,
+        cibil_name: cibilResponse?.data?.name,     // TODO: remove this field from response
       });
     },
     { timeout: 30000 }
