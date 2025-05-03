@@ -38,12 +38,28 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 // ✅ Allow frontend origin
-app.use(
-  cors({
-    origin: "http://10.6.24.87:5173", // replace with your frontend URL
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://192.168.11.131:5174", // replace with your frontend URL
+//     credentials: true,
+//   })
+// );
+var corsOption = {
+  origin: [
+    "http://192.168.11.131:5174",
+    "http://192.168.11.131:5174/",
+    "https://blinkrloan.com",
+    "https://www.blinkrloan.com",
+    "https://149.5.61.77",
+    // "http://localhost:5173"
+  ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOption))
 
 // ----------------------------
 // BODY & FILE PARSERS

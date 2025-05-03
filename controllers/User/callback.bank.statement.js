@@ -27,32 +27,32 @@ const downloadBsaCartApi = async (
       },
       body: docId,
     };
-    await new Promise((resolve) => setTimeout(resolve, 6 * 1000));
+    // await new Promise((resolve) => setTimeout(resolve, 6 * 1000));
     let response = await fetch(
       process.env.CARTBI_API_DOWNLOAD_URL,
       downloadRequestConfig
     );
-
+       
     let responseData = await response.json();
 
-    while (responseData.status === "In Progress") {
-      console.log("Waiting for 6 seconds before retrying download...");
-      // Wait for 6 seconds before retrying
-      await new Promise((resolve) => setTimeout(resolve, 6 * 1000));
-      response = await fetch(
-        process.env.CARTBI_API_DOWNLOAD_URL,
-        downloadRequestConfig
-      );
+    // while (responseData.status === "In Progress") {
+    //   console.log("Waiting for 6 seconds before retrying download...");
+    //   // Wait for 6 seconds before retrying
+    //   await new Promise((resolve) => setTimeout(resolve, 6 * 1000));
+    //   response = await fetch(
+    //     process.env.CARTBI_API_DOWNLOAD_URL,
+    //     downloadRequestConfig
+    //   );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new ResponseError(
-          response.status,
-          `Failed to download file from API: HTTP ${response.status}. Response: ${errorText}`
-        );
-      }
-      responseData = await response.json();
-    }
+    //   if (!response.ok) {
+    //     const errorText = await response.text();
+    //     throw new ResponseError(
+    //       response.status,
+    //       `Failed to download file from API: HTTP ${response.status}. Response: ${errorText}`
+    //     );
+    //   }
+    //   responseData = await response.json();
+    // }
     // await asyncThirdPartyApiLogs(
     //   pan,
     //   API_TYPE.BANK_STATEMENT_DOWNLOAD,
@@ -247,6 +247,7 @@ const repaymentDate = (data) => {
 
 const callbackBankStatement = asyncHandler(async (req, res) => {
   try {
+       console.log("sachin",req.body);
     let is_bre_complete = false;
     let is_bsa_complete = false;
     let is_bre_reject = false;
@@ -272,64 +273,64 @@ const callbackBankStatement = asyncHandler(async (req, res) => {
       });
     }
 
-    if (status === "Pending") {
-      return res
-        .status(400)
-        .json({ message: "Req is pending from the customer" });
-    }
-    if (status === "In Progress") {
-      return res.status(400).json({ message: "Req is in progress" });
-    }
+    // if (status === "Pending") {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Req is pending from the customer" });
+    // }
+    // if (status === "In Progress") {
+    //   return res.status(400).json({ message: "Req is in progress" });
+    // }
     if (status === "Processed") {
        
-      const breRequestConfig = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bureauReport.api_response),
-      };
+      // const breRequestConfig = {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(bureauReport.api_response),
+      // };
 
-      const breUrl =
-        process.env.NODE_ENV === "production"
-          ? process.env.BRE_API_URL
-          : process.env.BRE_API_URL_DEV;
-      const breResponse = await fetch(API_PATHS.CIBIL_URL, breRequestConfig);
+      // const breUrl =
+      //   process.env.NODE_ENV === "production"
+      //     ? process.env.BRE_API_URL
+      //     : process.env.BRE_API_URL_DEV;
+      // const breResponse = await fetch(API_PATHS.CIBIL_URL, breRequestConfig);
 
-      if (!breResponse.ok) {
-        throw new ResponseError(breResponse.status, `Something went wrong!`);
-      }
+      // if (!breResponse.ok) {
+      //   throw new ResponseError(breResponse.status, `Something went wrong!`);
+      // }
 
       // await asyncLeadLogs(userId, leadId, pan, "BRE Ran Successfully");
-      const breResponseData = await breResponse.json();
+      // const breResponseData = await breResponse.json();
 
-      if (breResponseData.finalDecision === "REJECT") {
-        is_bre_complete = true;
-        is_bre_reject = true;
-      }
+      // if (breResponseData.finalDecision === "REJECT") {
+      //   is_bre_complete = true;
+      //   is_bre_reject = true;
+      // }
 
-      await asyncLeadLogs(
-        userId,
-        leadId,
-        pan,
-        "BRE Ran Successfully : " + breResponseData.finalDecision
-      );
+      // await asyncLeadLogs(
+      //   userId,
+      //   leadId,
+      //   pan,
+      //   "BRE Ran Successfully : " + breResponseData.finalDecision
+      // );
 
-      await prisma.api_Logs.create({
-        data: {
-          customer_id: userId,
-          lead_id: lead.id,
-          pan: pan,
-          api_type: "BRE",
-          api_response: {
-            is_success: true,
-            apimsg: breResponseData,
-          },
-          api_provider: 0,
-          api_request: breRequestConfig,
-          api_status: breResponse.ok,
-        },
-      });
+      // await prisma.api_Logs.create({
+      //   data: {
+      //     customer_id: userId,
+      //     lead_id: lead.id,
+      //     pan: pan,
+      //     api_type: "BRE",
+      //     api_response: {
+      //       is_success: true,
+      //       apimsg: breResponseData,
+      //     },
+      //     api_provider: 0,
+      //     api_request: breRequestConfig,
+      //     api_status: breResponse.ok,
+      //   },
+      // });
 
       const downloadResponse = await downloadBsaCartApi(
         docId
@@ -337,6 +338,7 @@ const callbackBankStatement = asyncHandler(async (req, res) => {
         //   userId,
         //   leadId
       );
+      console.log("bsa report",downloadResponse);
 
       if (downloadResponse.status === "Rejected") {
         return res.status(400).json({

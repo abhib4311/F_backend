@@ -597,6 +597,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
   console.log("/user/add-employement", req.body);
   const { employee_type, company_name, salary_date, net_salary } = req.body;
   const userId = req.user.id;
+  console.log("userid->",userId);
 
   await prisma.$transaction(
     async (prisma) => {
