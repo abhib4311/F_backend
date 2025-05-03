@@ -368,18 +368,16 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       orderBy: {
         created_at: "desc",
       },
-    });
+    }).then(console.log("bureauReport---->>>PULLED FROM DB"));
 
-    console.log("Pulling Bureau Report from DB");
-    if (!bureauReport.api_response.is_success) {
+    if (!bureauReport.api_response.success) {
       return res
         .status(400)
         .json({ message: "Bureau was not pulled correctly" });
     }
 
     const score =
-      bureauReport?.api_response?.apimsg?.consumerCreditData[0]?.scores[0]
-        ?.score || null;
+      bureauReport?.api_response?.data?.credit_score || null;
     if (!score) {
       return res
         .status(400)
