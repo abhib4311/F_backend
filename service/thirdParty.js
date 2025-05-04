@@ -43,7 +43,7 @@ export const sendOtpAPI = async (phone_number) => {
       );
     }
   }
-};
+};  // SUREPASS OTP API
 
 
 // Verify OTP API
@@ -85,7 +85,7 @@ export const verifyOtpAPI = async (otp, request_id) => {
       );
     }
   }
-};
+}; // SUREPASS OTP API
 
 // Fetch Mobile Details API
 export const fetchMobileDetailsAPI = async (request_id) => {
@@ -122,7 +122,7 @@ export const fetchMobileDetailsAPI = async (request_id) => {
       );
     }
   }
-};
+}; // PERFIOS API
 
 // Fetch PAN Details API
 export const fetchPanDetailsAPI = async (PAN) => {
@@ -173,7 +173,7 @@ export const fetchPanDetailsAPI = async (PAN) => {
       );
     }
   }
-};
+}; // SUREPASS PAN API
 
 // Send OTP on Email
 export const sendEmailOtpAPI = async (email, employeeName) => {
@@ -220,7 +220,7 @@ export const sendEmailOtpAPI = async (email, employeeName) => {
       );
     }
   }
-};
+}; //PERFIOS API
 
 // Verif Email OTP
 export const verifyEmailOtpAPI = async (otp, request_id) => {
@@ -257,44 +257,44 @@ export const verifyEmailOtpAPI = async (otp, request_id) => {
       );
     }
   }
-};
+};  // PERFIOS API
 
 // validate Office Email API
-export const validateEmailAPI = async (email) => {
-  try {
-    let data = JSON.stringify({
-      email: email,
-      consent: "Y",
-    });
+// export const validateEmailAPI = async (email) => {
+//   try {
+//     let data = JSON.stringify({
+//       email: email,
+//       consent: "Y",
+//     });
 
-    let config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: process.env.VALIDATE_OFFICE_EMAIL,
-      headers: {
-        "x-karza-key": process.env.KARZA_API_KEY,
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
+//     let config = {
+//       method: "post",
+//       maxBodyLength: Infinity,
+//       url: process.env.VALIDATE_OFFICE_EMAIL,
+//       headers: {
+//         "x-karza-key": process.env.KARZA_API_KEY,
+//         "Content-Type": "application/json",
+//       },
+//       data: data,
+//     };
 
-    const response = await axios.request(config);
-    return { otpResponse: response.data, otpRequest: config };
-  } catch (error) {
-    console.error("Validate Office Email API Error:", error);
-    if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
-    } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
-    }
-  }
-};
+//     const response = await axios.request(config);
+//     return { otpResponse: response.data, otpRequest: config };
+//   } catch (error) {
+//     console.error("Validate Office Email API Error:", error);
+//     if (error.response) {
+//       throw new ResponseError(
+//         error.response.status || 500,
+//         error.response.data?.error || 'Third-Party API returned an error'
+//       );
+//     } else {
+//       throw new ResponseError(
+//         500,
+//         error.message || 'Failed to connect to Third-Party API'
+//       );
+//     }
+//   }
+// };  //PERFIOS API
 
 // Send Aadhaar OTP API
 export const sendAadhaarOtpAPI = async (aadhaar) => {
@@ -331,7 +331,7 @@ export const sendAadhaarOtpAPI = async (aadhaar) => {
       );
     }
   }
-};
+};  //PERFIOS API
 
 // Validate Aadhaar API
 export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
@@ -369,7 +369,7 @@ export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
       );
     }
   }
-};
+};  //PERFIOS API
 
 export const fetchOnGridAddress = async (mobile) => {
   try {
@@ -422,46 +422,10 @@ export const fetchOnGridAddress = async (mobile) => {
 
     throw new ResponseError(statusCode, message);
   }
-};
+};  //ONGRID API
 
 
 // esign document return API
-// export const esignDocAPI = async (document_id) => {
-//   try {
-//     let data = JSON.stringify({
-//       "documentId": document_id
-//     });
-
-//     let config = {
-//       method: 'post',
-//       maxBodyLength: Infinity,
-//       url: process.env.ESIGN_DOWNLOAD_FILE,
-//       headers: {
-//         'x-karza-key': process.env.KARZA_API_KEY,
-//         'Content-Type': 'application/json'
-//       },
-//       data: data
-//     };
-//     const response = await axios.request(config);
-//     return { apiRequest: config, apiResponse: response.data };
-
-//   } catch (error) {
-//     console.log("esign Doc API Error : ", error)
-//     if (error.response) {
-//       throw new ResponseError(
-//         error.response.status || 500,
-//         error.response.data?.error || 'Third-Party API returned an error'
-//       );
-//     } else {
-//       throw new ResponseError(
-//         500,
-//         error.message || 'Failed to connect to Third-Party API'
-//       );
-//     }
-//   }
-
-// };
-// fetch CIBIL API
 
 
 export const fetchCibilAPI = async (cibilRequestBody) => {
@@ -504,7 +468,7 @@ export const fetchCibilAPI = async (cibilRequestBody) => {
       );
     }
   }
-};
+};  // SUREPASS CIBIL API
 
 
 export const sanctionAPI = async (base64_encoded, full_name, personal_email, mobile, lead_id) => {
@@ -558,7 +522,7 @@ export const sanctionAPI = async (base64_encoded, full_name, personal_email, mob
 
   }
 
-};
+}; //PERFIOS API
 
 // Disburse Loan API
 export const disburseLoanAPI = async (data) => {
@@ -591,7 +555,7 @@ export const disburseLoanAPI = async (data) => {
       },
     };
   }
-};
+}; // ICICI API
 
 export const fetchLocationAPI = async (lat, lng) => {
   try {
@@ -651,7 +615,7 @@ export const fetchLocationAPI = async (lat, lng) => {
     // Wrap unexpected errors in a ResponseError
     throw new ResponseError(500, error.message || "Internal Server Error: Unable to fetch location details");
   };
-}
+}// GOOGLE MAPS API
 
 // surepass API aadhaar-kyc step - 1
 export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
@@ -667,13 +631,13 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
       url: process.env.SEND_AADHAAR_OTP_SUREPASS,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       data: data
     };
 
     const response = await axios.request(config)
-    return response;
+    return response.data;
   }
   catch (error) {
     console.log("Send Aadhaar API Error : ", error)
@@ -707,7 +671,7 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
       url: process.env.VALIDATE_ADDHAAR_OTP_SUREPASS,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       data: data
     };
@@ -737,15 +701,17 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
 // e-Sign Step 1
 export const esignInitAPI = async (payload) => {
   try {
+    console.log("esignInitAPI payload", payload)
     const response = await fetch(process.env.ESIGN_INIT_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // Add any required authorization headers
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });
+    console.log("esignInitAPI response", response.status)
 
     const apiResponse = await response.json();
     return {
@@ -753,10 +719,10 @@ export const esignInitAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("Error from Surepass e-Sign(esignInitAPI function in thirdParty.js) API(Sandip) : ", error);
+    console.log("error----->: ", error?.message);
     throw new ResponseError(500, "Error from Surepass e-Sign(esignInitAPI function in thirdParty.js) API(Sandip) : Failed to initialize e-Sign");
   }
-};
+}; //SUREPASS API
 
 // e-Sign step 2
 export const getUploadUrlAPI = async (payload) => {
@@ -766,7 +732,7 @@ export const getUploadUrlAPI = async (payload) => {
       headers: {
         'Content-Type': 'application/json',
         // Add any required authorization headers
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });
@@ -777,36 +743,32 @@ export const getUploadUrlAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : ", error);
+    console.log("Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : ", error.message);
     throw new ResponseError(500, "Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : Failed to get upload URL");
   }
-};
+}; //SUREPASS API
 
 export const esignDocAPI = async (document_id) => {
   try {
-    const url = `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`;
-    console.log("esign Doc API URL :==================> ", url);
+    let data = JSON.stringify({
+      "documentId": document_id
+    });
 
-    const requestOptions = {
-      method: 'GET',
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`,
       headers: {
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
         'Content-Type': 'application/json'
       },
+      data: data
     };
-
-    console.log("esign Doc API Request :==================> ", requestOptions);
-    const response = await fetch(url, requestOptions);
-    const data = await response.json();
-    console.log("esign Doc API Response :==================> ", data);
-
-    return {
-      apiRequest: requestOptions,
-      apiResponse: data
-    };
+    const response = await axios.request(config);
+    return { apiRequest: config, apiResponse: response.data };
 
   } catch (error) {
-    console.log("esign Doc API Error : ", error?.message);
+    console.log("esign Doc API Error : ", error)
     if (error.response) {
       throw new ResponseError(
         error.response.status || 500,
@@ -819,7 +781,5 @@ export const esignDocAPI = async (document_id) => {
       );
     }
   }
+
 };// PERFIOS API
-
-
-
