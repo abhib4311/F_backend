@@ -301,7 +301,7 @@ model Document {
   id            Int      @id @default(autoincrement())
   pan           String?
   document_type String?
-  document_url  String?
+  document_url  String?  @db.VarChar(1000)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   remarks       String?
