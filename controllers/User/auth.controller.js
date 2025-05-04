@@ -98,10 +98,10 @@ export const sendOTP = asyncHandler(async (req, res) => {
     const isServiceable = await prisma.serviceable_pin_code.findFirst({
       where: { pincode },
     });
-
-    if (!isServiceable) {
-      throw new ResponseError(400, `Area ${pincode} not serviceable`);
-    }
+    console.log("isServiceable---->", pincode, isServiceable)
+    // if (!isServiceable) {
+    //   throw new ResponseError(400, `Area ${pincode} not serviceable`);
+    // }
   }
 
   // Send OTP
@@ -226,8 +226,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
           ? panDetails?.gender.toUpperCase() === "M"
             ? Gender.M
             : panDetails?.gender.toUpperCase() === "F"
-            ? Gender.F
-            : Gender.O
+              ? Gender.F
+              : Gender.O
           : null,
         dob: new Date(panDetails?.dob) || null,
         mobile: phone_number,
@@ -248,8 +248,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
           ? panDetails?.gender.toUpperCase() === "M"
             ? Gender.M
             : panDetails?.gender.toUpperCase() === "F"
-            ? Gender.F
-            : Gender.O
+              ? Gender.F
+              : Gender.O
           : null,
         dob: new Date(panDetails?.dob) || null,
         lead_stage: LEAD_STAGE.COMPLETE_REGISTRATION,
@@ -680,8 +680,8 @@ export const addEmployement = asyncHandler(async (req, res) => {
         pan: cust.pan,
         mobile: cust.mobile,
       };
-      
-// console.log("cibilRequestBody---->>>",cibilRequestBody)
+
+      // console.log("cibilRequestBody---->>>",cibilRequestBody)
       // CIBIL API handling
       // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
       //   cibilRequestBody
@@ -695,7 +695,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
             pan: lead.pan,
             api_type: API_TYPE.CREDIT_REPORT,
             api_provider: 1,
-        // api_request: cibilRequest,   FOR REAL CIBIL API call
+            // api_request: cibilRequest,   FOR REAL CIBIL API call
             api_request: cibilRequestBody,    //FOR DUMMY CIBIL API call
             api_response: cibilResponse,
             api_status: true,
