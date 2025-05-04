@@ -6,7 +6,7 @@ import { uploadSanctionLetterS3 } from "../../utils/uploadSanction.js";
 import { ADDRESS_SOURCE, API_TYPE, COUNTRY, DOCUMENT_TYPE, LEAD_STAGE } from "../../constants/constants.js";
 import { ResponseError } from '../../utils/responseError.js'
 import { addressFormatter } from "../../utils/addressFormatter.js"
-import _  from 'lodash';
+import _ from 'lodash';
 
 dotenv.config();
 import {
@@ -333,6 +333,7 @@ const Initiatekyc = asyncHandler(async (req, res) => {
 
   // API call
   const otpResponse = await sendAadhaarOtpAPISurePass(aadhaarNo);
+  console.log("otpResponse---->", otpResponse)
   if (otpResponse?.status_code != '200') handleSurepassResponse(otpResponse);
 
   // Transaction block
@@ -459,7 +460,7 @@ const submitotp = asyncHandler(async (req, res) => {
     ]);
 
     // const bankDummyData = { beneficiary_name: "Mr. Uvesh" }
-    console.log("panDetails.api_response, aadharDetails.api_response",panDetails.api_response, aadharDetails.api_response);
+    console.log("panDetails.api_response, aadharDetails.api_response", panDetails.api_response, aadharDetails.api_response);
     // Validation logic
     const validateData = validatePANwithAadhaar(panDetails.api_response, aadharDetails.api_response);
     if (!validateData.isValid) {
