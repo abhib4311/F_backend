@@ -634,7 +634,7 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
       },
       data: data
     };
-
+    console.log("config----->", config)
     const response = await axios.request(config)
     console.log("response----->", response.data)
     return response.data;

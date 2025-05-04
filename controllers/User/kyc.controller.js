@@ -331,6 +331,7 @@ const Initiatekyc = asyncHandler(async (req, res) => {
   if (!lead.is_loan_requested) throw new ResponseError(400, "Please request your loan first");
   if (lead.is_kyc_approved) throw new ResponseError(400, "Your KYC is already approved");
 
+  console.log("aadhaarNo---->KYC CALL", aadhaarNo)
   // API call
   const otpResponse = await sendAadhaarOtpAPISurePass(aadhaarNo);
   console.log("otpResponse---->", otpResponse?.status_code)
