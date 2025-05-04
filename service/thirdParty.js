@@ -426,41 +426,41 @@ export const fetchOnGridAddress = async (mobile) => {
 
 
 // esign document return API
-export const esignDocAPI = async (document_id) => {
-  try {
-    let data = JSON.stringify({
-      "documentId": document_id
-    });
+// export const esignDocAPI = async (document_id) => {
+//   try {
+//     let data = JSON.stringify({
+//       "documentId": document_id
+//     });
 
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: process.env.ESIGN_DOWNLOAD_FILE,
-      headers: {
-        'x-karza-key': process.env.KARZA_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      data: data
-    };
-    const response = await axios.request(config);
-    return { apiRequest: config, apiResponse: response.data };
+//     let config = {
+//       method: 'post',
+//       maxBodyLength: Infinity,
+//       url: process.env.ESIGN_DOWNLOAD_FILE,
+//       headers: {
+//         'x-karza-key': process.env.KARZA_API_KEY,
+//         'Content-Type': 'application/json'
+//       },
+//       data: data
+//     };
+//     const response = await axios.request(config);
+//     return { apiRequest: config, apiResponse: response.data };
 
-  } catch (error) {
-    console.log("esign Doc API Error : ", error)
-    if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
-    } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
-    }
-  }
+//   } catch (error) {
+//     console.log("esign Doc API Error : ", error)
+//     if (error.response) {
+//       throw new ResponseError(
+//         error.response.status || 500,
+//         error.response.data?.error || 'Third-Party API returned an error'
+//       );
+//     } else {
+//       throw new ResponseError(
+//         500,
+//         error.message || 'Failed to connect to Third-Party API'
+//       );
+//     }
+//   }
 
-};
+// };
 // fetch CIBIL API
 
 
@@ -782,6 +782,44 @@ export const getUploadUrlAPI = async (payload) => {
   }
 };
 
+export const esignDocAPI = async (document_id) => {
+  try {
+    const url = `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`;
+    console.log("esign Doc API URL :==================> ", url);
+
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    console.log("esign Doc API Request :==================> ", requestOptions);
+    const response = await fetch(url, requestOptions);
+    const data = await response.json();
+    console.log("esign Doc API Response :==================> ", data);
+
+    return {
+      apiRequest: requestOptions,
+      apiResponse: data
+    };
+
+  } catch (error) {
+    console.log("esign Doc API Error : ", error?.message);
+    if (error.response) {
+      throw new ResponseError(
+        error.response.status || 500,
+        error.response.data?.error || 'Third-Party API returned an error'
+      );
+    } else {
+      throw new ResponseError(
+        500,
+        error.message || 'Failed to connect to Third-Party API'
+      );
+    }
+  }
+};// PERFIOS API
 
 
 

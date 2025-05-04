@@ -701,8 +701,9 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   }
 
   // // API call and parallel processing
-  // const { apiResponse, apiRequest } = await esignDocAPI(pendingSanction.document_id);
-  // if (apiResponse?.statusCode != "101") handleThirdPartyResponse(apiResponse);
+  const { apiRequest, apiResponse } = await esignDocAPI(pendingSanction.document_id);
+  console.log("apiResponse---->", apiResponse)
+  if (apiResponse?.status_code != "200") handleThirdPartyResponse(apiResponse);
 
   await prisma.$transaction(async (prisma) => {
     // Cache reusable values
@@ -731,7 +732,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
     //     "application/pdf"
     //   )
     // ]);
-    fileURL = "https://www.google.com";
+    const fileURL = apiResponse.data.url;
     // Sequential dependent operations
     await prisma.document.create({
       data: {
@@ -1058,3 +1059,5 @@ export const getCongratulationPageDetails = asyncHandler(async (req, res) => {
   });
 });
 
+
+// Done
