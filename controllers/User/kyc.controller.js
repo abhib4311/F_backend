@@ -333,7 +333,7 @@ const Initiatekyc = asyncHandler(async (req, res) => {
 
   // API call
   const otpResponse = await sendAadhaarOtpAPISurePass(aadhaarNo);
-  console.log("otpResponse---->", otpResponse)
+  console.log("otpResponse---->", otpResponse?.status_code)
   if (otpResponse?.status_code != '200') handleSurepassResponse(otpResponse);
 
   // Transaction block
