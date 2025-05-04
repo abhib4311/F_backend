@@ -313,11 +313,11 @@ const Initiatekyc = asyncHandler(async (req, res) => {
   const { aadhaarNo } = req.body;
   const userId = req.user.id;
 
-  // Validation checks
+  // // Validation checks
   if (!aadhaarNo) throw new ResponseError(400, "Please provide Aadhaar Number");
   if (!aadhaarRegex.test(aadhaarNo)) throw new ResponseError(400, "Invalid Aadhaar format");
 
-  // Parallel data fetching
+  // // Parallel data fetching
   const [user, lead] = await Promise.all([
     prisma.customer.findUnique({ where: { id: userId } }),
     prisma.lead.findFirst({
@@ -345,7 +345,7 @@ const Initiatekyc = asyncHandler(async (req, res) => {
       }),
       prisma.lead_Logs.create({
         data: {
-          customer_id: userId,
+          customer_id: user.id,
           lead_id: lead.id,
           pan: user.pan,
           remarks: "Send Aadhaar OTP",

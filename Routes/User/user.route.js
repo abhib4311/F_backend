@@ -68,6 +68,7 @@ router.post("/request-loan", authenticateUser, requestLoan); // Done
 // ---------------------------------------------------------------------------------//
 // E-KYC (Step:3)
 router.post("/initiate-kyc", authenticateUser, Initiatekyc); // Done
+// router.post("/initiate-kyc", Initiatekyc); // Done
 router.post("/submit-aadhar-otp", authenticateUser, submitotp); // Done
 router.post("/face-match", authenticateUser, faceMatchHandler);
 

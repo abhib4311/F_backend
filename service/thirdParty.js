@@ -620,31 +620,32 @@ export const fetchLocationAPI = async (lat, lng) => {
 // surepass API aadhaar-kyc step - 1
 export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
   try {
-    const response = await fetch(process.env.SEND_AADHAAR_OTP_SUREPASS, {
-      method: 'POST',
+
+    let data = JSON.stringify({
+      id_number: aadhaar
+    });
+
+    let config = {
+      method: 'post',
+      url: process.env.SEND_AADHAAR_OTP_SUREPASS,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
-      body: JSON.stringify({
-        id_number: aadhaar
-      })
-    });
+      data: data
+    };
 
-    // if (!response.ok) {
-    //   throw new ResponseError(
-    //     response.status,
-    //     'Third-Party API returned an error'
-    //   );
-    // }
-
-    const data = await response.json();
-    return data;
+    const response = await axios.request(config)
+    console.log("response----->", response.data)
+    return response.data;
   }
   catch (error) {
     console.log("Send Aadhaar API Error : ", error?.message)
-    if (error instanceof ResponseError) {
-      throw error;
+    if (error.response) {
+      throw new ResponseError(
+        error.response.status || 500,
+        error.response.data?.error || 'Third-Party API returned an error'
+      );
     } else {
       throw new ResponseError(
         500,
@@ -652,6 +653,7 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
       );
     }
   }
+
 };
 
 // surepass API aadhaar-kyc step - 2
