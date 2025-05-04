@@ -14,7 +14,9 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
     tenure,
     apr
   } = sanction_detail;
-  const { full_name } = user_detail;
+  const { full_name } = { full_name: "abhishek" };
+  // const { full_name } = user_detail;
+
 
   const date = new Date(repayment_date);
   const day = String(date.getDate()).padStart(2, "0");

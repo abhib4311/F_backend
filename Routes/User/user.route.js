@@ -35,8 +35,8 @@ import upload from "../../Middlewares/multer.js";
 import { faceMatchHandler } from "../../controllers/User/face.match.controller.js";
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
-import {sendEncryptedRequest,status_check} from "../../controllers/User/banking_integration.js"
-import {verifyStaticToken} from "../../utils/verify_static_token.js";
+import { sendEncryptedRequest, status_check } from "../../controllers/User/banking_integration.js"
+import { verifyStaticToken } from "../../utils/verify_static_token.js";
 
 const router = express.Router();
 export const uploadFields = upload.fields([
@@ -74,7 +74,9 @@ router.post("/face-match", authenticateUser, faceMatchHandler);
 // ---------------------------------------------------------------------------------//
 // Preview Sanction (Step:4)
 router.get("/loan-details", authenticateUser, getLoanDetails); // Done
-router.post("/preview-sanction", authenticateUser, previewSanction); // Done
+router.post("/preview-sanction",
+  authenticateUser,
+  previewSanction); // Done
 router.post("/redirect-url", authenticateUser, redirectUrl); // Done
 // router.post("/disbursed", authenticateUser, disbursed); // Done
 router.get(
@@ -90,8 +92,8 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
-router.post("/auto-payment",sendEncryptedRequest)
-router.post("/status-check",status_check)
+router.post("/auto-payment", sendEncryptedRequest)
+router.post("/status-check", status_check)
 
 // ---------------------------------------------------------------------------------//
 // Post loan Routes

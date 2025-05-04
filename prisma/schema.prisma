@@ -43,7 +43,6 @@ model Lead {
   is_office_email_verify   Boolean?     @default(false)
   is_employee_type_filled  Boolean?     @default(false)
   is_loan_requested        Boolean?     @default(false)
-  is_face_matched          Boolean?     @default(false)
   address                  String?
   state                    String?
   country                  String?
@@ -74,6 +73,7 @@ model Lead {
   is_feedback_submitted    Boolean?     @default(false)
   is_reference_added       Boolean?     @default(false)
   salary_date              DateTime?
+  is_face_matched          Boolean?     @default(false)
   collection               Collection[]
   disbursal                Disbursal?
   sanction                 Sanction?
