@@ -45,7 +45,8 @@ var corsOption = {
     "https://blinkrloan.com",
     "https://www.blinkrloan.com",
     "https://149.5.61.77",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    process.env.FRONTEND_URL
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
