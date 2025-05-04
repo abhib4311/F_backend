@@ -620,27 +620,24 @@ export const fetchLocationAPI = async (lat, lng) => {
 // surepass API aadhaar-kyc step - 1
 export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
   try {
-
-    let data = JSON.stringify({
-      id_number: aadhaar
-    });
-
-    let config = {
-      method: 'post',
-      url: process.env.SEND_AADHAAR_OTP_SUREPASS,
+    console.log("aadhaar----->KYC________", aadhaar)
+    const response = await fetch(process.env.SEND_AADHAAR_OTP_SUREPASS, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
-      data: data
-    };
-    console.log("config----->", config)
-    const response = await axios.request(config)
-    console.log("response----->", response.data)
-    return response.data;
+      body: JSON.stringify({
+        id_number: aadhaar
+      })
+    });
+
+    const data = await response.json();
+    console.log("response----->", data);
+    return data;
   }
   catch (error) {
-    console.log("Send Aadhaar API Error : ", error?.message)
+    console.log("Send Aadhaar API Error : ", error?.message);
     if (error.response) {
       throw new ResponseError(
         error.response.status || 500,
@@ -653,7 +650,6 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
       );
     }
   }
-
 };
 
 // surepass API aadhaar-kyc step - 2
