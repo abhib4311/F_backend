@@ -218,16 +218,15 @@ export const login = async (req, res) => {
       },
     });
     //  Response with data
-    res.status(200).cookie(
+    res.cookie(
       "employee_jwt",
       token,
       {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day 
+        expires: new Date(Date.now() + 8 * 3600000),
       }
-    ).json({
+    );
+
+    res.status(200).json({
       message: "Logged in successfully",
       token,
       employee: {
