@@ -222,7 +222,10 @@ export const login = async (req, res) => {
       "employee_jwt",
       token,
       {
-        expires: new Date(Date.now() + 8 * 3600000),
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day 
       }
     );
 

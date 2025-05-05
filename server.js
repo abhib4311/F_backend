@@ -46,7 +46,9 @@ var corsOption = {
     "https://www.blinkrloan.com",
     "https://149.5.61.77",
     "http://localhost:5173",
-    process.env.FRONTEND_URL
+    "https://fundobaba.com",
+    process.env.FRONTEND_URL,
+    process.env.FRONTEND_URL_DEV
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
