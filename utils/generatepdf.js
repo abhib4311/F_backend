@@ -64,4 +64,3 @@ const generatepdf = async (html, options = {}) => {
 };
 
 export default generatepdf;
-
