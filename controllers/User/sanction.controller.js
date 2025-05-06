@@ -536,15 +536,15 @@ export const previewSanction = asyncHandler(async (req, res) => {
     footerImageBase64
   );
 
-  console.log("sanction_html_page---->", sanction_html_page); 
+  console.log("sanction_html_page---->", sanction_html_page);
   const pdfBuffer = await generatepdf(sanction_html_page);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
   // console.log(pdfBuffer);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
-  if(!pdfBuffer) {
-    return res.status(400).json({message: "pdfBuffer is not generated"})
+  if (!pdfBuffer) {
+    return res.status(400).json({ message: "pdfBuffer is not generated" })
   }
-  console.log("---------------- PDF BUFFER" , pdfBuffer);
+  console.log("---------------- PDF BUFFER", pdfBuffer);
 
   // Create a Blod/File from the buffer
   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
@@ -609,7 +609,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   console.log("uploadFields---->", uploadFields);
 
   if (pdfFile) {
-    console.log("pdfFile---->" , pdfFile);
+    console.log("pdfFile---->", pdfFile);
   }
 
 
@@ -631,79 +631,79 @@ export const previewSanction = asyncHandler(async (req, res) => {
   }
 
   // Update database records
-  // await prisma.$transaction(async (prisma) => {
-  //   await prisma.sanction.update({
-  //     where: { id: existingSanction.id },
-  //     data: {
-  //       is_eSign_pending: true,
-  //       document_id: clientId,
-  //     },
-  //   });
-  // await prisma.$transaction(async (prisma) => {
-  //   await prisma.sanction.update({
-  //     where: { id: existingSanction.id },
-  //     data: {
-  //       is_eSign_pending: true,
-  //       document_id: clientId,
-  //     },
-  //   });
+  await prisma.$transaction(async (prisma) => {
+    await prisma.sanction.update({
+      where: { id: existingSanction.id },
+      data: {
+        is_eSign_pending: true,
+        document_id: clientId,
+      },
+    });
+    await prisma.$transaction(async (prisma) => {
+      await prisma.sanction.update({
+        where: { id: existingSanction.id },
+        data: {
+          is_eSign_pending: true,
+          document_id: clientId,
+        },
+      });
 
-  //   await prisma.api_Logs.create({
-  //     data: {
-  //       pan: user.pan,
-  //       api_type: API_TYPE.ESIGN_API,
-  //       api_provider: 1,
-  //       api_request: initRequest,
-  //       api_response: initResponse,
-  //       api_status: true,
-  //       lead_id: lead_detail.id,
-  //       customer_id: user.id,
-  //     },
-  //   });
-  //   await prisma.api_Logs.create({
-  //     data: {
-  //       pan: user.pan,
-  //       api_type: API_TYPE.ESIGN_API,
-  //       api_provider: 1,
-  //       api_request: initRequest,
-  //       api_response: initResponse,
-  //       api_status: true,
-  //       lead_id: lead_detail.id,
-  //       customer_id: user.id,
-  //     },
-  //   });
+      await prisma.api_Logs.create({
+        data: {
+          pan: user.pan,
+          api_type: API_TYPE.ESIGN_API,
+          api_provider: 1,
+          api_request: initRequest,
+          api_response: initResponse,
+          api_status: true,
+          lead_id: lead_detail.id,
+          customer_id: user.id,
+        },
+      });
+      await prisma.api_Logs.create({
+        data: {
+          pan: user.pan,
+          api_type: API_TYPE.ESIGN_API,
+          api_provider: 1,
+          api_request: initRequest,
+          api_response: initResponse,
+          api_status: true,
+          lead_id: lead_detail.id,
+          customer_id: user.id,
+        },
+      });
 
-  //   await prisma.lead.update({
-  //     where: { id: lead_detail.id },
-  //     data: {
-  //       lead_stage: LEAD_STAGE.SANCTION_PENDING,
-  //     },
-  //   });
-  //   await prisma.lead.update({
-  //     where: { id: lead_detail.id },
-  //     data: {
-  //       lead_stage: LEAD_STAGE.SANCTION_PENDING,
-  //     },
-  //   });
+      await prisma.lead.update({
+        where: { id: lead_detail.id },
+        data: {
+          lead_stage: LEAD_STAGE.SANCTION_PENDING,
+        },
+      });
+      await prisma.lead.update({
+        where: { id: lead_detail.id },
+        data: {
+          lead_stage: LEAD_STAGE.SANCTION_PENDING,
+        },
+      });
 
-  //   await prisma.lead_Logs.create({
-  //     data: {
-  //       customer_id: user.id,
-  //       lead_id: lead_detail.id,
-  //       pan: user.pan,
-  //       remarks: "Sending for e-Sign"
-  //     },
-  //   });
-  // }, { timeout: 30000 });
-  //   await prisma.lead_Logs.create({
-  //     data: {
-  //       customer_id: user.id,
-  //       lead_id: lead_detail.id,
-  //       pan: user.pan,
-  //       remarks: "Sending for e-Sign"
-  //     },
-  //   });
-  // }, { timeout: 30000 });
+      await prisma.lead_Logs.create({
+        data: {
+          customer_id: user.id,
+          lead_id: lead_detail.id,
+          pan: user.pan,
+          remarks: "Sending for e-Sign"
+        },
+      });
+    }, { timeout: 30000 });
+    await prisma.lead_Logs.create({
+      data: {
+        customer_id: user.id,
+        lead_id: lead_detail.id,
+        pan: user.pan,
+        remarks: "Sending for e-Sign"
+      },
+    });
+  }, { timeout: 30000 });
 
   // Return the e-Sign URL to frontend
   console.log("clientId---->", clientId);
@@ -795,7 +795,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
     //     "application/pdf"
     //   )
     // ]);
-    fileURL = apiResponse?.url; 
+    fileURL = apiResponse?.url;
     // Sequential dependent operations
     await prisma.document.create({
       data: {
