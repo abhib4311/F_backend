@@ -1348,7 +1348,7 @@ export const getDocument = async (req, res) => {
 
 export const presignedUrl = async (req, res) => {
     try {
-        const s3Url = req.body.document_url;
+        const s3Url = req.query.document_url;
 
         // Validate input
         if (!s3Url || typeof s3Url !== 'string') {
