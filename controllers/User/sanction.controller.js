@@ -773,6 +773,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Sanction letter generated and saved successfully",
+    disburseLoanAmount: pendingSanction.net_disbursal,
     data: { document_url: fileURL }
   });
 });
