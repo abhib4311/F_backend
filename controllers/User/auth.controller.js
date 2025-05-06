@@ -621,6 +621,8 @@ export const addEmployement = asyncHandler(async (req, res) => {
       //  console.log("cibilResponse---->>>", cibilResponse);
       // }
       const cibilResponse = dummyCIBIL;
+      console.log("cibilResponse---->>>", cibilResponse?.data?.credit_score);
+      console.log("cibilResponse---->>> type", typeof(cibilResponse?.data?.credit_score)); 
 
       // Batch database operations
       const [apiLog, leadLog, updatedLead] = await Promise.all([
@@ -659,7 +661,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
         prisma.customer.update({
           where: { id: userId },
           data: {
-            credit_score: cibilResponse?.data?.credit_score,
+            credit_score: Number(cibilResponse?.data?.credit_score),
             employement_type: employee_type,
             company_name,
             salary_date: new Date(salary_date),
