@@ -537,11 +537,11 @@ export const previewSanction = asyncHandler(async (req, res) => {
   );
 
   console.log("sanction_html_page---->", sanction_html_page); 
-  // const pdfBuffer = await generatepdf(sanction_html_page);
-  const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
-  console.log(pdfBuffer);
+  const pdfBuffer = await generatepdf(sanction_html_page);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
   // console.log(pdfBuffer);
+  // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
+  console.log("---------------- PDF BUFFER" , pdfBuffer);
 
   // Create a Blod/File from the buffer
   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
@@ -606,7 +606,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   console.log("uploadFields---->", uploadFields);
 
   if (pdfFile) {
-    console.log("pdfFile---->");
+    console.log("pdfFile---->" , pdfFile);
   }
 
 
@@ -703,6 +703,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // }, { timeout: 30000 });
 
   // Return the e-Sign URL to frontend
+  console.log("clientId---->", clientId);
   return res.status(200).json({
     success: true,
     message: "Sent for e-sign successfully!",
