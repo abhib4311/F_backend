@@ -5,7 +5,6 @@ import cors from "cors";
 import path from "path";
 import morgan from "morgan";
 // import helmet from "helmet";
-import compression from "compression";
 import rateLimit from "express-rate-limit";
 import hpp from "hpp";
 import xss from "xss-clean";
@@ -23,22 +22,6 @@ const app = express();
 // SECURITY MIDDLEWARES
 // ----------------------------
 // app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(fileUpload());
-if (process.env.NODE_ENV !== "test") {
-  app.use(
-    morgan(
-      process.env.NODE_ENV === "production" ? "combined" : "dev",
-      {
-        stream: {
-          write: (message) => logger.http(message.trim() + "------------ " + new Date().toISOString()),
-        },
-      }
-    )
-  );
-}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -76,7 +59,6 @@ var corsOption = {
 };
 app.use(cors(corsOption));
 app.use(xss());
-app.use(xss());
 app.use(hpp());
 
 // ----------------------------
@@ -94,7 +76,6 @@ app.use("/api/", limiter);
 // ----------------------------
 
 
-
 // ----------------------------
 // PERFORMANCE OPTIMIZATION
 // ----------------------------
@@ -103,7 +84,6 @@ app.use("/api/", limiter);
 // ----------------------------
 // HTTP REQUEST LOGGING
 // ----------------------------
-
 
 
 // -------------------------------------
