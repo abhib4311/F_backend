@@ -562,16 +562,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
         1: [{ x: 10, y: 20 }]
       }
     },
-    // prefill_options: {
-    //   full_name: "abhishek", // lead_detail.full_name,
-    //   mobile_number: "8877665544", // lead_detail.mobile,
-    //   user_email: "abhishek@gmail.com" // lead_detail.personal_email
-    // }
-    // prefill_options: {
-    //   full_name: "abhishek", // lead_detail.full_name,
-    //   mobile_number: "8877665544", // lead_detail.mobile,
-    //   user_email: "abhishek@gmail.com" // lead_detail.personal_email
-    // }
+
     prefill_options: {
       full_name: user.full_name, // lead_detail.full_name,
       mobile_number: user.mobile, // lead_detail.mobile,
