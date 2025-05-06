@@ -819,14 +819,15 @@ export const getUploadUrlAPI = async (payload) => {
 
 export const esignDocAPI = async (document_id) => {
   try {
-    let data = JSON.stringify({
-      "documentId": document_id
-    });
+    // Prepare request payload (if required by API body)
+    const requestBody = JSON.stringify({ documentId: document_id });
 
+    // Construct full URL with path parameter
+    const url = `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`;
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`,
+      url: url,
       headers: {
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
         'Content-Type': 'application/json'
