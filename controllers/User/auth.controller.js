@@ -98,10 +98,10 @@ export const sendOTP = asyncHandler(async (req, res) => {
     const isServiceable = await prisma.serviceable_pin_code.findFirst({
       where: { pincode },
     });
-
-    if (!isServiceable) {
-      throw new ResponseError(400, `Area ${pincode} not serviceable`);
-    }
+    console.log("isServiceable---->", pincode, isServiceable)
+    // if (!isServiceable) {
+    //   throw new ResponseError(400, `Area ${pincode} not serviceable`);
+    // }
   }
 
   // Send OTP

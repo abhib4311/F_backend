@@ -40,6 +40,22 @@ if (process.env.NODE_ENV !== "test") {
     )
   );
 }
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(fileUpload());
+if (process.env.NODE_ENV !== "test") {
+  app.use(
+    morgan(
+      process.env.NODE_ENV === "production" ? "combined" : "dev",
+      {
+        stream: {
+          write: (message) => logger.http(message.trim() + "------------ " + new Date().toISOString()),
+        },
+      }
+    )
+  );
+}
 var corsOption = {
   origin: [
     "https://blinkrloan.com",
@@ -61,6 +77,7 @@ var corsOption = {
 };
 app.use(cors(corsOption));
 app.use(xss());
+app.use(xss());
 app.use(hpp());
 
 // ----------------------------
@@ -78,6 +95,7 @@ app.use("/api/", limiter);
 // ----------------------------
 
 
+
 // ----------------------------
 // PERFORMANCE OPTIMIZATION
 // ----------------------------
@@ -86,6 +104,7 @@ app.use("/api/", limiter);
 // ----------------------------
 // HTTP REQUEST LOGGING
 // ----------------------------
+
 
 
 // -------------------------------------

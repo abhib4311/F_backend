@@ -218,7 +218,7 @@ export const login = async (req, res) => {
       },
     });
     //  Response with data
-    res.status(200).cookie(
+    res.cookie(
       "employee_jwt",
       token,
       {
@@ -227,7 +227,9 @@ export const login = async (req, res) => {
         sameSite: "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day 
       }
-    ).json({
+    );
+
+    res.status(200).json({
       message: "Logged in successfully",
       token,
       employee: {

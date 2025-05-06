@@ -44,6 +44,7 @@ export const sendOtpAPI = async (phone_number) => {
     }
   }
 };  // SUREPASS OTP API
+};  // SUREPASS OTP API
 
 
 // Verify OTP API
@@ -86,6 +87,7 @@ export const verifyOtpAPI = async (otp, request_id) => {
     }
   }
 }; // SUREPASS OTP API
+}; // SUREPASS OTP API
 
 // Fetch Mobile Details API
 export const fetchMobileDetailsAPI = async (request_id) => {
@@ -122,6 +124,7 @@ export const fetchMobileDetailsAPI = async (request_id) => {
       );
     }
   }
+}; // PERFIOS API
 }; // PERFIOS API
 
 // Fetch PAN Details API
@@ -174,6 +177,7 @@ export const fetchPanDetailsAPI = async (PAN) => {
     }
   }
 }; // SUREPASS PAN API
+}; // SUREPASS PAN API
 
 // Send OTP on Email
 export const sendEmailOtpAPI = async (email, employeeName) => {
@@ -221,6 +225,7 @@ export const sendEmailOtpAPI = async (email, employeeName) => {
     }
   }
 }; //PERFIOS API
+}; //PERFIOS API
 
 // Verif Email OTP
 export const verifyEmailOtpAPI = async (otp, request_id) => {
@@ -258,8 +263,15 @@ export const verifyEmailOtpAPI = async (otp, request_id) => {
     }
   }
 };  // PERFIOS API
+};  // PERFIOS API
 
 // validate Office Email API
+// export const validateEmailAPI = async (email) => {
+//   try {
+//     let data = JSON.stringify({
+//       email: email,
+//       consent: "Y",
+//     });
 // export const validateEmailAPI = async (email) => {
 //   try {
 //     let data = JSON.stringify({
@@ -277,7 +289,34 @@ export const verifyEmailOtpAPI = async (otp, request_id) => {
 //       },
 //       data: data,
 //     };
+//     let config = {
+//       method: "post",
+//       maxBodyLength: Infinity,
+//       url: process.env.VALIDATE_OFFICE_EMAIL,
+//       headers: {
+//         "x-karza-key": process.env.KARZA_API_KEY,
+//         "Content-Type": "application/json",
+//       },
+//       data: data,
+//     };
 
+//     const response = await axios.request(config);
+//     return { otpResponse: response.data, otpRequest: config };
+//   } catch (error) {
+//     console.error("Validate Office Email API Error:", error);
+//     if (error.response) {
+//       throw new ResponseError(
+//         error.response.status || 500,
+//         error.response.data?.error || 'Third-Party API returned an error'
+//       );
+//     } else {
+//       throw new ResponseError(
+//         500,
+//         error.message || 'Failed to connect to Third-Party API'
+//       );
+//     }
+//   }
+// };  //PERFIOS API
 //     const response = await axios.request(config);
 //     return { otpResponse: response.data, otpRequest: config };
 //   } catch (error) {
@@ -332,6 +371,7 @@ export const sendAadhaarOtpAPI = async (aadhaar) => {
     }
   }
 };  //PERFIOS API
+};  //PERFIOS API
 
 // Validate Aadhaar API
 export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
@@ -369,6 +409,7 @@ export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
       );
     }
   }
+};  //PERFIOS API
 };  //PERFIOS API
 
 export const fetchOnGridAddress = async (mobile) => {
@@ -423,6 +464,7 @@ export const fetchOnGridAddress = async (mobile) => {
     throw new ResponseError(statusCode, message);
   }
 };  //ONGRID API
+};  //ONGRID API
 
 
 // esign document return API
@@ -468,6 +510,7 @@ export const fetchCibilAPI = async (cibilRequestBody) => {
       );
     }
   }
+};  // SUREPASS CIBIL API
 };  // SUREPASS CIBIL API
 
 
@@ -523,6 +566,7 @@ export const sanctionAPI = async (base64_encoded, full_name, personal_email, mob
   }
 
 }; //PERFIOS API
+}; //PERFIOS API
 
 // Disburse Loan API
 export const disburseLoanAPI = async (data) => {
@@ -555,6 +599,7 @@ export const disburseLoanAPI = async (data) => {
       },
     };
   }
+}; // ICICI API
 }; // ICICI API
 
 export const fetchLocationAPI = async (lat, lng) => {
@@ -616,31 +661,30 @@ export const fetchLocationAPI = async (lat, lng) => {
     throw new ResponseError(500, error.message || "Internal Server Error: Unable to fetch location details");
   };
 }// GOOGLE MAPS API
+}// GOOGLE MAPS API
 
 // surepass API aadhaar-kyc step - 1
 export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
   try {
-
-    let data = JSON.stringify({
-      id_number: aadhaar
-    });
-
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: process.env.SEND_AADHAAR_OTP_SUREPASS,
+    console.log("aadhaar----->KYC________", aadhaar)
+    const response = await fetch(process.env.SEND_AADHAAR_OTP_SUREPASS, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
-      data: data
-    };
+      body: JSON.stringify({
+        id_number: aadhaar
+      })
+    });
 
-    const response = await axios.request(config)
-    return response.data;
+    const data = await response.json();
+    console.log("response----->", data);
+    return data;
   }
   catch (error) {
-    console.log("Send Aadhaar API Error : ", error)
+    console.log("Send Aadhaar API Error : ", error?.message);
     if (error.response) {
       throw new ResponseError(
         error.response.status || 500,
@@ -653,7 +697,6 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
       );
     }
   }
-
 };
 
 // surepass API aadhaar-kyc step - 2
@@ -671,6 +714,7 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
       url: process.env.VALIDATE_ADDHAAR_OTP_SUREPASS,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       data: data
@@ -702,15 +746,18 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
 export const esignInitAPI = async (payload) => {
   try {
     console.log("esignInitAPI payload", payload)
+    console.log("esignInitAPI payload", payload)
     const response = await fetch(process.env.ESIGN_INIT_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // Add any required authorization headers
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });
+    console.log("esignInitAPI response", response.status)
     console.log("esignInitAPI response", response.status)
 
     const apiResponse = await response.json();
@@ -733,6 +780,7 @@ export const esignInitAPI = async (payload) => {
     }
   }
 }; //SUREPASS API
+}; //SUREPASS API
 
 // e-Sign step 2
 export const getUploadUrlAPI = async (payload) => {
@@ -742,6 +790,7 @@ export const getUploadUrlAPI = async (payload) => {
       headers: {
         'Content-Type': 'application/json',
         // Add any required authorization headers
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
