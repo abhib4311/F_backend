@@ -31,7 +31,7 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
     // const base64PDF = Buffer.from(pdfBuffer).toString("base64");
     // console.log("Base64 PDF generated successfully.--------->");
 
-    console.log("PDF generated successfully.--->", base64PDF);
+    console.log("PDF generated successfully.--->", pdfBuffer);
 
     return pdfBuffer;
   } catch (error) {
