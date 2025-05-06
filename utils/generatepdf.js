@@ -3,6 +3,7 @@ import puppeteer from "puppeteer";
 
 const convertHtmlToPdfBase64 = async (htmlContent) => {
   try {
+    console.log("HTML content received for PDF generation:---->");
 
     const browser = await puppeteer.launch({
       args: [
@@ -24,15 +25,17 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
 
 
     const pdfBuffer = await page.pdf({ format: "A4" });
+    console.log("PDF buffer generated successfully.");  
 
 
     const base64PDF = Buffer.from(pdfBuffer).toString("base64");
+    console.log("Base64 PDF generated successfully.");
 
     await browser.close();
     console.log("PDF generated successfully.--->" , base64PDF);
     return base64PDF;
   } catch (error) {
-    console.error("Error converting HTML to PDF:", error);
+    console.log("Error converting HTML to PDF:", error);
     return null;
   }
 };
