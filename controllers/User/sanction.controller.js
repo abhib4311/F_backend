@@ -5,8 +5,8 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sanctionpage from "../../utils/sanction_loan.js";
 import generatepdf from "../../utils/generatepdf.js";
 import {
+  getSingedDocUrl,
   sanctionAPI,
-  esignDocAPI,
   disburseLoanAPI,
   esignInitAPI,
   getUploadUrlAPI,
@@ -590,7 +590,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // console.log("uploadUrlResponse---->", uploadUrlResponse);
   // console.log("uploadUrlRequest---->", uploadUrlRequest);
   if (uploadUrlResponse?.status_code != 200) {
-    handleThirdPartyResponse(uploadUrlResponse);
+    handleSurepassResponse(uploadUrlResponse);
   }
 
   // Step 4: Upload PDF to provided S3 URL
@@ -618,7 +618,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   });
   // console.log("uploadResponse---->", uploadResponse);
   if (!uploadResponse.ok) {
-    throw new ResponseError(400, "Error from Surepass e-Sign(uploadResponse function in sanction.controller.js) API : Failed to upload document");
+    throw new ResponseError(400, "Error from Surepass e-Sign API : Failed to upload document");
   }
 
   // Update database records
@@ -630,7 +630,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
         document_id: clientId,
       },
     });
-  
+
     await tx.api_Logs.create({
       data: {
         pan: user.pan,
@@ -643,14 +643,14 @@ export const previewSanction = asyncHandler(async (req, res) => {
         customer_id: user.id,
       },
     });
-  
+
     await tx.lead.update({
       where: { id: lead_detail.id },
       data: {
         lead_stage: LEAD_STAGE.SANCTION_PENDING,
       },
     });
-  
+
     await tx.lead_Logs.create({
       data: {
         customer_id: user.id,
@@ -660,7 +660,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
       },
     });
   }, { timeout: 30000 });
-  
+
   // Return the e-Sign URL to frontend
   console.log("clientId---->", clientId);
   return res.status(200).json({
@@ -721,50 +721,38 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   }
 
   // // API call and parallel processing
-  const { apiResponse, apiRequest } = await esignDocAPI(pendingSanction.document_id);
-  if (apiResponse?.statusCode != "101") handleThirdPartyResponse(apiResponse);
+  const { apiRequest, apiResponse } = await getSingedDocUrl(pendingSanction.document_id);
+  if (apiResponse?.status_code !== 200) handleSurepassResponse(apiResponse);
 
   await prisma.$transaction(async (prisma) => {
     // Cache reusable values
     const userPan = user.pan;
     const leadId = lead.id;
     const customerId = user.id;
-
+    const fileURL = apiResponse?.url;
     // Parallelize independent operations
-    // const [_, fileURL] = await Promise.all([
-    //   prisma.api_Logs.create({
-    //     data: {
-    //       pan: userPan,
-    //       api_type: API_TYPE.DOWNLOAD_ESIGN,
-    //       api_provider: 1,
-    //       api_request: apiRequest,
-    //       api_response: apiResponse,
-    //       api_status: true,
-    //       lead_id: leadId,
-    //       customer_id: customerId
-    //     }
-    //   }),
-    //   uploadSanctionLetterS3(
-    //     apiResponse?.result?.file,
-    //     userPan,
-    //     `sanction_letter-${Date.now()}`,
-    //     "application/pdf"
-    //   )
-    // ]);
-    fileURL = apiResponse?.url;
-    // Sequential dependent operations
-    await prisma.document.create({
-      data: {
-        pan: userPan,
-        document_type: DOCUMENT_TYPE.SANCTION_LETTER,
-        document_url: fileURL,
-        customer_id: customerId,
-        lead_id: leadId
-      }
-    });
-
-    // Parallel updates
     await Promise.all([
+      prisma.api_Logs.create({
+        data: {
+          pan: userPan,
+          api_type: API_TYPE.DOWNLOAD_ESIGN,
+          api_provider: 1,
+          api_request: apiRequest,
+          api_response: apiResponse,
+          api_status: true,
+          lead_id: leadId,
+          customer_id: customerId
+        }
+      }),
+      prisma.document.create({
+        data: {
+          pan: userPan,
+          document_type: DOCUMENT_TYPE.SANCTION_LETTER,
+          document_url: fileURL,
+          customer_id: customerId,
+          lead_id: leadId
+        }
+      }),
       prisma.sanction.update({
         where: { id: pendingSanction.id },
         data: { is_eSigned: true, is_eSign_pending: false }
@@ -772,18 +760,16 @@ export const redirectUrl = asyncHandler(async (req, res) => {
       prisma.lead.update({
         where: { id: leadId },
         data: { is_sanction: true, lead_stage: LEAD_STAGE.SANCTION_COMPLETED }
+      }),
+      prisma.lead_Logs.create({
+        data: {
+          customer_id: customerId,
+          lead_id: leadId,
+          pan: userPan,
+          remarks: " SIGNED SANCTION LETTER GENERATED"
+        }
       })
     ]);
-
-    // Final log entry
-    await prisma.lead_Logs.create({
-      data: {
-        customer_id: customerId,
-        lead_id: leadId,
-        pan: userPan,
-        remarks: "DOWNLOAD SANCTION LETTER"
-      }
-    });
 
     return res.status(200).json({
       success: true,

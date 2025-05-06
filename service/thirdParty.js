@@ -817,22 +817,21 @@ export const getUploadUrlAPI = async (payload) => {
   }
 }; //SUREPASS API
 
-export const esignDocAPI = async (document_id) => {
+export const getSingedDocUrl = async (document_id) => {
   try {
     // Prepare request payload (if required by API body)
     const requestBody = JSON.stringify({ documentId: document_id });
 
     // Construct full URL with path parameter
-    const url = `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`;
+    const url = `${process.env.ESIGN_DOWNLOAD_FILE_SUREPASS}/${document_id}`;
     let config = {
-      method: 'post',
+      method: 'GET',
       maxBodyLength: Infinity,
       url: url,
       headers: {
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
         'Content-Type': 'application/json'
-      },
-      data: data
+      }
     };
     const response = await axios.request(config);
     return { apiRequest: config, apiResponse: response.data };
