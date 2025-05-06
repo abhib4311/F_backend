@@ -1,42 +1,37 @@
 import puppeteer from "puppeteer";
 
+const generatepdf = async (html, options = {}) => {
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox']
+  });
 
-const convertHtmlToPdfBase64 = async (htmlContent) => {
   try {
-    console.log("HTML content received for PDF generation:---->");
-
-    const browser = await puppeteer.launch({
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage', // Prevent /dev/shm usage issues
-        '--disable-gpu',
-        '--single-process', // Recommended for Docker environments
-        '--no-zygote', // Disables zygote process for container optimization
-        '--font-render-hinting=none',
-        '--disable-font-subpixel-positioning'
-      ],
-      headless: "new" // or true (depending on Puppeteer version)
-    });
     const page = await browser.newPage();
+    await page.setContent(html);
 
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20px',
+        right: '20px',
+        bottom: '20px',
+        left: '20px'
+      }
+    });
 
-    await page.setContent(htmlContent, { waitUntil: "load" });
+    // If returnBuffer is true, return the raw buffer
+    // Otherwise convert to base64 for backward compatibility
+    if (options.returnBuffer) {
+      return pdfBuffer;
+    } else {
+      return pdfBuffer.toString('base64');
+    }
 
-
-    const pdfBuffer = await page.pdf({ format: "A4" });
-    console.log("PDF buffer generated successfully.");  
-
-
-    const base64PDF = Buffer.from(pdfBuffer).toString("base64");
-    console.log("Base64 PDF generated successfully.");
-
+  } finally {
     await browser.close();
-    console.log("PDF generated successfully.--->" , base64PDF);
-    return base64PDF;
-  } catch (error) {
-    console.log("Error converting HTML to PDF:", error);
-    return null;
   }
 };
-export default convertHtmlToPdfBase64;
+
+export default generatepdf;
