@@ -622,80 +622,45 @@ export const previewSanction = asyncHandler(async (req, res) => {
   }
 
   // Update database records
-  await prisma.$transaction(async (prisma) => {
-    await prisma.sanction.update({
+  await prisma.$transaction(async (tx) => {
+    await tx.sanction.update({
       where: { id: existingSanction.id },
       data: {
         is_eSign_pending: true,
         document_id: clientId,
       },
     });
-    await prisma.$transaction(async (prisma) => {
-      await prisma.sanction.update({
-        where: { id: existingSanction.id },
-        data: {
-          is_eSign_pending: true,
-          document_id: clientId,
-        },
-      });
-
-      await prisma.api_Logs.create({
-        data: {
-          pan: user.pan,
-          api_type: API_TYPE.ESIGN_API,
-          api_provider: 1,
-          api_request: initRequest,
-          api_response: initResponse,
-          api_status: true,
-          lead_id: lead_detail.id,
-          customer_id: user.id,
-        },
-      });
-      await prisma.api_Logs.create({
-        data: {
-          pan: user.pan,
-          api_type: API_TYPE.ESIGN_API,
-          api_provider: 1,
-          api_request: initRequest,
-          api_response: initResponse,
-          api_status: true,
-          lead_id: lead_detail.id,
-          customer_id: user.id,
-        },
-      });
-
-      await prisma.lead.update({
-        where: { id: lead_detail.id },
-        data: {
-          lead_stage: LEAD_STAGE.SANCTION_PENDING,
-        },
-      });
-      await prisma.lead.update({
-        where: { id: lead_detail.id },
-        data: {
-          lead_stage: LEAD_STAGE.SANCTION_PENDING,
-        },
-      });
-
-      await prisma.lead_Logs.create({
-        data: {
-          customer_id: user.id,
-          lead_id: lead_detail.id,
-          pan: user.pan,
-          remarks: "Sending for e-Sign"
-        },
-      });
-    }, { timeout: 30000 });
-    await prisma.lead_Logs.create({
+  
+    await tx.api_Logs.create({
+      data: {
+        pan: user.pan,
+        api_type: API_TYPE.ESIGN_API,
+        api_provider: 1,
+        api_request: initRequest,
+        api_response: initResponse,
+        api_status: true,
+        lead_id: lead_detail.id,
+        customer_id: user.id,
+      },
+    });
+  
+    await tx.lead.update({
+      where: { id: lead_detail.id },
+      data: {
+        lead_stage: LEAD_STAGE.SANCTION_PENDING,
+      },
+    });
+  
+    await tx.lead_Logs.create({
       data: {
         customer_id: user.id,
         lead_id: lead_detail.id,
         pan: user.pan,
-        remarks: "Sending for e-Sign"
+        remarks: "Sending for e-Sign",
       },
     });
   }, { timeout: 30000 });
-
+  
   // Return the e-Sign URL to frontend
   console.log("clientId---->", clientId);
   return res.status(200).json({
