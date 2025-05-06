@@ -14,7 +14,6 @@ import userRoutes from "./Routes/User/user.route.js";
 import logger from "./utils/logger.js";
 import { notFound, errorHandler } from "./Middlewares/errorMiddleware.js";
 import "./utils/logReporter.js";
-import fileUpload from "express-fileupload";
 
 dotenv.config();
 
@@ -43,7 +42,7 @@ if (process.env.NODE_ENV !== "test") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(fileUpload());
+
 if (process.env.NODE_ENV !== "test") {
   app.use(
     morgan(

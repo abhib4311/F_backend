@@ -31,18 +31,19 @@ import {
   addReference,
 } from "../../controllers/User/postLoan.controller.js";
 import authenticateUser from "../../Middlewares/user.js";
-// import upload from "../../Middlewares/multer.js";
 import { faceMatchHandler } from "../../controllers/User/face.match.controller.js";
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
 import { sendEncryptedRequest, status_check } from "../../controllers/User/banking_integration.js"
 import { verifyStaticToken } from "../../utils/verify_static_token.js";
 
+import fileUpload from "express-fileupload";
+
+
 const router = express.Router();
-// export const uploadFields = upload.fields([
-//   { name: "bankStatement", maxCount: 1 },
-//   { name: "paymentSS", maxCount: 3 },
-// ]);
+
+
+router.use(fileUpload());
 
 // ---------------------------------------------------------------------------------//
 // Onboarding (Step:1)
