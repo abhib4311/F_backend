@@ -651,7 +651,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
           where: { id: lead.id },
           data: {
             lead_stage: LEAD_STAGE.ADD_EMPLOYEMENT,
-            credit_score: cibilResponse?.data?.credit_score,
+            credit_score: Number(cibilResponse?.data?.credit_score),
             is_person_salaried: true,
             is_employee_type_filled: true,
             elegible_loan_amount: 7000,     //TODO: change this value based on credit score
@@ -680,7 +680,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
       });
 
       return res.status(200).json({
-        credit_score: cibilResponse?.data?.creditScore,
+        credit_score: cibilResponse?.data?.credit_score,
         message: "Employement added successfully",
         current_stage: updatedLead.lead_stage,
         elegible_loan_amount: updatedLead.elegible_loan_amount,
