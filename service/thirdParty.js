@@ -745,8 +745,8 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
 // e-Sign Step 1
 export const esignInitAPI = async (payload) => {
   try {
-    console.log("esignInitAPI payload", payload)
-    console.log("esignInitAPI payload", payload)
+    // console.log("esignInitAPI payload", payload)
+    // console.log("esignInitAPI payload", payload)
     const response = await fetch(process.env.ESIGN_INIT_API, {
       method: 'POST',
       headers: {
@@ -757,8 +757,8 @@ export const esignInitAPI = async (payload) => {
       },
       body: JSON.stringify(payload)
     });
-    console.log("esignInitAPI response", response.status)
-    console.log("esignInitAPI response", response.status)
+    // console.log("esignInitAPI response", response.status)
+    // console.log("esignInitAPI response", response.status)
 
     const apiResponse = await response.json();
     return {
@@ -791,7 +791,7 @@ export const getUploadUrlAPI = async (payload) => {
         'Content-Type': 'application/json',
         // Add any required authorization headers
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
+        // 'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });

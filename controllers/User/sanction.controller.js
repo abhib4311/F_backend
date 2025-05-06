@@ -545,6 +545,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
 
   // Create a Blod/File from the buffer
   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
+  console.log("pdfFile---->", pdfFile);
   // Step 2: Initialize e-Sign session
   const initEsignPayload = {
     pdf_pre_uploaded: true,
@@ -594,19 +595,19 @@ export const previewSanction = asyncHandler(async (req, res) => {
   const { apiRequest: uploadUrlRequest, apiResponse: uploadUrlResponse } = await getUploadUrlAPI({ client_id: clientId });
   // console.log("uploadUrlResponse---->", uploadUrlResponse);
   // console.log("uploadUrlRequest---->", uploadUrlRequest);
-  if (uploadUrlResponse?.status_code !== 200) {
+  if (uploadUrlResponse?.status_code != 200) {
     handleThirdPartyResponse(uploadUrlResponse);
   }
 
   // Step 4: Upload PDF to provided S3 URL
   const uploadUrl = uploadUrlResponse.data.url;
   const uploadFields = uploadUrlResponse.data.fields;
-  // console.log("uploadUrl---->", uploadUrl);
-  // console.log("uploadFields---->", uploadFields);
+  console.log("uploadUrl---->", uploadUrl);
+  console.log("uploadFields---->", uploadFields);
 
-  // if (pdfFile) {
-  //   console.log("pdfFile---->");
-  // }
+  if (pdfFile) {
+    console.log("pdfFile---->");
+  }
 
 
   // Step 5: Upload PDF to provided S3 URL
@@ -616,7 +617,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   });
   formData.append('file', pdfFile);
   // Step 6: Upload PDF to provided S3 URL
-  // console.log("formData---->", formData);
+  console.log("formData---->", formData);
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     body: formData
