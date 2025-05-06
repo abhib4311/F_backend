@@ -31,12 +31,16 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
     // const base64PDF = Buffer.from(pdfBuffer).toString("base64");
     // console.log("Base64 PDF generated successfully.--------->");
 
-    await browser.close();
     console.log("PDF generated successfully.--->", base64PDF);
+
     return pdfBuffer;
   } catch (error) {
     console.log("Error converting HTML to PDF:------->", error);
     return false;
+  }
+  finally {
+    await browser.close();
+    console.log("Puppeteer browser closed successfully.----->");
   }
 };
 export default convertHtmlToPdfBase64;
