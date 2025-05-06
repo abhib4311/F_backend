@@ -719,8 +719,18 @@ export const esignInitAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("error----->: ", error?.message);
-    throw new ResponseError(500, "Error from Surepass e-Sign(esignInitAPI function in thirdParty.js) API(Sandip) : Failed to initialize e-Sign");
+    console.log("Submit Aadhaar OTP API Error : ", error)
+    if (error.response) {
+      throw new ResponseError(
+        error.response.status || 500,
+        error.response.data?.error || 'Third-Party API returned an error'
+      );
+    } else {
+      throw new ResponseError(
+        500,
+        error.message || 'Failed to connect to Third-Party API'
+      );
+    }
   }
 }; //SUREPASS API
 
@@ -743,8 +753,18 @@ export const getUploadUrlAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : ", error.message);
-    throw new ResponseError(500, "Error from Surepass e-Sign(getUploadUrlAPI function in thirdParty.js) API(Sandip) : Failed to get upload URL");
+    console.log("Submit Aadhaar OTP API Error : ", error)
+    if (error.response) {
+      throw new ResponseError(
+        error.response.status || 500,
+        error.response.data?.error || 'Third-Party API returned an error'
+      );
+    } else {
+      throw new ResponseError(
+        500,
+        error.message || 'Failed to connect to Third-Party API'
+      );
+    }
   }
 }; //SUREPASS API
 
@@ -759,7 +779,7 @@ export const esignDocAPI = async (document_id) => {
       maxBodyLength: Infinity,
       url: `${process.env.ESIGN_DOWNLOAD_FILE}/${document_id}`,
       headers: {
-       'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
+        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
         'Content-Type': 'application/json'
       },
       data: data

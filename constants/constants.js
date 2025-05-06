@@ -55,7 +55,8 @@ export const LEAD_STAGE = {
 }
 
 export const SOURCE = {
-    BLINKER: "BLINKER",
+    FUNDO_APP: "FUNDO_APP",
+    FUNDO_WEB: "FUNDO_WEB",
     SQUID_LOAN: "SQUID_LOAN",
     MARKETING: "MARKETING",
     APP: "APP"

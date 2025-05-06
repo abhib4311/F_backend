@@ -24,7 +24,7 @@ import {
   fetchOnGridAddress,
 } from "../../service/thirdParty.js";
 import { handleThirdPartyResponseCibil } from "../../utils/apiResponseCibil.js";
-import { handleThirdPartyResponse } from "../../utils/apiResponse.js";
+import { handleSurepassResponse, handleThirdPartyResponse } from "../../utils/apiResponse.js";
 import { ResponseError } from "../../utils/responseError.js";
 import { nextSequence } from "../../utils/nextSequence.js";
 import getAge from "../../utils/calculateAge.js";
@@ -117,7 +117,7 @@ export const sendOTP = asyncHandler(async (req, res) => {
     });
   } else {
     console.log("else block");
-    handleThirdPartyResponse(otpResponse);
+    handleSurepassResponse(otpResponse);
   }
 });
 
@@ -133,7 +133,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
   console.log("--->", otpResponse);
   if (otpResponse?.["status_code"] != "200") {
     console.log("error block-->");
-    handleThirdPartyResponse(otpResponse);
+    handleSurepassResponse(otpResponse);
   }
 
   // Common response handler
@@ -182,7 +182,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
       const { panResponse, panRequest } = panResult;
 
       if (panResponse?.status_code != "200") {
-        handleThirdPartyResponse(panResponse);
+        handleSurepassResponse(panResponse);
       }
       console.log("------->>>>>", panResponse, panRequest);
 
@@ -226,8 +226,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
           ? panDetails?.gender.toUpperCase() === "M"
             ? Gender.M
             : panDetails?.gender.toUpperCase() === "F"
-            ? Gender.F
-            : Gender.O
+              ? Gender.F
+              : Gender.O
           : null,
         dob: new Date(panDetails?.dob) || null,
         mobile: phone_number,
@@ -248,8 +248,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
           ? panDetails?.gender.toUpperCase() === "M"
             ? Gender.M
             : panDetails?.gender.toUpperCase() === "F"
-            ? Gender.F
-            : Gender.O
+              ? Gender.F
+              : Gender.O
           : null,
         dob: new Date(panDetails?.dob) || null,
         lead_stage: LEAD_STAGE.COMPLETE_REGISTRATION,
@@ -281,9 +281,9 @@ export const verifyOTP = asyncHandler(async (req, res) => {
         lead = await prisma.lead.create({
           data: {
             ...leadBaseData,
-            lead_no: await nextSequence(prisma, "lead_no", "DEVLEAD", 10),
+            lead_no: await nextSequence(prisma, "lead_no", "FUNDO", 10),
             pan: PAN,
-            source: SOURCE.BLINKER,
+            source: SOURCE.FUNDO_WEB,
           },
         });
       }
@@ -356,7 +356,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
         }),
       ]);
 
-      return sendTokenResponse(null, auth_token);
+      return sendTokenResponse(user, auth_token);
     },
     { timeout: 30000 }
   );
@@ -523,76 +523,6 @@ export const verifyEmailOTP = asyncHandler(async (req, res) => {
   );
 });
 
-export const validatePersonalEmail = asyncHandler(async (req, res) => {
-  const { personal_email } = req.body;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!personal_email) {
-    return res.status(400).json({ message: "Please fill required details" });
-  }
-
-  if (!emailRegex.test(personal_email)) {
-    return res.status(400).json({ message: "Invalid work email format" });
-  }
-
-  const { otpResponse, otpRequest } = await validateOfficeEmailAPI(email);
-  if (
-    otpResponse.result[0].emailAndDomainValidationDetails.emailExists === "No"
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Please enter valid email your email does not Exists" });
-  }
-
-  if (otpResponse?.statusCode != "101") {
-    return handleThirdPartyResponse(otpResponse);
-  }
-
-  const user_id = req.user.id;
-  await prisma.$transaction(async (prisma) => {
-    const user = await prisma.customer.findUnique({
-      where: { id: user_id },
-    });
-
-    const lead = await prisma.lead.findFirst({
-      where: { customer_id: user.id },
-      orderBy: { created_at: "desc" },
-    });
-    if (lead.is_rejected) {
-      return res.status(400).json({ message: "Your Lead is rejected" });
-    }
-
-    await prisma.lead.update({
-      where: { id: lead.id },
-      data: {
-        personal_email: personal_email,
-        is_personal_email_verify: true,
-        lead_stage: LEAD_STAGE.VALIDATE_PERSONAL_EMAIL,
-      },
-    });
-    const leadDetails = await prisma.customer.update({
-      where: { id: user.id },
-      data: {
-        personal_email: personal_email,
-      },
-    });
-
-    await prisma.lead_Logs.create({
-      data: {
-        customer_id: user.id,
-        lead_id: lead.id,
-        pan: user.pan,
-        remarks: "Office Email add Sucessfully",
-      },
-    });
-    let current_stage;
-    current_stage = leadDetails ? leadDetails.lead_stage : null;
-    return res.status(200).json({
-      message: "verifed successfully",
-      current_stage,
-    });
-  });
-});
 
 export const addEmployement = asyncHandler(async (req, res) => {
   console.log("/user/add-employement", req.body);
@@ -680,12 +610,16 @@ export const addEmployement = asyncHandler(async (req, res) => {
         pan: cust.pan,
         mobile: cust.mobile,
       };
-      
-// console.log("cibilRequestBody---->>>",cibilRequestBody)
+
+      // console.log("cibilRequestBody---->>>",cibilRequestBody)
       // CIBIL API handling
       // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
       //   cibilRequestBody
       // );
+      // if (cibilResponse?.status_code != "200") {
+      //  handleSurepassResponse(cibilResponse);
+      //  console.log("cibilResponse---->>>", cibilResponse);
+      // }
       const cibilResponse = dummyCIBIL;
 
       // Batch database operations
@@ -695,7 +629,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
             pan: lead.pan,
             api_type: API_TYPE.CREDIT_REPORT,
             api_provider: 1,
-        // api_request: cibilRequest,   FOR REAL CIBIL API call
+            // api_request: cibilRequest,   FOR REAL CIBIL API call
             api_request: cibilRequestBody,    //FOR DUMMY CIBIL API call
             api_response: cibilResponse,
             api_status: true,
@@ -838,7 +772,7 @@ export const requestLoan = asyncHandler(async (req, res) => {
           data: sanctionData,
         });
       } else {
-        const loan_no = await nextSequence(prisma, "loan_no", "DEVLOAN", 10);
+        const loan_no = await nextSequence(prisma, "loan_no", "FUNDOLOAN", 10);
         await prisma.sanction.create({
           data: {
             ...sanctionData,

@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -67,28 +66,20 @@ export const getAdminDashboardStats = async (req, res) => {
     const dateRange = time ? getDateRange(time) : null;
     const prismaDateRange = dateRange ? { gte: dateRange.startDate, lte: dateRange.endDate } : undefined;
 
+    // Optimized queries using Promise.all for parallel execution
     const [
-      totalApplicationsDisbursed,
-      avgLoanSize,
-      totalAmountDisbursed,
+      totalDisbursalAmount,
       pendingDisbursalAmount,
-      pendingCases,
+      averageLoanSize,
       statusCounts
     ] = await Promise.all([
-      prisma.disbursal.count({
-        // where: prismaDateRange ? { disbursal_date: prismaDateRange } : undefined
-      }),
-
-      prisma.disbursal.aggregate({
-        _avg: { loan_amount: true },
-        // where: prismaDateRange ? { disbursal_date: prismaDateRange } : undefined
-      }),
-
+      // Total Disbursal Amount
       prisma.disbursal.aggregate({
         _sum: { loan_amount: true },
         where: prismaDateRange ? { disbursal_date: prismaDateRange } : undefined
       }),
 
+      // Pending Disbursal Amount
       prisma.sanction.aggregate({
         _sum: { loan_amount: true },
         where: {
@@ -98,47 +89,37 @@ export const getAdminDashboardStats = async (req, res) => {
         }
       }),
 
-      prisma.lead.count({
-        where: {
-          is_disbursed: false,
-          is_rejected: false,
-          sanction: {
-            ...(prismaDateRange && { updated_at: prismaDateRange })
-          }
-        }
+      // Average Loan Size
+      prisma.disbursal.aggregate({
+        _avg: { loan_amount: true },
+        where: prismaDateRange ? { disbursal_date: prismaDateRange } : undefined
       }),
 
+      // Status Counts
       Promise.all([
-        // prisma.lead.count({
-        //   where: {
-        //     is_sanction: true,
-        //     is_disbursed: false,
-        //     is_rejected:false,
-        //     sanction: prismaDateRange ? { sanction_date: prismaDateRange } : undefined
-        //   }
-        // }),
-
+        // Total Cases
+        prisma.lead.count({
+          where: prismaDateRange ? { updated_at: prismaDateRange } : undefined
+        }),
+        // Pending Cases
+        prisma.lead.count({
+          where: {
+            is_rejected: false,
+            is_disbursed: false,
+            ...(prismaDateRange && { updated_at: prismaDateRange })
+          }
+        }),
+        // Rejected Cases
         prisma.lead.count({
           where: {
             is_rejected: true,
             ...(prismaDateRange && { updated_at: prismaDateRange })
           }
         }),
-
+        // Disbursed Cases
         prisma.disbursal.count({
-          where: {
-            is_disbursed: true,
-            ...(prismaDateRange && { disbursal_date: prismaDateRange })
-          }
-        }),
-
-        prisma.lead.count({
-          where: {
-            is_rejected: false,
-            is_rejected: false,
-            ...(prismaDateRange && { updated_at: prismaDateRange })
-          }
-        }),
+          where: prismaDateRange ? { disbursal_date: prismaDateRange } : undefined
+        })
       ])
     ]);
 
@@ -146,16 +127,14 @@ export const getAdminDashboardStats = async (req, res) => {
       success: true,
       timeFilter: dateRange ? { startDate: dateRange.startDate, endDate: dateRange.endDate } : "overall",
       data: {
-        totalApplicationsDisbursed,
-        avgLoanSize: avgLoanSize._avg.loan_amount || 0,
-        totalAmountDisbursed: totalAmountDisbursed._sum.loan_amount || 0,
+        totalDisbursalAmount: totalDisbursalAmount._sum.loan_amount || 0,
         pendingDisbursalAmount: pendingDisbursalAmount._sum.loan_amount || 0,
-        pendingCases,
-        statusCounts: {
-          // approved: statusCounts[0],
-          rejected: statusCounts[0],
-          disbursed: statusCounts[1],
-          pending: statusCounts[2]
+        averageLoanSize: averageLoanSize._avg.loan_amount || 0,
+        statusCount: {
+          totalCases: statusCounts[0],
+          pendingCases: statusCounts[1],
+          rejectedCases: statusCounts[2],
+          disbursedCases: statusCounts[3]
         }
       }
     });

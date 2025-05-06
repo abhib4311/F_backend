@@ -31,7 +31,7 @@ export const fetchUnallocatedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: leadSelect,
+                // select: leadSelect,
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -159,7 +159,7 @@ export const fetchMyAllocatedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: leadSelect,
+                // select: leadSelect,
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -199,7 +199,7 @@ export const fetchMyBrePendingLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: leadSelect,
+                // select: leadSelect,
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -319,7 +319,7 @@ export const fetchMyRejectedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: { ...leadSelect, rejection_remarks: true },
+                // select: { ...leadSelect, rejection_remarks: true },
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -361,8 +361,8 @@ export const fetchMyDisbursedLeadsAsSales = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select:
-                    leadSelect,
+                // select:
+                    // leadSelect,
                 // sanction: {
                 //     select: {
                 //         disbursement_amount: true,
@@ -418,7 +418,7 @@ export const fetchUnassignedBreRejectedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: leadSelect,
+                // select: leadSelect,
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" }
@@ -542,7 +542,7 @@ export const fetchMyBreRejectedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: leadSelect,
+                // select: leadSelect,
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -740,7 +740,7 @@ export const fetchMyManuallyRejectedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: { ...leadSelect, rejection_remarks: true },
+                // select: { ...leadSelect, rejection_remarks: true },
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -778,7 +778,7 @@ export const fetchMyManuallyApprovedLeads = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: { ...leadSelect },
+                // select: { ...leadSelect },
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -814,7 +814,7 @@ export const fetchMyDisbursedLeadsAsCreditAnalyst = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: { ...leadSelect },
+                // select: { ...leadSelect },
                 skip,
                 take: limit,
                 orderBy: { created_at: "desc" },
@@ -852,9 +852,9 @@ export const fetchAllDisbursedLeadsWithDetails = async (req, res) => {
         const [leads, totalLeads] = await Promise.all([
             prisma.lead.findMany({
                 where: baseFilter,
-                select: {
-                    ...leadSelect
-                },
+                // select: {
+                //     ...leadSelect
+                // },
                 skip,
                 take: limit,
                 orderBy: {
@@ -1085,7 +1085,7 @@ export const getLoanDetails = async (req, res) => {
         // Single query to fetch all related data
         const loanData = await prisma.lead.findUnique({
             where: { id: leadId },
-            select: selectFilter
+            // select: selectFilter
         });
 
         if (!loanData) {

@@ -353,7 +353,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // Step 2: Initialize e-Sign session
   const initEsignPayload = {
     pdf_pre_uploaded: true,
-    callback_url: "https://www.blinkrloan.com/",
+    callback_url: "https://fundobaba.com/apply/disbursal/",
     config: {
       skip_otp: true,
       auth_mode: "1",
@@ -379,8 +379,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // console.log("initResponse---->", initResponse);
   // console.log("initRequest---->", initRequest);
   if (initResponse?.status_code !== 200) {
-
-    handleThirdPartyResponse(initResponse);
+    handleSurepassResponse(initResponse);
   }
 
   const clientId = initResponse.data.client_id;

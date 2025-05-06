@@ -21,7 +21,7 @@ function getInsurancePremium(loanAmount) {
 }
 
 export const calculateLoanDetails = (loanAmount, tenureDays, pfPercent) => {
-  const insurance = getInsurancePremium(loanAmount); // now dynamic
+  const insurance = 0 // now static
   const dailyInterestRate = 0.009; // 0.90% per day
 
   const pfAmount = Math.round((loanAmount * pfPercent) / 100);
@@ -38,7 +38,7 @@ export const calculateLoanDetails = (loanAmount, tenureDays, pfPercent) => {
   return {
     loanAmount,
     tenureDays,
-    pfPercent,
+    pfPercent, // 
     pfAmount,
     insurance,
     totalAdminFees,

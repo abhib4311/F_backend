@@ -7,6 +7,8 @@ const prisma = new PrismaClient();
 
 // Middleware to verify JWT token and user role
 const authenticateEmployee = async (req, res, next) => {
+  console.log("req.cookies-->", req.cookies);
+  console.log("req.headers-->", req.headers);
   try {
     let token;
     if (req.cookies && req.cookies.employee_jwt) {
@@ -18,7 +20,7 @@ const authenticateEmployee = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    // console.log("token-->", token);
+    console.log("token-->", token);
     if (!token) {
       return res.status(401).json({ message: "not authorised" });
     }
