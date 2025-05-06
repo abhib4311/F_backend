@@ -328,6 +328,7 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
 
 const uploadBankStatement = asyncHandler(async (req, res) => {
   try {
+    console.log("Inside uploadBankStatement controller");
     let is_bre_complete = false;
     let is_bsa_complete = false;
     let is_bre_reject = false;

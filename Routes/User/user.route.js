@@ -31,7 +31,7 @@ import {
   addReference,
 } from "../../controllers/User/postLoan.controller.js";
 import authenticateUser from "../../Middlewares/user.js";
-import upload from "../../Middlewares/multer.js";
+// import upload from "../../Middlewares/multer.js";
 import { faceMatchHandler } from "../../controllers/User/face.match.controller.js";
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
@@ -39,10 +39,10 @@ import { sendEncryptedRequest, status_check } from "../../controllers/User/banki
 import { verifyStaticToken } from "../../utils/verify_static_token.js";
 
 const router = express.Router();
-export const uploadFields = upload.fields([
-  { name: "bankStatement", maxCount: 1 },
-  { name: "paymentSS", maxCount: 3 },
-]);
+// export const uploadFields = upload.fields([
+//   { name: "bankStatement", maxCount: 1 },
+//   { name: "paymentSS", maxCount: 3 },
+// ]);
 
 // ---------------------------------------------------------------------------------//
 // Onboarding (Step:1)
