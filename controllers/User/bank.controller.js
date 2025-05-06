@@ -15,14 +15,17 @@ const prisma = new PrismaClient();
 
 const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
   try {
+    console.log("file-1 --------------------------------->");
     const uploadedFile = file;
+    console.log("file-2 --------------------------------->", uploadedFile);
     const form = new FormData();
+    console.log("form --------------------------------->", form);
 
     form.append("file", uploadedFile.data, {
       filename: uploadedFile.name,
       contentType: uploadedFile.mimetype,
     });
-
+    console.log("form-1 --------------------------------->");
     const metadata = {
       password: "",
       bank: "Other",
@@ -30,6 +33,7 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
       productType: "Salaried",
     };
     form.append("metadata", JSON.stringify(metadata));
+    console.log("form-2 --------------------------------->");
 
     const documentDetails = [
       {
@@ -42,6 +46,7 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
       },
     ];
     form.append("documentDetails", JSON.stringify(documentDetails));
+    console.log("form-3 --------------------------------->");
 
     const uploadRequestConfig = {
       method: "POST",
@@ -51,18 +56,17 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
       },
       body: form.getBuffer(),
     };
-
+    console.log("uploadRequestConfig --------------------------------->", uploadRequestConfig);
     const uploadResponse = await fetch(
       process.env.CARTBI_API_UPLOAD,
       uploadRequestConfig
     );
-
+    console.log("uploadResponse --------------------------------->", uploadResponse);
     if (!uploadResponse.ok) {
       const errorText = await uploadResponse.text();
       throw new ResponseError(
         uploadResponse?.status || 500,
-        `Failed to upload file: HTTP ${
-          uploadResponse?.status || "unknown"
+        `Failed to upload file: HTTP ${uploadResponse?.status || "unknown"
         }. Response: ${errorText || "No response text available"}`
       );
     }
@@ -76,6 +80,7 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
       uploadResponseData,
       true
     );
+    console.log("uploadResponseData --------------------------------->", uploadResponseData);
 
     return uploadResponseData;
   } catch (error) {
@@ -392,6 +397,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         .json({ message: "File not uploaded from the web" });
     }
     const uploadedFile = req.files.file;
+    console.log("uploadedFile------->", uploadedFile);
 
     if (uploadedFile.mimetype !== "application/pdf") {
       return res.status(400).json({ message: "Uploaded File is not a PDF" });
@@ -536,7 +542,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     console.log("Performing Fraud Check");
 
     const fraudCheck = performFraudCheck(downloadResponse);
-    console.log("fraudCheck ---> " , fraudCheck);
+    console.log("fraudCheck ---> ", fraudCheck);
 
     if (!fraudCheck.basicValidationStatus) {
       is_bre_reject = true;

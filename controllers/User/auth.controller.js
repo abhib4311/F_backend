@@ -649,7 +649,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
           where: { id: lead.id },
           data: {
             lead_stage: LEAD_STAGE.ADD_EMPLOYEMENT,
-            credit_score: cibilResponse?.data?.creditScore,
+            credit_score: cibilResponse?.data?.credit_score,
             is_person_salaried: true,
             is_employee_type_filled: true,
             elegible_loan_amount: 7000,     //TODO: change this value based on credit score
@@ -659,7 +659,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
         prisma.customer.update({
           where: { id: userId },
           data: {
-            credit_score: cibilResponse?.data?.creditScore,
+            credit_score: cibilResponse?.data?.credit_score,
             employement_type: employee_type,
             company_name,
             salary_date: new Date(salary_date),
