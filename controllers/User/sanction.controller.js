@@ -507,6 +507,21 @@ export const previewSanction = asyncHandler(async (req, res) => {
   //   apr: 13.25                     // 13.25% APR
   // };
   // ;
+  // const existingSanction = {
+  //   loan_no: "LN202405041234",
+  //   loan_amount: 500000,           // ₹5,00,000
+  //   roi: 12.5,                     // 12.5% Rate of Interest
+  //   interest_amount: 62500,        // ₹62,500 Interest
+  //   pf_amount: 2500,               // ₹2,500 Processing Fee
+  //   insurance: 3000,               // ₹3,000 Insurance
+  //   total_admin_fee: 1500,         // ₹1,500 Admin Charges
+  //   net_disbursal: 493000,         // ₹4,93,000 Final Amount (after deductions)
+  //   repayment_amount: 562500,      // ₹5,62,500 Total to Repay
+  //   repayment_date: "2026-05-04",  // Repayment ends on May 4, 2026
+  //   tenure: 24,                    // 24 months
+  //   apr: 13.25                     // 13.25% APR
+  // };
+  // ;
   // const lead_detail = true;
 
   // Generate PDF content
@@ -521,24 +536,34 @@ export const previewSanction = asyncHandler(async (req, res) => {
     footerImageBase64
   );
 
-  const pdfBuffer = await generatepdf(sanction_html_page, { returnBuffer: true });
+  console.log("sanction_html_page---->", sanction_html_page); 
+  // const pdfBuffer = await generatepdf(sanction_html_page);
+  const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
+  // console.log(pdfBuffer);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
-  console.log(pdfBuffer);
+  console.log("---------------- PDF BUFFER" , pdfBuffer);
 
   // Create a Blod/File from the buffer
   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
+  console.log("pdfFile---->", pdfFile);
   // Step 2: Initialize e-Sign session
   const initEsignPayload = {
     pdf_pre_uploaded: true,
-    callback_url: "https://www.blinkrloan.com/",
+    callback_url: "https://fundobaba.com/apply/disbursal/",
     config: {
       skip_otp: true,
       auth_mode: "1",
+      reason: "E-Signed Sanction Letter",
       reason: "E-Signed Sanction Letter",
       positions: {
         1: [{ x: 10, y: 20 }]
       }
     },
+    // prefill_options: {
+    //   full_name: "abhishek", // lead_detail.full_name,
+    //   mobile_number: "8877665544", // lead_detail.mobile,
+    //   user_email: "abhishek@gmail.com" // lead_detail.personal_email
+    // }
     // prefill_options: {
     //   full_name: "abhishek", // lead_detail.full_name,
     //   mobile_number: "8877665544", // lead_detail.mobile,
@@ -556,8 +581,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // console.log("initResponse---->", initResponse);
   // console.log("initRequest---->", initRequest);
   if (initResponse?.status_code !== 200) {
-
-    handleThirdPartyResponse(initResponse);
+    handleSurepassResponse(initResponse);
   }
 
   const clientId = initResponse.data.client_id;
@@ -566,23 +590,24 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // console.log("esignUrl---->", esignUrl);
 
   console.log("clientId---->", clientId);
+  console.log("clientId---->", clientId);
   // Step 3: Get upload URL
   const { apiRequest: uploadUrlRequest, apiResponse: uploadUrlResponse } = await getUploadUrlAPI({ client_id: clientId });
   // console.log("uploadUrlResponse---->", uploadUrlResponse);
   // console.log("uploadUrlRequest---->", uploadUrlRequest);
-  if (uploadUrlResponse?.status_code !== 200) {
+  if (uploadUrlResponse?.status_code != 200) {
     handleThirdPartyResponse(uploadUrlResponse);
   }
 
   // Step 4: Upload PDF to provided S3 URL
   const uploadUrl = uploadUrlResponse.data.url;
   const uploadFields = uploadUrlResponse.data.fields;
-  // console.log("uploadUrl---->", uploadUrl);
-  // console.log("uploadFields---->", uploadFields);
+  console.log("uploadUrl---->", uploadUrl);
+  console.log("uploadFields---->", uploadFields);
 
-  // if (pdfFile) {
-  //   console.log("pdfFile---->");
-  // }
+  if (pdfFile) {
+    console.log("pdfFile---->" , pdfFile);
+  }
 
 
   // Step 5: Upload PDF to provided S3 URL
@@ -592,7 +617,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
   });
   formData.append('file', pdfFile);
   // Step 6: Upload PDF to provided S3 URL
-  // console.log("formData---->", formData);
+  console.log("formData---->", formData);
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
     body: formData
@@ -603,6 +628,14 @@ export const previewSanction = asyncHandler(async (req, res) => {
   }
 
   // Update database records
+  // await prisma.$transaction(async (prisma) => {
+  //   await prisma.sanction.update({
+  //     where: { id: existingSanction.id },
+  //     data: {
+  //       is_eSign_pending: true,
+  //       document_id: clientId,
+  //     },
+  //   });
   // await prisma.$transaction(async (prisma) => {
   //   await prisma.sanction.update({
   //     where: { id: existingSanction.id },
@@ -624,7 +657,25 @@ export const previewSanction = asyncHandler(async (req, res) => {
   //       customer_id: user.id,
   //     },
   //   });
+  //   await prisma.api_Logs.create({
+  //     data: {
+  //       pan: user.pan,
+  //       api_type: API_TYPE.ESIGN_API,
+  //       api_provider: 1,
+  //       api_request: initRequest,
+  //       api_response: initResponse,
+  //       api_status: true,
+  //       lead_id: lead_detail.id,
+  //       customer_id: user.id,
+  //     },
+  //   });
 
+  //   await prisma.lead.update({
+  //     where: { id: lead_detail.id },
+  //     data: {
+  //       lead_stage: LEAD_STAGE.SANCTION_PENDING,
+  //     },
+  //   });
   //   await prisma.lead.update({
   //     where: { id: lead_detail.id },
   //     data: {
@@ -641,8 +692,18 @@ export const previewSanction = asyncHandler(async (req, res) => {
   //     },
   //   });
   // }, { timeout: 30000 });
+  //   await prisma.lead_Logs.create({
+  //     data: {
+  //       customer_id: user.id,
+  //       lead_id: lead_detail.id,
+  //       pan: user.pan,
+  //       remarks: "Sending for e-Sign"
+  //     },
+  //   });
+  // }, { timeout: 30000 });
 
   // Return the e-Sign URL to frontend
+  console.log("clientId---->", clientId);
   return res.status(200).json({
     success: true,
     message: "Sent for e-sign successfully!",
@@ -650,7 +711,6 @@ export const previewSanction = asyncHandler(async (req, res) => {
     signUrl: esignUrl,
   });
 });
-
 export const redirectUrl = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   // const userId = 32
@@ -732,7 +792,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
     //     "application/pdf"
     //   )
     // ]);
-    fileURL = apiResponse?.url;
+    fileURL = apiResponse?.url; 
     // Sequential dependent operations
     await prisma.document.create({
       data: {
