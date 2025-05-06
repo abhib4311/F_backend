@@ -820,24 +820,22 @@ export const getUploadUrlAPI = async (payload) => {
 export const getSingedDocUrl = async (document_id) => {
   try {
     // Prepare request payload (if required by API body)
-    const requestBody = JSON.stringify({ documentId: document_id });
-
     // Construct full URL with path parameter
     const url = `${process.env.ESIGN_DOWNLOAD_FILE_SUREPASS}/${document_id}`;
     let config = {
-      method: 'GET',
+      method: 'get',
       maxBodyLength: Infinity,
       url: url,
       headers: {
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN,
         'Content-Type': 'application/json'
-      }
+      },
     };
     const response = await axios.request(config);
     return { apiRequest: config, apiResponse: response.data };
 
   } catch (error) {
-    console.log("esign Doc API Error : ", error)
+    console.log("esign Doc API Error : ", error.response)
     if (error.response) {
       throw new ResponseError(
         error.response.status || 500,

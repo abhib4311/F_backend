@@ -671,10 +671,9 @@ export const previewSanction = asyncHandler(async (req, res) => {
   });
 });
 export const redirectUrl = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  // const userId = 32
+  const userId = req?.user?.id;
+  if (!userId) throw new ResponseError(401, "Unauthorized: User ID missing");
 
-  // Fetch minimum required fields
   const [user, lead] = await Promise.all([
     prisma.customer.findUnique({
       where: { id: userId },
@@ -692,91 +691,90 @@ export const redirectUrl = asyncHandler(async (req, res) => {
     })
   ]);
 
-  if (!user) throw new ResponseError(400, "User not found");
-  if (!lead) throw new ResponseError(400, "No lead found for user");
+  if (!user) throw new ResponseError(404, "User not found");
+  if (!lead) throw new ResponseError(404, "No lead found for user");
 
-  // Validate lead status
-  const leadValidations = [
-    { check: lead.is_rejected, message: "Lead is rejected" },
-    { check: lead.is_sanction, message: "Sanction already completed" },
-    { check: !lead.is_kyc_approved, message: "Verify Your KYC first" }
-  ];
+  // Validation checks
+  if (lead.is_rejected) throw new ResponseError(400, "Lead is rejected");
+  if (lead.is_sanction) throw new ResponseError(400, "Sanction already completed");
+  if (!lead.is_kyc_approved) throw new ResponseError(400, "Please complete your KYC first");
 
-  for (const validation of leadValidations) {
-    if (validation.check) throw new ResponseError(400, validation.message);
-  }
-
-  // Find required sanction details
+  // Get pending sanction with document ID
   const pendingSanction = await prisma.sanction.findFirst({
     where: { lead_id: lead.id, is_eSign_pending: true },
     select: { id: true, document_id: true }
   });
+  console.log("pendingSanction---->", pendingSanction);
 
-  // Fixed syntax error: Added missing parenthesis and formatted ternary operator
-  if (!pendingSanction?.document_id) {
-    throw new ResponseError(400, pendingSanction
-      ? "Document ID not found in sanction record"
-      : "No pending e-sign sanction found for this lead"
-    );
-  }
-// console.log("pendingSanction---->", pendingSanction);
-  // // API call and parallel processing
+  if (!pendingSanction) throw new ResponseError(404, "No pending e-sign sanction found for this lead");
+  if (!pendingSanction.document_id) throw new ResponseError(422, "Sanction record found but missing document ID");
+  console.log("pendingSanction.document_id---->", pendingSanction.document_id);
+  // External API call
   const { apiRequest, apiResponse } = await getSingedDocUrl(pendingSanction.document_id);
-  if (apiResponse?.status_code !== 200) handleSurepassResponse(apiResponse);
+  if (!apiResponse || apiResponse.status_code !== 200) {
+    handleSurepassResponse(apiResponse);
+  }
+  // console.log("apiResponse---->", apiResponse);
+  const fileURL = apiResponse?.data?.url;
+  if (!fileURL) throw new ResponseError(500, "Signed document URL missing in API response");
 
-  await prisma.$transaction(async (prisma) => {
-    // Cache reusable values
-    const userPan = user.pan;
-    const leadId = lead.id;
-    const customerId = user.id;
-    const fileURL = apiResponse?.url;
-    // Parallelize independent operations
+  // DB Transaction
+  await prisma.$transaction(async (tx) => {
+    const { pan } = user;
+    const { id: leadId } = lead;
+
     await Promise.all([
-      prisma.api_Logs.create({
+      tx.api_Logs.create({
         data: {
-          pan: userPan,
+          pan,
           api_type: API_TYPE.DOWNLOAD_ESIGN,
           api_provider: 1,
           api_request: apiRequest,
           api_response: apiResponse,
           api_status: true,
           lead_id: leadId,
-          customer_id: customerId
+          customer_id: userId
         }
       }),
-      prisma.document.create({
+      tx.document.create({
         data: {
-          pan: userPan,
+          pan,
           document_type: DOCUMENT_TYPE.SANCTION_LETTER,
           document_url: fileURL,
-          customer_id: customerId,
+          customer_id: userId,
           lead_id: leadId
         }
       }),
-      prisma.sanction.update({
+      tx.sanction.update({
         where: { id: pendingSanction.id },
-        data: { is_eSigned: true, is_eSign_pending: false }
-      }),
-      prisma.lead.update({
-        where: { id: leadId },
-        data: { is_sanction: true, lead_stage: LEAD_STAGE.SANCTION_COMPLETED }
-      }),
-      prisma.lead_Logs.create({
         data: {
-          customer_id: customerId,
+          is_eSigned: true,
+          is_eSign_pending: false
+        }
+      }),
+      tx.lead.update({
+        where: { id: leadId },
+        data: {
+          is_sanction: true,
+          lead_stage: LEAD_STAGE.SANCTION_COMPLETED
+        }
+      }),
+      tx.lead_Logs.create({
+        data: {
+          customer_id: userId,
           lead_id: leadId,
-          pan: userPan,
-          remarks: " SIGNED SANCTION LETTER GENERATED"
+          pan,
+          remarks: "SIGNED SANCTION LETTER GENERATED"
         }
       })
     ]);
-
-    return res.status(200).json({
-      success: true,
-      message: "Sanction letter saved successfully",
-      data: { document_url: fileURL }
-    });
   }, { timeout: 30000 });
+
+  return res.status(200).json({
+    success: true,
+    message: "Sanction letter generated and saved successfully",
+    data: { document_url: fileURL }
+  });
 });
 
 // Done
