@@ -719,7 +719,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
       : "No pending e-sign sanction found for this lead"
     );
   }
-
+// console.log("pendingSanction---->", pendingSanction);
   // // API call and parallel processing
   const { apiRequest, apiResponse } = await getSingedDocUrl(pendingSanction.document_id);
   if (apiResponse?.status_code !== 200) handleSurepassResponse(apiResponse);
