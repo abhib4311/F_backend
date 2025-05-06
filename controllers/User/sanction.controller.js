@@ -536,6 +536,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
     footerImageBase64
   );
 
+  console.log("sanction_html_page---->", sanction_html_page); 
   const pdfBuffer = await generatepdf(sanction_html_page, { returnBuffer: true });
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
   console.log(pdfBuffer);

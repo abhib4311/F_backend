@@ -1,23 +1,39 @@
 import puppeteer from "puppeteer";
 
+
 const convertHtmlToPdfBase64 = async (htmlContent) => {
   try {
+
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', // Prevent /dev/shm usage issues
+        '--disable-gpu',
+        '--single-process', // Recommended for Docker environments
+        '--no-zygote', // Disables zygote process for container optimization
+        '--font-render-hinting=none',
+        '--disable-font-subpixel-positioning'
+      ],
+      headless: "new" // or true (depending on Puppeteer version)
     });
     const page = await browser.newPage();
-    await page.setContent(htmlContent, {
-      waitUntil: 'networkidle0',
-      timeout: 30000
-    });
-    const pdfBuffer = await page.pdf({ format: 'A4' });
+
+
+    await page.setContent(htmlContent, { waitUntil: "load" });
+
+
+    const pdfBuffer = await page.pdf({ format: "A4" });
+
+
+    const base64PDF = Buffer.from(pdfBuffer).toString("base64");
+
     await browser.close();
-    return Buffer.from(pdfBuffer).toString('base64');
+    console.log("PDF generated successfully.--->" , base64PDF);
+    return base64PDF;
   } catch (error) {
-    console.error('Error converting HTML to PDF:', error?.message || error);
+    console.error("Error converting HTML to PDF:", error);
     return null;
   }
 };
-
 export default convertHtmlToPdfBase64;
