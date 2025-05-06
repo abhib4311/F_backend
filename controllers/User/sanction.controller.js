@@ -1002,15 +1002,17 @@ export const redirectUrl = asyncHandler(async (req, res) => {
 export const getCongratulationPageDetails = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
-  const userExists = await prisma.customer.findUnique({
+  // Step 1: Validate user
+  const user = await prisma.customer.findUnique({
     where: { id: userId },
     select: { id: true }
   });
 
-  if (!userExists) {
-    throw new ResponseError(400, "User not found");
+  if (!user) {
+    throw new ResponseError(404, "User not found");
   }
 
+  // Step 2: Get most recent lead
   const lead = await prisma.lead.findFirst({
     where: { customer_id: userId },
     orderBy: { created_at: "desc" },
@@ -1023,19 +1025,21 @@ export const getCongratulationPageDetails = asyncHandler(async (req, res) => {
   });
 
   if (!lead) {
-    throw new ResponseError(400, "No lead found for user");
+    throw new ResponseError(404, "No lead found for user");
   }
 
-  const leadChecks = [
-    [lead.is_rejected, "Lead is rejected"],
-    [!lead.is_sanction, "Sanction not completed"],
-    [!lead.is_disbursed, "Loan is not disbursed"]
-  ];
-
-  for (const [condition, message] of leadChecks) {
-    if (condition) throw new ResponseError(400, message);
+  // Step 3: Business rule validations
+  if (lead.is_rejected) {
+    throw new ResponseError(400, "Lead is rejected");
   }
+  if (!lead.is_sanction) {
+    throw new ResponseError(400, "Sanction not completed");
+  }
+  // if (!lead.is_disbursed) {
+  //   throw new ResponseError(400, "Loan is not disbursed");
+  // }
 
+  // Step 4: Fetch bank & sanction details in parallel
   const [bankDetails, sanctionDetails] = await Promise.all([
     prisma.bank_Details.findFirst({
       where: { customer_id: userId },
@@ -1048,20 +1052,25 @@ export const getCongratulationPageDetails = asyncHandler(async (req, res) => {
     })
   ]);
 
-  const maskAccountNumber = (accNo = '') =>
-    accNo.slice(-4).padStart(accNo.length, 'X');
-
-  const data = {
-    amount_disbursed: sanctionDetails?.net_disbursal || 0,
-    masked_bank_no: maskAccountNumber(bankDetails?.bank_acc_no)
+  // Step 5: Mask account number safely
+  const maskAccountNumber = (accNo = '') => {
+    if (typeof accNo !== 'string' || accNo.length < 4) return accNo;
+    return accNo.slice(-4).padStart(accNo.length, 'X');
   };
 
+  const responseData = {
+    amount_disbursed: sanctionDetails?.net_disbursal || 0,
+    masked_bank_no: maskAccountNumber(bankDetails?.bank_acc_no || '')
+  };
+
+  // Step 6: Respond
   res.status(200).json({
     success: true,
-    message: "Congratulation page details fetched successfully",
-    data
+    message: "Congratulations! Loan disbursed successfully.",
+    data: responseData
   });
 });
+
 
 
 // Done
