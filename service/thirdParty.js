@@ -44,7 +44,7 @@ export const sendOtpAPI = async (phone_number) => {
     }
   }
 };  // SUREPASS OTP API
-};  // SUREPASS OTP API
+// };  // SUREPASS OTP API
 
 
 // Verify OTP API
@@ -87,7 +87,7 @@ export const verifyOtpAPI = async (otp, request_id) => {
     }
   }
 }; // SUREPASS OTP API
-}; // SUREPASS OTP API
+// }; // SUREPASS OTP API
 
 // Fetch Mobile Details API
 export const fetchMobileDetailsAPI = async (request_id) => {
@@ -125,7 +125,7 @@ export const fetchMobileDetailsAPI = async (request_id) => {
     }
   }
 }; // PERFIOS API
-}; // PERFIOS API
+// }; // PERFIOS API
 
 // Fetch PAN Details API
 export const fetchPanDetailsAPI = async (PAN) => {
@@ -177,7 +177,7 @@ export const fetchPanDetailsAPI = async (PAN) => {
     }
   }
 }; // SUREPASS PAN API
-}; // SUREPASS PAN API
+// }; // SUREPASS PAN API
 
 // Send OTP on Email
 export const sendEmailOtpAPI = async (email, employeeName) => {
@@ -225,7 +225,7 @@ export const sendEmailOtpAPI = async (email, employeeName) => {
     }
   }
 }; //PERFIOS API
-}; //PERFIOS API
+// }; //PERFIOS API
 
 // Verif Email OTP
 export const verifyEmailOtpAPI = async (otp, request_id) => {
@@ -263,7 +263,7 @@ export const verifyEmailOtpAPI = async (otp, request_id) => {
     }
   }
 };  // PERFIOS API
-};  // PERFIOS API
+// };  // PERFIOS API
 
 // validate Office Email API
 // export const validateEmailAPI = async (email) => {
@@ -371,7 +371,7 @@ export const sendAadhaarOtpAPI = async (aadhaar) => {
     }
   }
 };  //PERFIOS API
-};  //PERFIOS API
+// };  //PERFIOS API
 
 // Validate Aadhaar API
 export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
@@ -410,7 +410,7 @@ export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
     }
   }
 };  //PERFIOS API
-};  //PERFIOS API
+// };  //PERFIOS API
 
 export const fetchOnGridAddress = async (mobile) => {
   try {
@@ -464,7 +464,7 @@ export const fetchOnGridAddress = async (mobile) => {
     throw new ResponseError(statusCode, message);
   }
 };  //ONGRID API
-};  //ONGRID API
+// };  //ONGRID API
 
 
 // esign document return API
@@ -511,7 +511,7 @@ export const fetchCibilAPI = async (cibilRequestBody) => {
     }
   }
 };  // SUREPASS CIBIL API
-};  // SUREPASS CIBIL API
+// };  // SUREPASS CIBIL API
 
 
 export const sanctionAPI = async (base64_encoded, full_name, personal_email, mobile, lead_id) => {
@@ -566,7 +566,7 @@ export const sanctionAPI = async (base64_encoded, full_name, personal_email, mob
   }
 
 }; //PERFIOS API
-}; //PERFIOS API
+// }; //PERFIOS API
 
 // Disburse Loan API
 export const disburseLoanAPI = async (data) => {
@@ -600,7 +600,7 @@ export const disburseLoanAPI = async (data) => {
     };
   }
 }; // ICICI API
-}; // ICICI API
+// }; // ICICI API
 
 export const fetchLocationAPI = async (lat, lng) => {
   try {
@@ -661,7 +661,7 @@ export const fetchLocationAPI = async (lat, lng) => {
     throw new ResponseError(500, error.message || "Internal Server Error: Unable to fetch location details");
   };
 }// GOOGLE MAPS API
-}// GOOGLE MAPS API
+// }// GOOGLE MAPS API
 
 // surepass API aadhaar-kyc step - 1
 export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
@@ -780,7 +780,7 @@ export const esignInitAPI = async (payload) => {
     }
   }
 }; //SUREPASS API
-}; //SUREPASS API
+// }; //SUREPASS API
 
 // e-Sign step 2
 export const getUploadUrlAPI = async (payload) => {

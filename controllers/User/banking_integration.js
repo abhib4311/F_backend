@@ -10,7 +10,7 @@ dotenv.config();
 const exec = promisify(execCb);
 
 // Utility to generate timestamp
- export const getCurrentTimestamp = () => {
+export const getCurrentTimestamp = () => {
   const now = new Date();
   const [yyyy, mm, dd, hh, min, ss] = [
     now.getFullYear(),
@@ -31,21 +31,21 @@ const generateRandom16Digit = () => {
 const sendEncryptedRequest = async () => {
   const timestamp = getCurrentTimestamp();
 
-  
-    const requestParams = {
-      "localTxnDtTime": timestamp,
-  "beneAccNo": "123456041",
-  "beneIFSC": "NPCI0000001",
-  "amount": "1.00",
-  "tranRefNo": timestamp,
-  "paymentRef": "IMPSTransferP2A",
-  "senderName": "Pratik Mundhe",
-  "mobile": "9999988888",
-  "retailerCode": "rcode",
-  "passCode": "447c4524c9074b8c97e3a3c40ca7458d",
-  "bcID": "IBCKer00055",
-    };
-  
+
+  const requestParams = {
+    "localTxnDtTime": timestamp,
+    "beneAccNo": "123456041",
+    "beneIFSC": "NPCI0000001",
+    "amount": "1.00",
+    "tranRefNo": timestamp,
+    "paymentRef": "IMPSTransferP2A",
+    "senderName": "Pratik Mundhe",
+    "mobile": "9999988888",
+    "retailerCode": "rcode",
+    "passCode": "447c4524c9074b8c97e3a3c40ca7458d",
+    "bcID": "IBCKer00055",
+  };
+
 
   console.log(
     "<<========Request Params=========>>",
@@ -98,7 +98,7 @@ const sendEncryptedRequest = async () => {
 
   try {
     const url = process.env.ICICI_BANK_COMPOSITE_API;
-    console.log("--->" , url)
+    console.log("--->", url)
     const headers = {
       "cache-control": "no-cache",
       accept: "application/json",
@@ -165,13 +165,13 @@ const status_check = async () => {
   const timestamp = getCurrentTimestamp();
 
   const requestParams = {
-    
-      transRefNo: 20250501191601,
-      date: "2/05/2025",
-      recon360: "N",
-      passCode: "447c4524c9074b8c97e3a3c40ca7458d",
+
+    transRefNo: 20250501191601,
+    date: "2/05/2025",
+    recon360: "N",
+    passCode: "447c4524c9074b8c97e3a3c40ca7458d",
     bcID: "IBCKer00055",
-     
+
   };
 
   console.log(
@@ -225,7 +225,7 @@ const status_check = async () => {
 
   try {
     const url = process.env.ICICI_BANK_STATUS_CHECK;
-    console.log("--->" , url)
+    console.log("--->", url)
     const headers = {
       "cache-control": "no-cache",
       accept: "application/json",
@@ -288,4 +288,4 @@ const status_check = async () => {
 
 // Run it
 // console.log(sendEncryptedRequest());
-export {sendEncryptedRequest,status_check};
+export { sendEncryptedRequest, status_check };

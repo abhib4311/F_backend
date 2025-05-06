@@ -612,7 +612,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
       };
 
       // console.log("cibilRequestBody---->>>",cibilRequestBody)
-      // CIBIL API handling
+      // // CIBIL API handling
       // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
       //   cibilRequestBody
       // );
@@ -739,7 +739,7 @@ export const requestLoan = asyncHandler(async (req, res) => {
       const { repaymentDate, tenure } = calculateRepaymentDate(
         lead.salary_date
       );
-      const loanDetails = calculateLoanDetails(loan_amount, tenure, 15);
+      const loanDetails = calculateLoanDetails(loan_amount, tenure, 10); // 10% intrest rate 
 
       // Sanction data preparation
       const sanctionData = {

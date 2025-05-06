@@ -6,16 +6,16 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
     roi,
     interest_amount,
     pf_amount,
-    insurance,
     total_admin_fee,
     net_disbursal,
     repayment_amount,
     repayment_date,
     tenure,
-    apr
+    apr,
+    gst
   } = sanction_detail;
-  const { full_name } = { full_name: "abhishek" };
-  // const { full_name } = user_detail;
+  // const { full_name } = { full_name: "abhishek" };
+  const { full_name } = user_detail;
 
 
   const date = new Date(repayment_date);
@@ -192,11 +192,11 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
           <td class="kfs-td">(g)</td>
           <td class="kfs-td" id="data">
             <div style="width: 100%; height: 10%">
-              ICICI Lombard General Insurance Company Limited
+              GST on Processing Fee at 18%
             </div>
             <span style="font-size: 6px">* Please refer T&Cs</span>
           </td>
-          <td class="kfs-td" id="data">₹ ${insurance}</td>
+          <td class="kfs-td" id="data">₹ ${gst}</td>
         </tr>
         <tr>
           <td class="kfs-td">(h)</td>

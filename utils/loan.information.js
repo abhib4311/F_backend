@@ -22,15 +22,15 @@ function getInsurancePremium(loanAmount) {
 
 export const calculateLoanDetails = (loanAmount, tenureDays, pfPercent) => {
   const insurance = 0 // now static
-  const dailyInterestRate = 0.009; // 0.90% per day
+  const dailyInterestRate = 0.01; // 1% per day
 
   const pfAmount = Math.round((loanAmount * pfPercent) / 100);
-  const totalAdminFees = Math.round(pfAmount + insurance);
+  const gst = Math.round(pfAmount * 0.18);
+  const totalAdminFees = Math.round(pfAmount + insurance + gst);
   const netDisbursal = Math.round(loanAmount - totalAdminFees);
   const interestAmount = Math.round(loanAmount * dailyInterestRate * tenureDays);
   const repaymentAmount = Math.round(loanAmount + interestAmount);
   const netAdminFee = Math.round((totalAdminFees / 118) * 100);
-  const gst = Math.round((totalAdminFees / 118) * 18);
   const apr = Number(
     (((totalAdminFees + interestAmount) / loanAmount) * (365 / tenureDays) * 100).toFixed(2)
   );
