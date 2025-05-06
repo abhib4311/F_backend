@@ -835,7 +835,7 @@ export const getSingedDocUrl = async (document_id) => {
     return { apiRequest: config, apiResponse: response.data };
 
   } catch (error) {
-    console.log("esign Doc API Error : ", error.response)
+    console.log("esign Doc API Error : ", error)
     if (error.response) {
       throw new ResponseError(
         error.response.status || 500,

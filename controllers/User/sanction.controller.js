@@ -714,7 +714,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   if (!apiResponse || apiResponse.status_code !== 200) {
     handleSurepassResponse(apiResponse);
   }
-  // console.log("apiResponse---->", apiResponse);
+  console.log("apiResponse---->", apiResponse);
   const fileURL = apiResponse?.data?.url;
   if (!fileURL) throw new ResponseError(500, "Signed document URL missing in API response");
 
