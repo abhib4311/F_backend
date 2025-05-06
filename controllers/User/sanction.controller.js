@@ -541,6 +541,9 @@ export const previewSanction = asyncHandler(async (req, res) => {
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
   // console.log(pdfBuffer);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
+  if(!pdfBuffer) {
+    return res.status(400).json({message: "pdfBuffer is not generated"})
+  }
   console.log("---------------- PDF BUFFER" , pdfBuffer);
 
   // Create a Blod/File from the buffer
