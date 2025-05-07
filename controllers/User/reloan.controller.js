@@ -182,7 +182,8 @@ export const getLoanStatus = asyncHandler(async (req, res) => {
       select: {
         net_disbursal: true,
         repayment_date: true,
-        repayment_amount: true
+        repayment_amount: true,
+        loan_amount: true
       }
     }),
     prisma.disbursal.findFirst({
@@ -194,6 +195,7 @@ export const getLoanStatus = asyncHandler(async (req, res) => {
 
   const data = {
     amount_disbursed: sanctionDetails?.net_disbursal ?? 0,
+    loan_amount: sanctionDetails?.loan_amount ?? 0,
     disbursed_date: disbursalDate?.disbursal_date ?? new Date(),
     repayment_date: sanctionDetails?.repayment_date ?? null,
     repayment_amount: sanctionDetails?.repayment_amount ?? 0,
