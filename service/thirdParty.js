@@ -715,7 +715,7 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
+        // 'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       data: data
     };

@@ -492,37 +492,6 @@ export const previewSanction = asyncHandler(async (req, res) => {
   if (!existingSanction) {
     throw new ResponseError(400, "Sanction not found");
   }
-  // const existingSanction = {
-  //   loan_no: "LN202405041234",
-  //   loan_amount: 500000,           // ₹5,00,000
-  //   roi: 12.5,                     // 12.5% Rate of Interest
-  //   interest_amount: 62500,        // ₹62,500 Interest
-  //   pf_amount: 2500,               // ₹2,500 Processing Fee
-  //   insurance: 3000,               // ₹3,000 Insurance
-  //   total_admin_fee: 1500,         // ₹1,500 Admin Charges
-  //   net_disbursal: 493000,         // ₹4,93,000 Final Amount (after deductions)
-  //   repayment_amount: 562500,      // ₹5,62,500 Total to Repay
-  //   repayment_date: "2026-05-04",  // Repayment ends on May 4, 2026
-  //   tenure: 24,                    // 24 months
-  //   apr: 13.25                     // 13.25% APR
-  // };
-  // ;
-  // const existingSanction = {
-  //   loan_no: "LN202405041234",
-  //   loan_amount: 500000,           // ₹5,00,000
-  //   roi: 12.5,                     // 12.5% Rate of Interest
-  //   interest_amount: 62500,        // ₹62,500 Interest
-  //   pf_amount: 2500,               // ₹2,500 Processing Fee
-  //   insurance: 3000,               // ₹3,000 Insurance
-  //   total_admin_fee: 1500,         // ₹1,500 Admin Charges
-  //   net_disbursal: 493000,         // ₹4,93,000 Final Amount (after deductions)
-  //   repayment_amount: 562500,      // ₹5,62,500 Total to Repay
-  //   repayment_date: "2026-05-04",  // Repayment ends on May 4, 2026
-  //   tenure: 24,                    // 24 months
-  //   apr: 13.25                     // 13.25% APR
-  // };
-  // ;
-  // const lead_detail = true;
 
   // Generate PDF content
   const headerImagePath = path.join(__dirname, '../../public/images/Header.png');
