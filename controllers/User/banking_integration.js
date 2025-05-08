@@ -233,6 +233,7 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
       });
     }
 
+    console.log('Payment Error:-->', error);
     // Handle known error codes
     const errorCode = Object.keys(errorMap).find(code =>
       error.message.includes(code)
