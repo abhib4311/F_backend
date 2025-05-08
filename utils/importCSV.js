@@ -127,6 +127,16 @@ const importData = async () => {
             prisma.serviceable_pin_code
         );
 
+        await processFile.csv(
+            './utils/whitelisted_users.csv', 
+            (row) => ({
+                customer_name: row.customer_name?.trim(),
+                pan: row.pan?.trim(),
+                previous_loan_amount: parseInt(row.amount) || 0,
+            }),
+            prisma.whitelisted_users 
+        );
+
     } catch (err) {
         Imported
         console.error(' Import failed:', err);

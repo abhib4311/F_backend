@@ -13,7 +13,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 
 const prisma = new PrismaClient();
 
-const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
+const uploadBsaCartApiInitiate = async (file, userId, leadId, pan, password) => {
   try {
     console.log("file-1 --------------------------------->");
     const uploadedFile = file;
@@ -27,7 +27,7 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan) => {
     });
     console.log("form-1 --------------------------------->");
     const metadata = {
-      password: "",
+      password: password || "",
       bank: "Other",
       name: "Blinkr",
       productType: "Salaried",
@@ -173,20 +173,30 @@ const estimateSalary = (data) => {
   const salary = Math.round(averageThreeMonthsSalary);
   return salary;
 };
-const applyMultipliers = (salary, score, type) => {
+const applyMultipliers = (amount, score, type) => {
   let maxLoanAmount = 0;
   if (type === "CIBIL") {
     if (score >= 780) {
-      maxLoanAmount = salary * 0.65;
+      maxLoanAmount = amount * 0.65;
     } else if (score >= 750) {
-      maxLoanAmount = salary * 0.5;
+      maxLoanAmount = amount * 0.5;
     } else if (score >= 700) {
-      maxLoanAmount = salary * 0.3;
+      maxLoanAmount = amount * 0.3;
     } else if (score >= 650) {
-      maxLoanAmount = salary * 0.2;
+      maxLoanAmount = amount * 0.2;
+    }
+  } else if (type === "WHITE_LISTED"){
+    if(score >= 750){
+      maxLoanAmount = amount * 0.80;
+    } else if (score >= 700) {
+      maxLoanAmount = amount * 0.75;
+    } else if (score >= 650){
+      maxLoanAmount = amount * 0.65
+    } else {
+      maxLoanAmount = amount * 0.50;
     }
   } else {
-    // Handle other types of scores here
+
   }
   return maxLoanAmount;
 };
@@ -325,6 +335,15 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
     },
   });
 };
+const checkWhiteListedUser = async (pan) => {
+  const whiteListedUser = await prisma.whitelisted_users.findFirst({
+    where: {
+      pan: pan,
+    },
+  });
+  if (whiteListedUser) return true;
+  return false;
+}
 
 const uploadBankStatement = asyncHandler(async (req, res) => {
   try {
@@ -382,8 +401,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         .json({ message: "Bureau was not pulled correctly" });
     }
 
-    const score =
-      bureauReport?.api_response?.data?.credit_score || null;
+    const score = bureauReport?.api_response?.data?.credit_score || null;
     if (!score) {
       return res
         .status(400)
@@ -398,7 +416,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         .json({ message: "File not uploaded from the web" });
     }
     const uploadedFile = req.files.file;
-    console.log("uploadedFile------->", uploadedFile);
+    const password = req.headers["password"];
 
     if (uploadedFile.mimetype !== "application/pdf") {
       return res.status(400).json({ message: "Uploaded File is not a PDF" });
@@ -415,7 +433,8 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       uploadedFile,
       userId,
       leadId,
-      pan
+      pan,
+      password
     );
 
     if (apiUploadResponse.status === "Rejected") {
@@ -451,12 +470,16 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       },
     });
 
+    const isWhitelisted = await checkWhiteListedUser(pan);
+
     const breRequestConfig = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "customer-type": isWhitelisted ? "whitelisted" : "",
       },
       body: JSON.stringify(bureauReport.api_response),
+
     };
 
     const breUrl =
@@ -568,18 +591,18 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     } = bankDetails;
 
 
-    if (
-      !bankName ||
-      !branchName ||
-      !accountNumber ||
-      !ifscCode ||
-      !accountType ||
-      !accountName
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Incomplete bank details in the response" });
-    }
+    // if (
+    //   !bankName ||
+    //   !branchName ||
+    //   !accountNumber ||
+    //   !ifscCode ||
+    //   !accountType ||
+    //   !accountName
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Incomplete bank details in the response" });
+    // }
 
     await prisma.bank_Details.create({
       data: {
@@ -598,9 +621,17 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     const averageSalary = parseFloat(estimateSalary(downloadResponse));
     const repaymentDateValue = repaymentDate(downloadResponse);
 
-    console.log("Calulating maxLoanAmount");
+    const whiteListedUser = await prisma.whitelisted_users.findFirst({
+      where: {
+        pan: pan,
+      },
+    });
 
-    const maxLoanAmount = applyMultipliers(averageSalary, score, "CIBIL");
+    console.log("Calulating maxLoanAmount");
+    console.log("whiteListedUser ---> ", JSON.stringify(whiteListedUser));
+    console.log("isWhitelisted ---> ", isWhitelisted);
+
+    let maxLoanAmount = !isWhitelisted ? applyMultipliers(averageSalary, score, "CIBIL") : applyMultipliers(whiteListedUser.previous_loan_amount, score, "WHITE_LISTED");
     if (maxLoanAmount === 0) {
       return res
         .status(400)
