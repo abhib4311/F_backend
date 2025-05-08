@@ -336,6 +336,7 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
   });
 };
 const checkWhiteListedUser = async (pan) => {
+  console.log("Hii----------- 1")
   const whiteListedUser = await prisma.whitelisted_users.findFirst({
     where: {
       pan: pan,
@@ -631,7 +632,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     console.log("whiteListedUser ---> ", JSON.stringify(whiteListedUser));
     console.log("isWhitelisted ---> ", isWhitelisted);
 
-    let maxLoanAmount = !isWhitelisted ? applyMultipliers(averageSalary, score, "CIBIL") : applyMultipliers(whiteListedUser.previous_loan_amount, score, "WHITE_LISTED");
+    let maxLoanAmount = !isWhitelisted ? applyMultipliers(averageSalary, score, "CIBIL") : applyMultipliers(whiteListedUser?.previous_loan_amount, score, "WHITE_LISTED");
     if (maxLoanAmount === 0) {
       return res
         .status(400)
