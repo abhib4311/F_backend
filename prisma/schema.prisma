@@ -1,0 +1,533 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("MYSQL_DATABASE_URL")
+}
+
+model Lead {
+  id                       Int          @id @default(autoincrement())
+  lead_no                  String?
+  f_name                   String?
+  m_name                   String?
+  l_name                   String?
+  full_name                String?
+  pan                      String?
+  gender                   Gender?
+  dob                      DateTime?
+  aadhaar                  String?
+  elegible_loan_amount     Decimal?     @db.Decimal(10, 2)
+  loan_amount              Decimal?     @db.Decimal(10, 2)
+  tenure                   Int?
+  dpd                      Int?
+  mobile                   String?
+  personal_email           String?
+  office_email             String?
+  allocated_to             Int?
+  assigned_to              Int?
+  lead_stage               String?      @default("PENDING_LEAD")
+  remarks                  String?
+  is_lead_completed        Boolean      @default(false)
+  is_lead_closed           Boolean      @default(false)
+  is_lead_verify_by_otp    Boolean      @default(false)
+  repayment_date           DateTime?
+  is_kyc_approved          Boolean      @default(false)
+  is_kyc_reject            Boolean      @default(false)
+  kyc_rejected_by          Int?
+  is_bre_complete          Boolean?     @default(false)
+  is_bsa_complete          Boolean?     @default(false)
+  is_bre_reject            Boolean?     @default(false)
+  is_personal_email_verify Boolean?     @default(false)
+  is_office_email_verify   Boolean?     @default(false)
+  is_employee_type_filled  Boolean?     @default(false)
+  is_loan_requested        Boolean?     @default(false)
+  address                  String?
+  state                    String?
+  country                  String?
+  pincode                  String?
+  city                     String?
+  lat                      String?
+  lng                      String?
+  is_reloan_case           Boolean?     @default(false)
+  is_sanction              Boolean      @default(false)
+  is_disbursed             Boolean      @default(false)
+  is_closed                Boolean      @default(false)
+  is_active                Boolean      @default(true)
+  source                   String?
+  is_hold                  Boolean?     @default(false)
+  is_rejected              Boolean?     @default(false)
+  rejected_by              Int?
+  approved_by              Int?
+  rejection_remarks        String?
+  credit_score             Int?
+  is_person_salaried       Boolean?     @default(true)
+  created_at               DateTime     @default(now())
+  updated_at               DateTime     @updatedAt
+  loan_no                  String?
+  customer_id              Int?
+  sanction_id              Int?
+  disbursal_id             Int?
+  collection_id            Int?
+  is_feedback_submitted    Boolean?     @default(false)
+  is_reference_added       Boolean?     @default(false)
+  salary_date              DateTime?
+  is_face_matched          Boolean?     @default(false)
+  collection               Collection[]
+  disbursal                Disbursal?
+  sanction                 Sanction?
+
+  @@index([lead_no])
+  @@index([customer_id])
+  @@index([sanction_id])
+  @@index([disbursal_id])
+  @@index([pan])
+  @@index([aadhaar])
+  @@index([mobile])
+  @@index([personal_email])
+  @@index([source])
+}
+
+model Customer {
+  id                       Int       @id @default(autoincrement())
+  customer_no              String?
+  pan                      String    @unique
+  aadhaar                  String?
+  f_name                   String?
+  m_name                   String?
+  l_name                   String?
+  full_name                String?
+  gender                   Gender?
+  dob                      DateTime?
+  mobile                   String?
+  personal_email           String?
+  office_email             String?
+  address                  String?
+  state                    String?
+  country                  String?
+  pincode                  String?
+  city                     String?
+  employement_type         String?
+  monthly_income           Decimal?  @db.Decimal(10, 2)
+  loan_count               Int       @default(0)
+  credit_score             Int?
+  recent_credit_score_date DateTime?
+  is_active                Boolean   @default(true)
+  is_logged_in             Boolean?
+  last_logged_in           DateTime?
+  auth_token               String?
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+  company_name             String?
+  net_monthly_salary       Int?
+  salary_date              DateTime?
+
+  @@index([mobile])
+  @@index([personal_email])
+  @@index([office_email])
+  @@index([state])
+  @@index([city])
+  @@index([pincode])
+  @@index([pan])
+}
+
+model Sanction {
+  id               Int       @id @default(autoincrement())
+  pan              String?
+  lead_id          Int?      @unique
+  lead_no          String?
+  loan_no          String    @unique
+  sanction_date    DateTime?
+  loan_amount      Decimal?  @db.Decimal(10, 2)
+  repayment_date   DateTime?
+  repayment_amount Decimal?  @db.Decimal(10, 2)
+  processing_fee   Decimal?  @db.Decimal(10, 2)
+  roi              Decimal?  @db.Decimal(10, 2)
+  pf_percent       Decimal?  @db.Decimal(10, 2)
+  pf_amount        Decimal?  @db.Decimal(10, 2)
+  insurance        Decimal?  @db.Decimal(10, 2)
+  total_admin_fee  Decimal?  @db.Decimal(10, 2)
+  net_admin_fee    Decimal?  @db.Decimal(10, 2)
+  net_disbursal    Decimal?  @db.Decimal(10, 2)
+  interest_amount  Decimal?  @db.Decimal(10, 2)
+  gst              Decimal?  @db.Decimal(10, 2)
+  apr              Decimal?  @db.Decimal(10, 2)
+  tenure           Decimal?  @db.Decimal(10, 2)
+  remarks          String?
+  is_eSign_pending Boolean   @default(false)
+  is_eSigned       Boolean   @default(false)
+  is_on_hold       Boolean   @default(false)
+  is_rejected      Boolean   @default(false)
+  rejected_by      Int?
+  is_disbursed     Boolean   @default(false)
+  approved_by      Int?
+  document_id      String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  lead             Lead?     @relation(fields: [lead_id], references: [id])
+
+  @@index([lead_id])
+  @@index([lead_no])
+  @@index([pan])
+  @@index([sanction_date])
+  @@index([is_disbursed])
+}
+
+model Disbursal {
+  id                     Int       @id @default(autoincrement())
+  lead_id                Int       @unique
+  loan_no                String?
+  pan                    String?
+  sanction_id            Int?
+  payable_account        String?
+  payment_mode           String
+  amount                 Decimal?  @db.Decimal(10, 2)
+  utr                    String?
+  transaction_history_id Int?
+  disbursal_date         DateTime?
+  is_active              Boolean   @default(true)
+  is_closed              Boolean   @default(false)
+  is_settled             Boolean   @default(false)
+  is_write_off           Boolean   @default(false)
+  is_on_hold             Boolean   @default(false)
+  is_rejected            Boolean   @default(false)
+  rejected_by            Int?
+  is_disbursed           Boolean   @default(false)
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+  loan_amount            Decimal?  @db.Decimal(10, 2)
+  repayment_date         DateTime?
+  repayment_amount       Decimal?  @db.Decimal(10, 2)
+  roi                    Decimal?  @db.Decimal(10, 2)
+  tenure                 Int?
+  disbursed_by           Int?
+  channel                String?
+  remarks                String?
+  lead                   Lead      @relation(fields: [lead_id], references: [id])
+
+  @@index([lead_id])
+  @@index([loan_no])
+  @@index([pan])
+  @@index([sanction_id])
+  @@index([disbursal_date])
+}
+
+model Collection {
+  id                   Int       @id @default(autoincrement())
+  customer_id          Int?
+  lead_id              Int?
+  loan_no              String?
+  pan                  String?
+  payment_mode         String?
+  received_amount      Decimal?  @db.Decimal(10, 2)
+  repayment_type       String?
+  discount             Decimal?  @db.Decimal(10, 2)
+  refund               Decimal?  @db.Decimal(10, 2)
+  date_of_recived      DateTime?
+  payment_verification Int?
+  sattelment           Decimal?  @db.Decimal(10, 2)
+  remarks              String?
+  collection_active    Boolean?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  lead                 Lead?     @relation(fields: [lead_id], references: [id])
+
+  @@index([lead_id])
+  @@index([loan_no])
+  @@index([pan])
+}
+
+model Payment {
+  id                    Int       @id @default(autoincrement())
+  pan                   String?
+  lead_id               Int?
+  lead_no               String?
+  loan_no               String?
+  total_received_amount Decimal?  @db.Decimal(10, 2)
+  interest_discount     Decimal?  @db.Decimal(10, 2)
+  penalty_discount      Decimal?  @db.Decimal(10, 2)
+  principal_discount    Decimal?  @db.Decimal(10, 2)
+  interest_received     Decimal?  @db.Decimal(10, 2)
+  penalty_received      Decimal?  @db.Decimal(10, 2)
+  principal_received    Decimal?  @db.Decimal(10, 2)
+  excess_amount         Decimal?  @db.Decimal(10, 2)
+  settled_amount        Decimal?
+  writeOff_amount       Decimal?
+  outstanding_amount    Decimal?
+  received_amount       Decimal?  @db.Decimal(10, 2)
+  payment_date          DateTime?
+  payment_mode          String?
+  transaction_id        String?   @unique
+  closing_type          String?
+  discount              Decimal?  @db.Decimal(10, 2)
+  is_payment_verified   Boolean?  @default(false)
+  is_rejected           Boolean?  @default(false)
+  order_status          String?
+  order_id              String?   @unique
+  receipt_id            String?
+  payment_method        String?
+  is_partial_paid       Boolean?  @default(false)
+  created_at            DateTime? @default(now())
+  updated_at            DateTime? @updatedAt
+
+  @@index([lead_id])
+  @@index([loan_no])
+  @@index([payment_date])
+  @@index([created_at])
+}
+
+model Api_Logs {
+  id           Int      @id @default(autoincrement())
+  pan          String?
+  api_type     String?
+  api_provider Int?
+  api_request  Json?
+  api_response Json?
+  api_status   Boolean?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  customer_id  Int?
+  lead_id      Int?
+
+  @@index([pan])
+  @@index([customer_id])
+  @@index([lead_id])
+  @@index([api_type])
+  @@index([created_at])
+}
+
+model Document {
+  id            Int      @id @default(autoincrement())
+  pan           String?
+  document_type String?
+  document_url  String?  @db.VarChar(1000)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  remarks       String?
+  customer_id   Int?
+  lead_id       Int?
+
+  @@index([pan])
+  @@index([customer_id])
+  @@index([lead_id])
+  @@index([document_type])
+}
+
+model Transaction_History {
+  id                   Int      @id @default(autoincrement())
+  lead_id              Int?
+  loan_no              String?
+  utr                  String?
+  payable_account      String?
+  bank_name            String?
+  ifsc                 String?
+  payment_mode         String?
+  disbursal_id         Int?
+  sanction_id          Int?
+  amount               Decimal? @db.Decimal(10, 2)
+  transaction_request  Json?
+  transaction_response Json?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@index([loan_no])
+  @@index([utr])
+  @@index([disbursal_id])
+  @@index([sanction_id])
+}
+
+model Lead_Logs {
+  id          Int      @id @default(autoincrement())
+  customer_id Int?
+  lead_id     Int?
+  pan         String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  remarks     String?
+
+  @@index([customer_id])
+  @@index([lead_id])
+  @@index([pan])
+}
+
+model Employee {
+  id             Int             @id @default(autoincrement())
+  emp_id         String          @unique
+  f_name         String?
+  l_name         String?
+  email          String          @unique
+  password       String?
+  gender         Gender
+  mobile         String?
+  is_active      Boolean         @default(true)
+  is_logged_in   Boolean
+  created_at     DateTime        @default(now())
+  last_logged_in DateTime?
+  updated_at     DateTime        @updatedAt
+  logs           Employee_Logs[]
+  roles          Employee_Role[]
+}
+
+model Role {
+  id         Int             @id @default(autoincrement())
+  role_name  String          @unique
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+  employees  Employee_Role[]
+}
+
+model Employee_Role {
+  employee_id Int
+  role_id     Int
+  assigned_at DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  employee    Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+  role        Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([employee_id, role_id])
+  @@index([role_id], map: "Employee_Role_role_id_fkey")
+}
+
+model Employee_Logs {
+  id          Int      @id @default(autoincrement())
+  employee_id Int
+  remarks     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  employee    Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+
+  @@index([employee_id], map: "Employee_Logs_employee_id_fkey")
+}
+
+model Counter {
+  id             Int      @id @default(autoincrement())
+  sequence_name  String?  @unique
+  sequence_value Int?     @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model Bank_Details {
+  id               Int      @id @default(autoincrement())
+  customer_id      Int?
+  lead_id          Int?
+  pan              String?
+  bank_name        String?
+  branch_name      String?
+  bank_acc_no      String?
+  ifsc_code        String?
+  beneficiary_name String?
+  account_type     String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@index([customer_id])
+  @@index([lead_id])
+  @@index([pan])
+}
+
+model customer_address {
+  id             Int      @id @default(autoincrement())
+  customer_id    Int?
+  lead_id        Int?
+  pan            String?
+  address_source String?
+  address        String?
+  state          String?
+  country        String?
+  pincode        String?
+  city           String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@index([pan])
+  @@index([customer_id])
+  @@index([lead_id])
+  @@index([pincode])
+}
+
+model Bank_Statement_Report {
+  id           Int      @id @default(autoincrement())
+  pan          String
+  api_provider Int?
+  api_request  Json?
+  api_response Json?
+  api_status   Boolean?
+  customer_id  Int?
+  lead_id      Int?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@index([pan])
+  @@index([customer_id])
+  @@index([lead_id])
+}
+
+model blacklisted_pan {
+  id            Int      @id @default(autoincrement())
+  pan           String   @unique
+  customer_name String?
+  reason        String?
+  dpd           String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([pan])
+}
+
+model serviceable_pin_code {
+  id         Int      @id @default(autoincrement())
+  pincode    String?
+  district   String?
+  state      String?
+  firstTwo   Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([pincode])
+}
+
+model feedback_form {
+  id                        Int      @id @default(autoincrement())
+  over_all_interface        Int?
+  navigate                  Int?
+  easy_to_apply             Int?
+  customer_centric_approach Int?
+  recommend_to              Int?
+  category                  String?
+  feedback_text             String?
+  lead_id                   Int?
+  customer_id               Int?
+  pan                       String?
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+
+  @@index([lead_id])
+  @@index([pan])
+  @@index([customer_id])
+}
+
+model references {
+  id          Int      @id @default(autoincrement())
+  lead_id     Int?
+  customer_id Int?
+  pan         String?
+  ref_no_1    String?
+  ref_name_1  String?
+  ref_no_2    String?
+  ref_name_2  String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([lead_id])
+  @@index([customer_id])
+  @@index([pan])
+}
+
+enum Gender {
+  M
+  F
+  O
+}
