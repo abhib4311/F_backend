@@ -492,17 +492,29 @@ export const previewSanction = asyncHandler(async (req, res) => {
   if (!existingSanction) {
     throw new ResponseError(400, "Sanction not found");
   }
+  const bankDetails = await prisma.bank_Details.findFirst({
+    where:{
+      pan:lead_detail.pan
+    },
+    orderBy:{
+      created_at : "desc"
+    }
+   
+  })
 
   // Generate PDF content
-  const headerImagePath = path.join(__dirname, '../../public/images/Header.png');
-  const footerImagePath = path.join(__dirname, '../../public/images/Footer.png');
+  const headerImagePath = path.join(__dirname, '../../public/images/Header.webp');
+  const footerImagePath = path.join(__dirname, '../../public/images/Footer.webp');
   const headerImageBase64 = convertImageToBase64(headerImagePath);
   const footerImageBase64 = convertImageToBase64(footerImagePath);
   const sanction_html_page = sanctionpage(
     existingSanction,
     lead_detail,
     headerImageBase64,
-    footerImageBase64
+    footerImageBase64,
+    lead_detail?.elegible_loan_amount,
+    bankDetails?.bank_acc_no,
+    user?.address
   );
 
   console.log("sanction_html_page---->", sanction_html_page);
