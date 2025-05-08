@@ -97,8 +97,8 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
     "amount": "1.00",
     "tranRefNo": generateTransactionId,
     "paymentRef": "IMPSTransferP2A",
-    "senderName": "Pratik Mundhe",
-    "mobile": "9999988888",
+    "senderName": "UY fincorp",
+    "mobile": "9896956566",
     "retailerCode": "rcode",
     "passCode": "0f1f8b6dcebd4e5d89f20a78a06a3c26",
     "bcID": "IBCUY01852",
@@ -213,13 +213,13 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
     }
 
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       data: decryptedData,
       tranRefNo: requestParams?.tranRefNo
     });
   } catch (error) {
-    console.error('Payment Error:', error);
+    console.log('Payment Error:-->', error);
 
     // Handle Axios errors
     if (axios.isAxiosError(error)) {
