@@ -40,7 +40,7 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
     return false;
   }
   finally {
-    await browser.close();
+    // await browser.close();
     console.log("Puppeteer browser closed successfully.----->");
   }
 };
