@@ -127,6 +127,7 @@ const importData = async () => {
             prisma.serviceable_pin_code
         );
 
+        // Process Whitelisted (CSV)
         await processFile.csv(
             './utils/whitelisted_users.csv', 
             (row) => ({

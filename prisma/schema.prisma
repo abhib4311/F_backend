@@ -530,7 +530,7 @@ model whitelisted_users {
   id Int @id  @default(autoincrement())
   customer_name String?
   pan String?
-  previous_loan_amount String?
+  previous_loan_amount Int?
 }
 
 enum Gender {
