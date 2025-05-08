@@ -461,9 +461,9 @@ const submitotp = asyncHandler(async (req, res) => {
     ]);
 
     // const bankDummyData = { beneficiary_name: "Mr. Uvesh" }
-    console.log("panDetails.api_response, aadharDetails.api_response", panDetails.api_response, aadharDetails.api_response);
+    console.log("panDetails.api_response, aadharDetails.api_response", panDetails.api_response, aadharDetails.api_response, bankDetails);
     // Validation logic
-    const validateData = validatePANwithAadhaar(panDetails.api_response, aadharDetails.api_response);
+    const validateData = validatePANwithAadhaar(panDetails.api_response, aadharDetails.api_response, bankDetails);
     if (!validateData.isValid) {
       await Promise.all([
         prisma.lead_Logs.create({
@@ -497,7 +497,7 @@ const submitotp = asyncHandler(async (req, res) => {
           customer_id: userId,
           lead_id: leadId,
           pan,
-          remarks: "Aadhaar KYC successfully completed"
+          remarks: `Aadhaar KYC successfully completed ${validateData?.nameMatchScore}`
         }
       })
     ]);

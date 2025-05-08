@@ -611,18 +611,18 @@ export const addEmployement = asyncHandler(async (req, res) => {
         mobile: cust.mobile,
       };
 
-      // console.log("cibilRequestBody---->>>",cibilRequestBody)
-      // // CIBIL API handling
-      // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
-      //   cibilRequestBody
-      // );
-      // if (cibilResponse?.status_code != "200") {
-      //  handleSurepassResponse(cibilResponse);
-      //  console.log("cibilResponse---->>>", cibilResponse);
-      // }
-      const cibilResponse = dummyCIBIL;
+      console.log("cibilRequestBody---->>>", cibilRequestBody)
+      // CIBIL API handling
+      const { cibilResponse, cibilRequest } = await fetchCibilAPI(
+        cibilRequestBody
+      );
+      if (cibilResponse?.status_code != "200") {
+        handleSurepassResponse(cibilResponse);
+        console.log("cibilResponse---->>>", cibilResponse);
+      }
+      // const cibilResponse = dummyCIBIL;
       console.log("cibilResponse---->>>", cibilResponse?.data?.credit_score);
-      console.log("cibilResponse---->>> type", typeof(cibilResponse?.data?.credit_score)); 
+      console.log("cibilResponse---->>> type", typeof (cibilResponse?.data?.credit_score));
 
       // Batch database operations
       const [apiLog, leadLog, updatedLead] = await Promise.all([
