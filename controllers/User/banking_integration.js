@@ -219,13 +219,13 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
       tranRefNo: requestParams?.tranRefNo
     });
   } catch (error) {
-    console.log('Payment Error:-->', error);
-
+    // console.log('Payment Error:-->', error);
+    
     // Handle Axios errors
     if (axios.isAxiosError(error)) {
       const statusCode = error.response?.status || 500;
       const errorCode = error.response?.data?.errorCode;
-
+      console.log("------------ ERROR ----------" , error?.response?.data)
       return res.status(statusCode).json({
         success: false,
         errorCode,
