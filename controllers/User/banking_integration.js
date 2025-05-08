@@ -71,7 +71,8 @@ function generateTransactionId(length = 6) {
 
 
 // Main function
-export const  sendEncryptedRequest = asyncHandler(async (req, res) => {
+export const sendEncryptedRequest = asyncHandler(async (req, res) => {
+  console.log("----------- HII-1 ------------------------")
   const timestamp = getCurrentTimestamp();
 
   // ----------- UAT REQUEST ------------ 
@@ -91,8 +92,8 @@ export const  sendEncryptedRequest = asyncHandler(async (req, res) => {
 
   const requestParams = {
     "localTxnDtTime": timestamp,
-    "beneAccNo": "123456041",
-    "beneIFSC": "NPCI0000001",
+    "beneAccNo": "2649697009",
+    "beneIFSC": "KKBK0004265",
     "amount": "1.00",
     "tranRefNo": generateTransactionId,
     "paymentRef": "IMPSTransferP2A",
