@@ -362,7 +362,7 @@ export const fetchMyDisbursedLeadsAsSales = async (req, res) => {
             prisma.lead.findMany({
                 where: baseFilter,
                 // select:
-                    // leadSelect,
+                // leadSelect,
                 // sanction: {
                 //     select: {
                 //         disbursement_amount: true,
@@ -1415,6 +1415,67 @@ export const getReferenceDetails = async (req, res) => {
         });
     }
 }
+export const getBSAReport = async (req, res) => {
+    try {
+        const leadId = parseInt(req.params.id);
+        if (isNaN(leadId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid lead ID. It must be a number.',
+            });
+        }
+        const lead = await prisma.lead.findFirst({
+            where: { id: leadId },
+            select: {
+                pan: true
+            }
+        });
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: `No lead found for lead ID: ${leadId}`,
+            });
+        }
+        const pan = lead.pan;
+        let report = await prisma.bank_Statement_Report.findFirst({
+            where: {
+                pan,
+                lead_id: leadId,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        });
+
+        if (!report) {
+            report = await prisma.bank_Statement_Report.findFirst({
+                where: {
+                    pan,
+                },
+                orderBy: {
+                    created_at: 'desc',
+                },
+            });
+        }
+        if (!report) {
+            return res.status(404).json({
+                success: false,
+                message: `No BSA report found for lead ID: ${leadId}`,
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: report
+        });
+    } catch (error) {
+        console.error('Error fetching BSA report:', error);
+        return res.status(500).json({
+            success: false,
+            message: error?.message
+        });
+    }
+}
+
 
 // ============================================================================================================================================
 // ============================================================================================================================================

@@ -568,18 +568,18 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     } = bankDetails;
 
 
-    // if (
-    //   !bankName ||
-    //   !branchName ||
-    //   !accountNumber ||
-    //   !ifscCode ||
-    //   !accountType ||
-    //   !accountName
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Incomplete bank details in the response" });
-    // }
+    if (
+      !bankName ||
+      !branchName ||
+      !accountNumber ||
+      !ifscCode ||
+      !accountType ||
+      !accountName
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Incomplete bank details in the response" });
+    }
 
     await prisma.bank_Details.create({
       data: {

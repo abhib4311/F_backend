@@ -30,7 +30,8 @@ import {
     getThirdPartyApiResponse,
     getLeadLogs,
     disbursed,
-    uploadDocument
+    uploadDocument,
+    getBSAReport
 } from '../../controllers/CRM/leadController.js';
 import { authenticateEmployee, authorizeRoles } from '../../Middlewares/employee.js';
 import upload, { handleMulterError } from '../../Middlewares/multer.js';
@@ -97,8 +98,7 @@ router.get('/closed', fetchAllClosedLeadsWithDetails);
 // // ======================================================================
 
 router.get('/customer-detail/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getCustomerDetails);
-router.get('/loan-details/:id', getLoanDetails);
-// router.get('/loan-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), getLoanDetails);
+router.get('/loan-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), getLoanDetails);
 router.get('/bank-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getBankDetails);
 
 // Third-party data and audit logs
@@ -110,11 +110,11 @@ router.get('/address/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'
 router.get('/documents/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getDocument);
 
 // Secure URL generation
-router.get('/generate-presigned-url', authorizeRoles('ADMIN', 'SALES-OPS'), presignedUrl);
+router.get('/generate-presigned-url', authorizeRoles('ADMIN', 'SALES-OPS', 'CREDIT-ANALYST'), presignedUrl);
 
 // Reference details
 router.get('/reference-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getReferenceDetails);
-
+router.get('/bsa-report/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getBSAReport);
 
 // // ======================================================================
 // // ====================== Disbursal Route ======================
