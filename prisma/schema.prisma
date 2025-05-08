@@ -526,6 +526,13 @@ model references {
   @@index([pan])
 }
 
+model whitelisted_users {
+  id Int @id  @default(autoincrement())
+  customer_name String?
+  pan String?
+  previous_loan_amount String?
+}
+
 enum Gender {
   M
   F

@@ -94,7 +94,7 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
-router.post("/auto-payment", sendEncryptedRequest) // BANK AP
+router.post("/auto-payment", sendEncryptedRequest) // BANK API
 // router.post("/status-check", status_check)
 
 // ---------------------------------------------------------------------------------//

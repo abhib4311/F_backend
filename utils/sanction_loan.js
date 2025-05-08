@@ -23,511 +23,2789 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   const formattedRepaymentDate = `${day}/${month}/${year}`;
-  return `
-  <!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      @page {
-        size: A4;
-        margin: 0mm;
-      }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @page {
+      size: A4;
+      margin: 9mm 15mm 0mm 15mm;
+    }
+
+    body {
+      font-family: "Arial", Times, serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background: #fff;
+    }
+
+    div {
+      page-break-inside: avoid;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #1a237e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    h2 {
+      color: #1a237e;
+      font-size: 20px;
+      margin-top: 30px;
+      border-bottom: 2px solid #1a237e;
+      padding-bottom: 5px;
+    }
+
+    h3 {
+      color: #1a237e;
+      font-size: 16px;
+      margin-top: 25px;
+    }
+
+    .title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a237e;
+    }
+
+    .header-wrapper {
+      width: 100%;
+      margin-bottom: 20px;
+      text-align: center;
+      page-break-after: avoid;
+    }
+
+    .header-img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .interest-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border: 1px solid #1a237e;
+    }
+
+    .interest-table th,
+    .interest-table td {
+      border: 1px solid #1a237e;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .interest-table th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+
+    .footer-wrapper {
+      width: 100%;
+      margin-top: 30px;
+      text-align: center;
+      page-break-before: avoid;
+    }
+
+    .footer-img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .kfs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border: 1px solid #1a237e;
+      margin-bottom: 25px;
+    }
+
+    .kfs-table th,
+    .kfs-table td {
+      border: 1px solid #1a237e;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .kfs-table th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+
+    .kfs-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .cooling-off-info {
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+
+    .cooling-off-info p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    .grievance-body {
+      margin-bottom: 20px;
+    }
+
+    .grievance-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border: 1px solid #1a237e;
+    }
+
+    .grievance-table td {
+      border: 1px solid #1a237e;
+      padding: 10px;
+      vertical-align: top;
+    }
+
+    .grievance-table strong {
+      color: #1a237e;
+    }
+
+    .grievance-td {
+      padding: 10px;
+      line-height: 1.6;
+    }
+
+    .gro-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .gro-section {
+      flex: 1;
+      padding: 10px;
+    }
+
+    .gro-section strong {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .recovery-info {
+      margin: 20px 0;
+    }
+
+    .recovery-info ol {
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    .recovery-info li {
+      margin-bottom: 10px;
+    }
+
+    .repayment-section {
+      font-size: 10px;
+    }
+
+    .repayment-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      border: 1px solid #1a237e;
+    }
+
+    .repayment-table th,
+    .repayment-table td {
+      border: 1px solid #1a237e;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .repayment-table th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+      color: #1a237e;
+    }
+
+    .closing-text {
+      margin-top: 30px;
+      line-height: 1.6;
+    }
+
+    .closing-text p {
+      margin-bottom: 10px;
+    }
+
+    .terms-section {
+      font-size: 10px;
+      margin: 20px 0;
+      text-align: justify;
+    }
+
+    .terms-section p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .definitions {
+      margin-top: 20px;
+    }
+
+    .terms-list {
+      /* margin-left: 20px; */
+      margin-top: 15px;
+    }
+
+    .terms-list li {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .terms-list strong {
+      color: #1a237e;
+    }
+
+    .borrower-representations p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .borrower-representations .terms-list {
+      counter-reset: section 2;
+    }
+
+    .borrower-representations .terms-list strong {
+      margin-right: 10px;
+    }
+
+    @media print {
+
+      html,
       body {
-        font-family: Arial, sans-serif;
-        line-height: 1.5;
         width: 210mm;
         height: 297mm;
-        margin: 0 auto;
+        margin: 0;
         padding: 0;
       }
-      div {
+
+      .content-wrapper {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header-wrapper,
+      .footer-wrapper {
+        margin: 0;
+        padding: 0;
+      }
+
+      table {
         page-break-inside: avoid;
       }
-      h1 {
-        text-align: center;
-        font-size: 24px;
-        margin-bottom: 10px;
+
+      tr {
+        page-break-inside: avoid;
       }
-      .kfs {
-        width: 100%;
-        border-collapse: collapse;
-        margin: auto;
+
+      thead {
+        display: table-header-group;
       }
-      .kfs,
-      .kfs-th,
-      .kfs-td {
-        border: 1px solid #000;
-        padding: 3.65px;
+
+      tfoot {
+        display: table-footer-group;
       }
-      .kfs-th,
-      .kfs-td {
-        text-align: left;
-      }
-      .details {
-        margin-bottom: 20px;
-      }
-      .signature {
-        margin-top: 20px;
-        text-align: left;
-      }
-      #data {
-        width: 50%;
-      }
-      .header-img {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin-bottom: 10px;
-      }
-      .footer-img {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin-top: 10px;
-      }
-      .content-wrapper {
-        font-family: Arial, Helvetica, sans-serif;
-        line-height: 25px;
-        font-size: 14px;
-        border: solid 1px #ddd;
-        padding: 0 15px 0 15px;
-        width: 95%;
-        max-width: 210mm;
-        box-sizing: border-box;
-        margin: auto;
-      }
-      .header-wrapper {
-        width: 95%;
-        max-width: 210mm;
-        margin: auto;
-        padding: 0;
-        page-break-after: avoid;
-      }
-      .footer-wrapper {
-        width: 95%;
-        max-width: 210mm;
-        margin: auto;
-        padding: 0;
-        page-break-before: avoid;
-      }
-      .kfs-table {
-        border: 1px solid #000;
-        width: 95%;
-        border-collapse: collapse;
-        margin: 15px auto;
-        font-size: 12px;
-      }
-      @media print {
-        body {
-          width: 210mm;
-          height: 297mm;
-        }
-        .content-wrapper {
-          width: 95%;
-          border: none;
-        }
-        .header-wrapper {
-          position: relative;
-          margin-bottom: 0;
-        }
-        .content-wrapper {
-          margin-top: 0;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header-wrapper">
-      <img src="${headerImageBase64}" alt="Header" class="header-img" />
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="title">SANCTION LETTER</div>
+    <div class="letter-body">
+      <p>Dear ${full_name},</p>
+
+      <p>
+        <strong>Sub: Short Term Loan from U.Y. Fincorp Limited.</strong>
+      </p>
+
+      <p>
+        With reference to your application dated {{Date of Application}} for a
+        Short Term Loan, we have the pleasure of sanctioning you an amount of
+        Rs. {{Loan Amount}} (in figures) (in words) {{amount in Words}}
+        subject to the following terms and conditions:
+      </p>
+
+      <ol>
+        <li>Loan Amount: ${loan_amount}</li>
+        <li>Interest Rate: ${roi}</li>
+      </ol>
+
+      <p>
+        As of effective date, the Schedule of interest and the charges are as
+        follows:
+      </p>
+
+      <table class="interest-table">
+        <tr>
+          <th>Component</th>
+          <th>Details</th>
+        </tr>
+        <tr>
+          <td>Interest on the Loan</td>
+          <td>
+            ${roi}.% per day from the date of disbursal until
+            the date of repayment. In the event of failure to make payment on
+            due date, a penal interest of {{Penal Interest rate}}% per day
+            shall be applicable from the due date until the date of payment.
+          </td>
+        </tr>
+        <tr>
+          <td>Processing Fee</td>
+          <td>
+            Lender will charge a processing fee of INR {{Net Processing Fees}}
+            plus applicable taxes.
+          </td>
+        </tr>
+        <tr>
+          <td>Late Fee</td>
+          <td>
+            In case of delay in payment of amount due, late fee charges shall
+            be INR {{Penal Interest}}.% of the loan amount, whichever is
+            higher.
+          </td>
+        </tr>
+        <tr>
+          <td>Maximum interest rate</td>
+          <td>
+            The Interest rate on the loan shall not exceed 50% per month.
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        The Lender, may at its sole discretion, waive or reduce the charges as
+        mentioned above, on a case to case basis.
+      </p>
+
+      <p>
+        For any queries, you may write to us at
+        <a href="mailto:info@fundobaba.com">info@fundobaba.com</a>,
+        <a href="mailto:grievance@fundobaba.com">grievance@fundobaba.com</a>
+      </p>
+
+      <p>Look forward to serving you.</p>
+      <p>Kind Regards</p>
     </div>
-    <div class="content-wrapper">
-      <table class="kfs-table">
-        <tr>
-          <th colspan="12" style="text-align: center" class="kfs-th">
-            <strong>Key Fact Statement (KFS)</strong>
-          </th>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+  <!-- New Page for KFS -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+
+  <div class="content">
+    <h3 style="margin-top: 20px; color: #1a237e">A. Details of the Loan</h3>
+    <table class="kfs-table">
+      <tr>
+        <th colspan="3" style="text-align: center" class="kfs-th">
+          <strong>Key Fact Statement (KFS)</strong>
+        </th>
+      </tr>
+      <tr>
+        <th class="kfs-th">S.No.</th>
+        <th class="kfs-th">Parameters</th>
+        <th class="kfs-th">Details</th>
+      </tr>
+      <tr>
+        <td class="kfs-td">(a)</td>
+        <td class="kfs-td">Name of the Lender</td>
+        <td class="kfs-td">FundoBaba</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(b)</td>
+        <td class="kfs-td">Name of the Borrower</td>
+        <td class="kfs-td">${full_name}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(c)</td>
+        <td class="kfs-td">Name of the Lending Service Provider (LSP)</td>
+        <td class="kfs-td">U.Y. Fincorp Limited</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(d)</td>
+        <td class="kfs-td">Name of the Digital Lending Application (DLA)</td>
+        <td class="kfs-td">FundoBaba</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(e)</td>
+        <td class="kfs-td">
+          Name of the Loan Service Provider acting as recovery agent and
+          authorized to approach the Borrower
+        </td>
+        <td class="kfs-td">U.Y. Fincorp Limited</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(f)</td>
+        <td class="kfs-td">Loan ID</td>
+        <td class="kfs-td">{{Loan ID}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(g)</td>
+        <td class="kfs-td">Sanction Loan Amount</td>
+        <td class="kfs-td">₹ {{Loan Amount}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(h)</td>
+        <td class="kfs-td">ROI (% per day)</td>
+        <td class="kfs-td">${roi}%</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(i)</td>
+        <td class="kfs-td">
+          Total Interest charge during the entire Tenure of the loan
+        </td>
+        <td class="kfs-td">₹ {{Total Interest}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(j)</td>
+        <td class="kfs-td">Processing Fee</td>
+        <td class="kfs-td">₹ {{Net Processing Fees}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(k)</td>
+        <td class="kfs-td">GST</td>
+        <td class="kfs-td">₹ {{GST}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(l)</td>
+        <td class="kfs-td">Total Fees (j + k)</td>
+        <td class="kfs-td">₹ {{Total Fees}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(m)</td>
+        <td class="kfs-td">Net Disbursed Amount</td>
+        <td class="kfs-td">₹ {{Net Disbursed Amount}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(n)</td>
+        <td class="kfs-td">Total Repayment Amount</td>
+        <td class="kfs-td">₹ {{Total Repayment Amount}}</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(o)</td>
+        <td class="kfs-td">Repayment Date</td>
+        <td class="kfs-td">{{Repayment Date}}</td>
+      </tr>
+      <!-- <tr>
+          <td class="kfs-td">(p)</td>
+          <td class="kfs-td">Tenure of the Loan (in Days)</td>
+          <td class="kfs-td">{{Tenure}} Days</td>
         </tr>
         <tr>
-          <th class="kfs-th">S.No.</th>
-          <th class="kfs-th">Parameters</th>
-          <th class="kfs-th">Details</th>
+          <td class="kfs-td">(q)</td>
+          <td class="kfs-td">Repayment Frequency</td>
+          <td class="kfs-td">One Time Only</td>
         </tr>
         <tr>
-          <td class="kfs-td">(a)</td>
-          <td class="kfs-td" id="data">Loan ID</td>
-          <td class="kfs-td" id="data">${loan_no}</td>
+          <td class="kfs-td">(r)</td>
+          <td class="kfs-td">Number of installments of Repayment</td>
+          <td class="kfs-td">1</td>
         </tr>
         <tr>
-          <td class="kfs-td">(b)</td>
-          <td class="kfs-td" id="data">Full name</td>
-          <td class="kfs-td" id="data">${full_name}</td>
+          <td class="kfs-td">(s)</td>
+          <td class="kfs-td">Annual Percentage Rate (APR)</td>
+          <td class="kfs-td">{{APR}}%</td>
         </tr>
         <tr>
-          <td class="kfs-td">(c)</td>
-          <td class="kfs-td" id="data">Sanction Loan Amount</td>
-          <td class="kfs-td" id="data">₹ ${loan_amount}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(d)</td>
-          <td class="kfs-td" id="data">ROI (% per day)</td>
-          <td class="kfs-td" id="data">${roi}%</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(e)</td>
-          <td class="kfs-td" id="data">
-            Total Interest charge during the entire Tenure of the loan
-          </td>
-          <td class="kfs-td" id="data">₹ ${interest_amount}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(f)</td>
-          <td class="kfs-td" id="data">Processing Fee at 15%</td>
-          <td class="kfs-td" id="data">₹ ${pf_amount}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(g)</td>
-          <td class="kfs-td" id="data">
-            <div style="width: 100%; height: 10%">
-              GST on Processing Fee at 18%
-            </div>
-            <span style="font-size: 6px">* Please refer T&Cs</span>
-          </td>
-          <td class="kfs-td" id="data">₹ ${gst}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(h)</td>
-          <td class="kfs-td" id="data">Total Fees (f + g)</td>
-          <td class="kfs-td" id="data">₹ ${total_admin_fee}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(i)</td>
-          <td class="kfs-td" id="data">Net Disbursed Amount</td>
-          <td class="kfs-td" id="data">₹ ${net_disbursal}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(j)</td>
-          <td class="kfs-td" id="data">Total Repayment Amount</td>
-          <td class="kfs-td" id="data">₹ ${repayment_amount}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(k)</td>
-          <td class="kfs-td" id="data">Repayment Date</td>
-          <td class="kfs-td" id="data">${formattedRepaymentDate}</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(l)</td>
-          <td class="kfs-td" id="data">Tenure of the Loan (in Days)</td>
-          <td class="kfs-td" id="data">${tenure} Days</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(m)</td>
-          <td class="kfs-td" id="data">Repayment Frequency</td>
-          <td class="kfs-td" id="data">One Time Only</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(n)</td>
-          <td class="kfs-td" id="data">Number of installments of Repayment</td>
-          <td class="kfs-td" id="data">1</td>
-        </tr>
-        <tr>
-          <td class="kfs-td">(o)</td>
-          <td class="kfs-td" id="data">Annual Percentage Rate (APR)</td>
-          <td class="kfs-td" id="data">${apr}%</td>
-        </tr>
-        <!-- <tr>
-                    <td class="kfs-td">(XIV)</td>
-                    <td class="kfs-td" id="data">
-                        Amount of each installment of repayment (in ₹)
-                    </td>
-                    <td class="kfs-td" id="data">(IX)</td>
-                </tr> -->
-        <tr>
-          <td class="kfs-td" colspan="12">
+          <td class="kfs-td" colspan="3">
             <strong>Details about Contingent Charges</strong>
           </td>
         </tr>
         <tr>
-          <td class="kfs-td">(p)</td>
-          <td class="kfs-td" id="data">
-            Rate of annualized penal charges in case of delayed payments (if
-            any)
+          <td class="kfs-td">(t)</td>
+          <td class="kfs-td">
+            Rate of annualized penal charges in case of delayed payments
           </td>
-          <td class="kfs-td" id="data">2% Per Day</td>
-        </tr>
-        <tr>
-          <td class="kfs-td" colspan="12">
+          <td class="kfs-td">Double of (m)</td>
+        </tr> -->
+      <!-- <tr>
+          <td class="kfs-td" colspan="3">
             <strong>Disclosures</strong>
           </td>
         </tr>
         <tr>
           <td class="kfs-td">(q)</td>
-          <td class="kfs-td" id="data">
-            Cooling period during which borrower shall not be charged any
-            penalty on prepayment of Loan
+          <td class="kfs-td">
+            Cooling period during which borrower will not be charged any
+            interest on prepayment of Loan
           </td>
-          <td class="kfs-td" id="data">1 Day</td>
+          <td class="kfs-td">3 Days</td>
         </tr>
         <tr>
           <td class="kfs-td">(r)</td>
-          <td class="kfs-td" id="data">
+          <td class="kfs-td">
             Name, designation, address, and contact number of the nodal
-            grievance redressal officer appointed specifically to handle FinTech
-            or digital lending-related complaints and issues
+            grievance redressal officer
           </td>
-          <td class="kfs-td" id="data">
-            Gaurav Kalra<br />Email: nodal@blinkrloan.com<br />Mobile:
-            8800040798<br />Address: MGF Metropolis Mall, Metro Station, Near,
-            Mehrauli-Gurgaon Rd, Sector 28, Maruti Housing Colony, Gurugram,
-            Sarhol, Haryana 122002
+          <td class="kfs-td">
+            Swati Aggarwal<br />
+            Email: grievance@fundobaba.com<br />
+            Mobile: 8655367146<br />
+            Address: 7th Floor B Wing Vaman Techno Center
+Andheri East , Mumbai, Maharashtra
+400059
+          </td>
+        </tr> -->
+    </table>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <table class="kfs-table">
+      <tr>
+        <td class="kfs-td">(p)</td>
+        <td class="kfs-td">Tenure of the Loan (in Days)</td>
+        <td class="kfs-td">{{Tenure}} Days</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(q)</td>
+        <td class="kfs-td">Repayment Frequency</td>
+        <td class="kfs-td">One Time Only</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(r)</td>
+        <td class="kfs-td">Number of installments of Repayment</td>
+        <td class="kfs-td">1</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(s)</td>
+        <td class="kfs-td">Annual Percentage Rate (APR)</td>
+        <td class="kfs-td">{{APR}}%</td>
+      </tr>
+      <tr>
+        <td class="kfs-td" colspan="3">
+          <strong>Details about Contingent Charges</strong>
+        </td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(t)</td>
+        <td class="kfs-td">
+          Rate of annualized penal charges in case of delayed payments
+        </td>
+        <td class="kfs-td">Double of (m)</td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(u)</td>
+        <td class="kfs-td">Taxes & Levies</td>
+        <td class="kfs-td">
+          The Loan and any other services rendered by the Lender and/ or
+          payments made by the Borrower shall be subject to applicable taxes
+          notified by the government from time to time. The Borrower shall pay
+          all taxes present and future on any transactions undertaken with the
+          Lender.
+        </td>
+      </tr>
+      <tr>
+        <td class="kfs-td">(v)</td>
+        <td class="kfs-td">Costs and charges</td>
+        <td class="kfs-td">
+          1. Cheque/electronic Instrument bounce /non-registration of NACH –
+          NA<br />
+          2. Payment gateway charges for repayment –NA<br />
+          3. Stamp Duty -NA
+        </td>
+      </tr>
+    </table>
+
+    <div class="cooling-off-info">
+      <p>
+        <strong>*A cooling off period</strong> allows you / Borrower /
+        end-user to cancel or withdraw from the loan until the Cooling-off
+        Period. Upon expiry of the Cooling-off Period, the loan terms shall be
+        deemed to be accepted by you. The Cooling-off Period on the loan
+        commences / starts from the date of signing / accepting the loan terms
+        / agreement and ends on the third (3) day from such acceptance. The
+        Lender shall not levy any penalty or pre-payment charges for
+        cancellation during the Cooling-off Period.
+      </p>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Grievance Redressal -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="grievance-body">
+      <p>
+        To apply for cancellation of loan during the Cooling-off Period, a
+        request must be submitted by the Borrower at
+        <a href="mailto:info@fundobaba.com">info@fundobaba.com</a>,
+        <a href="mailto:grievance@fundobaba.com">grievance@fundobaba.com</a>. After
+        submission of such request, the Borrower must submit a copy of the
+        bank account statement in which the said loan amount was disbursed
+        along with an undertaking that such loan amount was not utilized by
+        the Borrower during the Cooling-off Period.
+      </p>
+      <p>
+        The cancellation request will only be accepted, if (a) the loan has
+        not been utilized; and (b) the Borrower repays the principal amount
+        along with the Rate of Interest.
+      </p>
+      <h3 style="margin-top: 20px; color: #1a237e">
+        B. Grievance Redressal Mechanism
+      </h3>
+      <table class="grievance-table">
+        <tr>
+          <td rowspan="2" class="grievance-td" style="width: 15%">Level 1</td>
+          <td class="grievance-td">
+            <strong>Grievance Redressal Officer (GRO)</strong><br />
+            Borrowers can refer to Grievance Redressal Policy at
+            https://fundobaba.com/privacy-policy
+          </td>
+        </tr>
+        <tr>
+          <td class="grievance-td">
+            <div class="gro-details">
+              <div class="gro-section">
+                <strong>Grievance Redressal Officer (GRO)</strong><br />
+                Ms. SWATI AGGARWAL<br />
+                Address: 7th Floor B Wing Vaman Techno Center<br />
+                Andheri East , Mumbai,
+                Maharashtra<br />
+                400059<br />
+                Contact No: 8655367146<br />
+                Email: grievance@fundobaba.com
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="grievance-td">LSP</td>
+          <td class="grievance-td">
+            The GRO may be reached on the number provided above anytime
+            between 09:00 and 17:30 from Monday to Saturdays except public
+            holidays or write to the GRO. The GRO shall endeavor to resolve
+            the grievance within a period of (14) fourteen days from the date
+            of receipt of a grievance.<br /><br />
+            If the Borrower does not receive a response from the GRO within
+            14 (fourteen) days of making a representation, or if the Borrower
+            is not satisfied with the response received from the GRO, the
+            Borrower may approach the Nodal Officer anytime between 09:00 to
+            17:30 from Monday to Saturdays except public holidays or write to
+            the Nodal Officer.
           </td>
         </tr>
       </table>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
 
-      <div class="terms-conditions">
-        <h2>TERMS AND CONDITIONS</h2>
+  <!-- New Page for Recovery & Repayment -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <h3 style="margin-top: 20px; color: #1a237e">
+      C. TERMS & CONDITIONS OF RECOVERY MECHANISM
+    </h3>
+    <div class="recovery-info">
+      <p>
+        The Lender undertakes the recovery practices considering the following
+        terms.
+      </p>
+      <ol>
+        <li>In-house/Outsource Recovery</li>
+        <li>Telephone Recovery {Human / IVR / Robo Calls}</li>
+        <li>Digital Recovery</li>
+        <li>Reminder Communication</li>
+        <li>Legal Notice</li>
+        <li>Arbitration & Conciliation</li>
+      </ol>
+      <p>
+        For the purpose of undertaking collection and recovery the Lender may,
+        either on its own or through the service provider (including its
+        agents etc.), undertake collection or recovery from the Borrower. The
+        details of service provider and its agents etc.
+      </p>
+    </div>
+
+    <h3 style="margin-top: 30px; color: #1a237e">D. REPAYMENT SCHEDULE</h3>
+    <table class="repayment-table">
+      <tr>
+        <th>S.No.</th>
+        <th>Principal (INR)</th>
+        <th>Interest (INR)</th>
+        <th>Fees (INR)</th>
+        <th>Due Date</th>
+        <th>Repayable (INR)</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>{{Loan Amount}}</td>
+        <td>${roi}</td>
+        <td>{{Processing Fee}}</td>
+        <td>{{Repayment Date}}</td>
+        <td>{{Repayment Amount}}</td>
+      </tr>
+    </table>
+
+    <div class="closing-text">
+      <p>
+        For any queries, you may write to us at
+        <a href="mailto:info@fundobaba.com">info@fundobaba.com</a>,
+        <a href="mailto:grievance@fundobaba.com">grievance@fundobaba.com</a>
+      </p>
+      <p>Look forward to serving you.</p>
+      <p>Kind Regards</p>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Loan Terms -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+      LOAN CUM COMMERCIAL TERMS
+    </h3>
+
+    <div class="terms-section">
+      <p>
+        By clicking the "I AGREE" button, you acknowledge that you have read,
+        understood, and accepted the terms and conditions set forth herein
+        ("Terms"). You further agree to be bound by these Terms and will be
+        fully responsible for complying with them. If you do not agree with
+        any provision of these Terms, do not click the "I AGREE" button.
+      </p>
+
+      <p>
+        Upon your acceptance of these Terms and the Key Fact Statement
+        ("KFS"), you, the borrower ("Borrower")—which term shall include
+        individual, legal heir(s), successor(s), and permitted assignee(s),
+        unless repugnant to the context—confirm having requested a credit
+        facility from U.Y. Fincorp Limited Ltd., having its registered office
+        at 7th Floor B Wing Vaman Techno Center, Andheri East , Mumbai,
+        Maharashtra 400059
+        ("Lender"), under the conditions specified herein.
+      </p>
+
+      <p>
+        The Borrower hereby understands and acknowledges that these Terms are
+        for two loan products, namely (a) Bullet Repayment; (b) EMI /
+        Installment and that based on the nature / type of Loan availed by me
+        / us through the Application Form and thereafter accepted in the KFS,
+        only the respective Loan product Terms shall apply.
+      </p>
+
+      <div class="definitions">
         <p>
-          The Borrower confirms to have read and understood these Terms of
-          Agreement before accepting a personal loan ("Loan") offer with us. By
-          clicking on the Esign button using Aadhar OTP and Digital Esign, the
-          Borrower shall be deemed to have electronically accepted these Terms
-          of Agreement. To the extent of any inconsistency, these Terms of
-          Agreement shall prevail.
+          <strong>Definition:</strong> In these Terms, the capitalized words
+          shall have the following meanings. All terms capitalized but not
+          defined below shall have such meaning as ascribed to them in the
+          Commercial Terms:
         </p>
 
-        <ol>
+        <ol class="terms-list">
           <li>
-            The Loan shall carry a fixed rate of interest specified at the time
-            of applying for the loan.
+            <strong>ANNUALISED PERCENTAGE RATE / APR</strong> means the
+            effective annualised rate payable by the Borrower based on an
+            all-inclusive cost and margin including cost of funds, credit cost
+            and operating cost, processing fee, verification charges,
+            maintenance charges, etc., and / or such specific costs indicated
+            in the KFS.
           </li>
-          <li>
-            The Loan amount shall be disbursed, after debiting processing fees,
-            in Borrower's account only with the Bank on accepting the Personal
-            Loan Terms of Agreement.
-          </li>
-          <li>
-            The repayment amount shall consist of principal and interest
-            components. The Borrower confirms to repay the repayment amount on
-            the specified repayment date.
-          </li>
-          <li>
-            If repayment is not done by the specified date, the Borrower will be
-            liable for Late Payment Charges.
-          </li>
-          <li>
-            If any repayment thru online or physical mode is not honored, the
-            Borrower will be liable for dishonor charges, Penalty and Late
-            Payment Charges including Interest.
-          </li>
-          <li>
-            The Borrower agrees to pay the processing fee, payment dishonor
-            charges, etc.
-          </li>
-          <li>
-            Any overdue payment incurs interest at the Late Payment Charges rate
-            (which is higher than the usual interest rate). We may change the
-            interest rate if required by the statutory/regulatory authority.
-          </li>
-          <li>
-            The Borrower agrees that fees and charges specified may be revised
-            from time to time and binding on the Borrower.
-          </li>
-          <li>The Borrower agrees to pay applicable Goods and Service Tax.</li>
-          <li>
-            Loan Insured by ICICI Lombard General Insurance Company Limited and
-            Borrower agreed to pay the mentioned Premium with GST as per Key
-            Fact Statement to BlinkR Loan (Dev-Aashish Capitals Private
-            Limited). Borrower Confirms that Dev-Aashish Capitals Private
-            Limited (NBFC) and affiliated Loan Product (BlinkR Loan) is entitled
-            to claim Loan Insurance amount directly from Insurance Provider
-            (ICICI Lombard General Insurance Company Limited). Borrower agrees
-            to present any/all the required valid documents/proof of Documents
-            by Dev-Aashish Capitals Private Limited.
-          </li>
-        </ol>
 
-        <table class="kfs-table">
-          <tr>
-            <th>Section</th>
-            <th>Category</th>
-            <th>Sub sections</th>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>Loss of job</td>
-            <td>Involuntary unemployment, Merger & acquisition.</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Cyber frauds</td>
-            <td>
-              Unauthorized transactions: Bank account, credit/debit cards, e
-              wallets. Cyber frauds occurring through borrower's bank account,
-              credit/debit cards for loss amount> INR 1 lakh
-            </td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Home Protect</td>
-            <td>
-              Home Building and Household Assets, Natural calamities such as
-              earthquakes, cyclones and flood. Fire and allied perils
-            </td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Family emergency</td>
-            <td>
-              Accidental Death, Permanent disablement, Illness/Injury resulting
-              in hospitalization of borrower for a minimum of 10 days
-            </td>
-          </tr>
-        </table>
+          <li>
+            <strong>APPLICATION FORM</strong> means, direct application made
+            by the Borrower for the Loan through web portal / mobile
+            application of the Lender.
+          </li>
 
-        <h3>Borrower Representations</h3>
-        <p>The Borrower represents and covenants that the Borrower:</p>
-        <ul>
-          <li>will use the Loan amount for legitimate purposes.</li>
           <li>
-            will not use the Loan for any speculative, antisocial, or prohibited
-            purposes. If the Loan funds have been used for purposes as stated
-            above, we shall be entitled to do all acts and things that we deem
-            necessary to comply with its policies. The Borrower agrees to bear
-            all costs and expenses incurs as a result thereof.
+            <strong>BORROWER</strong> means the individual availing the Loan
+            from the Lender in under these Terms hereof and who has agreed to
+            the terms and conditions contained in these Terms for the purpose
+            of availing Loan.
           </li>
-          <li>
-            shall notify, within 7 calendar days, if any information given by
-            the Borrower changes. In the specific event of a change in address
-            due to relocation or any other reason, the Borrower shall intimate
-            the new address as soon as possible but no later than 15 days of
-            such a change.
-          </li>
-          <li>
-            information of the Borrower with us is correct, complete, and
-            updated.
-          </li>
-          <li>
-            has read and understood the Privacy Policy available on our website.
-          </li>
-        </ul>
 
-        <h3>Notice</h3>
-        <p>
-          We may send Loan-related notices, statements, or any other
-          communication to the Borrower by in-app messages, short message system
-          (SMS), Whatsapp messaging service, electronic mail, ordinary prepaid
-          post, or personal delivery to Borrower's registered communication &
-          alternate addresses. Communication and notices sent by in-app
-          messages/facsimile/SMS/email will be considered to have been sent and
-          received by the Borrower on the same day irrespective of carrier
-          delays. Communication and notices sent by pre-paid mail will be
-          considered to have been delivered on the day immediately after the
-          date of posting.
-        </p>
+          <li>
+            <strong>BULLET REPAYMENT</strong> shall mean such Loan product
+            where the Borrower repays the full Outstanding Amount on one fixed
+            Due Date;
+          </li>
 
-        <h3>Consent to Disclose</h3>
-        <ul>
           <li>
-            The Borrower has no objection in and gives consent for sharing Loan
-            details including Borrower's personal details to branches,
-            affiliates, services providers, agents, contractors, surveyors,
-            agencies, credit bureaus, etc. in or outside India, to enable us to
-            provide services under the arrangement with the third parties
-            including customized solutions and marketing services. The Borrower
-            confirms that the authorization given above shall be valid till
-            written communication of withdrawal of Borrower's consent is
-            acknowledged by us.
+            <strong>COMMERCIAL TERMS</strong> shall mean the terms applicable
+            to the Loan as detailed in SCHEDULE I of these Terms.
           </li>
           <li>
-            The Borrower understands and accepts the risks involved in sharing
-            personal information including sensitive personal information like
-            account details with a third party.
+            <strong>DUE DATE</strong> shall mean such date identified in the
+            Commercial Terms and KFS on which the EMI shall be due and payable
+            by the Borrower.
+          </li>
+
+          <li>
+            <strong>ECS OR NACH</strong> means electronic clearing services /
+            electronic payment services, consented to in writing by Borrower,
+            for facilitating the payment of EMI, fees and other applicable
+            charges to the Lender in connection with the Loan.
+          </li>
+
+          <li>
+            <strong>ESSENTIAL DATA</strong> means such data which is
+            statutorily required by the Lender to be retained for compliance
+            with applicable laws.
+          </li>
+
+          <li>
+            <strong>EQUATED MONTHLY INSTALLMENT (EMI) / INSTALLMENT</strong>
+            shall mean such Loan product whereby the Borrower repays the
+            Outstanding Amount at such frequency (monthly / quarterly) as
+            indicated in the Commercial Terms on the respective Due Date
+            during the Tenure of the Loan.
+          </li>
+
+          <li>
+            <strong>GRIEVANCE REDRESSAL OFFICER</strong> shall mean the
+            officer named in the Commercial Terms and KFS who shall address
+            and resolve the complaints / queries of Borrowers.
           </li>
           <li>
-            The Borrower consents to share Borrower's personal information with
-            third parties for processing, statistical or risks analysis,
-            conducting credit or anti-money laundering checks, designing
-            financial services or related products, marketing financial services
-            or related products, customer recognition on our website/app,
-            offering relevant product and service offers to customers, etc.
+            <strong>LOAN</strong> means the credit facility granted / agreed
+            to be granted by the Lender to the Borrower.
           </li>
           <li>
-            The Borrower agrees that we may disclose Borrower's information to
-            the Reserve Bank of India, other statutory/regulatory authorities,
-            arbitrator, credit bureaus, local authorities, credit rating agency,
-            information utility, marketing agencies, and service providers if
-            required.
+            <strong>KFS</strong> shall mean the Key Fact Statement provided by
+            the Lender before the execution of these Terms which lays down
+            details such as Annual Percentage Rate, terms and conditions of
+            recovery mechanism, details of Grievance Redressal Officer, and
+            Cooling-off/ Look-up period.
           </li>
           <li>
-            The Borrower authorizes to provide monthly details of the Loan
-            Account and the credit facilities extended to the Borrower to credit
-            information companies. We may obtain information on credit
-            facilities availed by the Borrower from other financial institutions
-            to determine whether we can extend additional credit facilities. On
-            the regularization of the Borrowers account, we will update the
-            credit information companies accordingly.
+            <strong>OUTSTANDING AMOUNT</strong> shall mean all amounts
+            pertaining to the Loan whether by way of the principal amount
+            together with any EMI, accrued interest, default interest,
+            Prepayment charges, bounce charges and/or any other cost and
+            charges indicated herein or the Commercial Terms or KFS.
           </li>
           <li>
-            The Borrower authorizes to verify any of the information of the
-            Borrower including Borrower's credit standing from anyone we may
-            consider appropriate including credit bureaus, local authority,
-            credit rating agencies etc.
+            <strong>PREPAYMENT</strong> means premature repayment of the Loan
+            in full, including principal amount, interest thereon, and all
+            Outstanding Amount which is not yet due for payment by the
+            Borrower under the Terms.
           </li>
           <li>
-            The Borrower authorizes us to inform Borrower's employer of any
-            default in repayment and agrees to do things necessary to fulfill
-            Borrower's obligations.
-          </li>
-          <li>
-            Our records about the Loan shall be conclusive and binding on the
+            <strong>REPAYMENT SCHEDULE</strong> shall mean the schedule shared
+            by the Lender which indicates the Outstanding Amount and the Due
+            Date on which the said Outstanding Amount is to be repaid by the
             Borrower.
           </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Loan Terms -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <div class="definitions">
+        <ol class="terms-list" start="16">
           <li>
-            In case of default in repayment of the Loan amount, Borrower
-            authorizes us and our collection assistance specialist/executives to
-            contact Borrower over phone, whatsapp, Messaging, IVR calling,
-            Office and Borrower's residence physical visits including alternate
-            addresses where Borrower is located.
+            <strong>REPAYMENT INSTRUMENT</strong> shall mean an ECS / NACH /
+            standing instructions / cheque / post-dated cheque (PDC) and / or
+            such other negotiable instrument or mode of payment that may be
+            notified by the RBI from time to time.
           </li>
-        </ul>
+          <li><strong>RBI</strong> shall mean the Reserve Bank of India.</li>
+          <li>
+            <strong>TENURE</strong> shall mean the months / years as indicated
+            in the Commercial Terms and KFS.
+          </li>
+        </ol>
+      </div>
 
-        <h3>Effective Date</h3>
-        <p>
-          These Terms of Agreement shall be effective from the date of disbursal
-          of the loan amount.
-        </p>
+      <div class="borrower-representations">
+        <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+          Borrower's Representations, Warranties and Undertakings:
+        </h4>
+        <p>The Borrower hereby represents and warrants as follows:</p>
 
-        <h3>Assignment</h3>
-        <p>
-          The Borrower agrees that, with or without intimation to the Borrower,
-          be authorized to sell and /or assign to any third party, the Loan and
-          all outstanding dues under this Agreement, in any manner, in whole or
-          in part, and on such terms as we may decide. Any such sale or
-          assignment shall bind the Borrower, and the Borrower shall accept the
-          third party as its sole creditor or creditor jointly with us and in
-          such event, the Borrower shall pay us or such creditor or as we may
-          direct, the outstanding amounts due from the Borrower under this
-          Agreement.
-        </p>
+        <ol class="terms-list">
+          <li>
+            Is of sound mind, competent to contract, has attained the age of
+            majority, and capable of fulfilling the obligations under these
+            terms;
+          </li>
 
-        <h3>Governing Law & Jurisdiction</h3>
+          <li>
+            Is financially stable, not declared bankrupt or insolvent, and
+            capable of repaying the Loan.
+          </li>
+
+          <li>
+            Will maintain sufficient funds in the designated account for
+            repayment.
+          </li>
+
+          <li>
+            Shall maintain confidentiality and security over communications
+            with the Lender.
+          </li>
+
+          <li>
+            Accepts the Lender's final discretion in case of any disputes
+            regarding interpretation or materiality of any matter.
+          </li>
+
+          <li>
+            All information and documents provided are true, correct,
+            complete, and not misleading.
+          </li>
+
+          <li>
+            Authorizes the Lender to access necessary data (location, CIBIL
+            score, KYC, etc.) for loan processing and servicing.
+          </li>
+
+          <li>
+            Agrees to the storage of Essential Data for a duration of 5 to 8
+            years as per law.
+          </li>
+
+          <li>
+            Confirms that the Loan shall be used strictly for the declared
+            purpose and agrees to provide end-use certification upon request.
+          </li>
+        </ol>
+      </div>
+
+      <div class="loan-disbursement">
+        <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+          Loan Disbursement:
+        </h4>
         <p>
-          The Loan shall be governed by the laws of India and all claims and
-          disputes arising out of or in connection with the Loan shall be
-          settled by arbitration. Any arbitration award/ direction passed shall
-          be final and binding on the parties. The language of the arbitration
-          shall be English/Hindi and the venue of such arbitration shall be in
-          New Delhi.
+          The Lender shall disburse the Loan into an account specified in
+          Commercial Terms, below and/or such other account as indicated in
+          the Loan disbursal request form ("DRF").
         </p>
       </div>
     </div>
-    <div class="footer-wrapper">
-      <img src="${footerImageBase64}" alt="Footer" class="footer-img" />
+  </div>
+  <div class="repayment-section">
+    <h4 style="color: #1a237e; margin-bottom: 15px">Repayment:</h4>
+    <p>The Borrower hereby agrees and undertakes:</p>
+    <ol class="terms-list">
+      <li>
+        to issue such Repayment Instruments for: (a) Bullet Repayment Loan;
+        (b) EMI Loan, respectively based on the type of Loan product agreed to
+        be availed by the Borrower. The Borrower shall repay the Loan for such
+        amount and at such intervals as is specified in the Commercial Terms,
+        KFS and / or Repayment Schedule shared by the Lender from time to
+        time. The Borrower understands and acknowledges that Lender may
+        collect repayment directly by itself or through third party agents, as
+        appointed by the Lender. The Borrower further undertakes to extend all
+        co-operation with such third-party agents to ensure that due
+        fulfillment of Borrower's obligations under these Terms and to obtain
+        a valid discharge against the Outstanding Amounts.
+      </li>
+      <li>
+        that should at any time during the Tenure of the Loan, if instructions
+        for stop payment, cancellation of a Repayment Instrument and /or fail
+        to confirm / register the ECS / NACH, the same shall be treated as
+        dishonour / bounce of the Repayment Instrument, and the Loan shall be
+        recalled at the discretion of the Lender.
+      </li>
+
+      <li>
+        that upon delay and / or non-payment of Outstanding Amounts on the
+        respective Due Date, the Lender shall have the right to classify the
+        Borrower and its accounts as Special Mention Account ("SMA") and / or
+        Non-Performing Asset ("NPA"), as detailed below:
+      </li>
+    </ol>
+  </div>
+
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Repayment Terms -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="repayment-section">
+      <!-- <ol class="terms-list" start="4">
+          <li>
+            
+          </li>
+        </ol> -->
+      <div class="repayment-note">
+        <p>
+          If the Due Date is second (2nd) day of every month and the Borrower
+          pays the Instalment amount on thirtieth (30th) of the month, the
+          Lender shall levy Default Interest starting from third (3rd) until
+          thirtieth (30th). In the second scenario, if the Borrower does not
+          pay on the Due Date and the Outstanding Amount remain unpaid for a
+          continuous period of thirty (30) days, the Lender shall have the
+          right to: (a) levy Default Interest; and (b) report the Borrower as
+          an SMA-0. If the Borrower further continues to default in repayment
+          from a period of thirty (30) days up to sixty (60) days, the Lender
+          shall report the Borrower as SMA-1 and levy Default Interest. If the
+          Borrower further continues to default in repayment from a period of
+          sixty (60) days up to ninety (90) day, the Lender shall report the
+          Borrower as SMA-2 and levy Default Interest. Further, if the
+          Borrower defaults in repayment beyond ninety (90) days, the Lender
+          shall report the Borrower as NPA and levy Default Interest. The
+          Lender shall additionally have the right to call and Event of
+          Default in accordance with Clause 8, below, at any time upon an
+          event of non-payment.
+        </p>
+      </div>
+      <h4 style="color: #1a237e; margin-bottom: 15px">Interest & Costs:</h4>
+      <p>
+        The Borrower shall pay interest on the Loan at the Rate of Interest
+        specified in the Commercial Terms from the date when the Loan is
+        disbursed. The Lender shall inform the Borrower regarding any change
+        in Rate of Interest by way of publishing a notice that shall be
+        displayed on the notice board in the branch of the Lender or on the
+        Lender's website. The said notice of change of Rate of Interest shall
+        be deemed to be sufficient notice of change to the Borrower. The
+        Borrower shall pay on the Loan, processing fee, stamp duty, and such
+        other fees and charges indicated in the KFS and/ or notified by the
+        Lender. Further, the Borrower undertakes to pay such fees / charges/
+        costs that comprise the Annual Percentage Rate, as mentioned in the
+        Commercial Terms and KFS. The Borrower understands that Loan is
+        subject to applicable taxes and such other statutory levies as may be
+        notified by the government from time to time. All such taxes and
+        levies shall be payable by the Borrower.
+      </p>
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Prepayment:
+      </h4>
+      <p>
+        In the event the Borrower wishes to prepay the Loan, the same shall be
+        subject to Prepayment Fees as indicated in the Commercial Terms. Such
+        Prepayment Fees shall be levied or become applicable after expiry of
+        the Cooling-off and / or Look-up period indicated in the Commercial
+        Terms and KFS.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Default/ Penal Interest:
+      </h4>
+      <p>
+        In the event the Borrower fails to comply with the Terms including
+        failure to repay the Loan on a Due Date and/ or such other Events of
+        Default listed in Clause 8 below, the Lender shall be entitled to levy
+        Default/ Penal Interest set out in Commercial Terms and KFS on the
+        Outstanding Amount from the date of default until full and final
+        settlement.
+      </p>
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Events of Default and Remedies:
+      </h4>
+      <p>
+        The following are the events of default under these Terms ("Event of
+        Default"):
+      </p>
+      <ol class="terms-list">
+        <li>
+          failure by torrower is subjected to any insolvency or bankruptcy
+          proceeding or a receiver is appointed for ihe Borrower to repay the
+          Loan (whole or part) on the Due Date;
+        </li>
+        <li>
+          breach / non-performance of any representation, warranty, covenant,
+          undertaking or obligations under these Terms (including
+          non-submission of documents or execution thereof), or any change in
+          the information furnished by the Borrower to the Lender, if deemed
+          material by the Lender;
+        </li>
+        <li>
+          the Borrower is subjected to any insolvency or bankruptcy proceeding
+          or a receiver is appointed for its assets;
+        </li>
+        <li>
+          if the Borrower commits default in relation to any other loan or
+          credit facility and /or statutory taxes and dues owed, or enters
+          into any compromise with its creditors, or admits any inability in
+          payment of its other debts;
+        </li>
+        <li>
+          the performance of obligations under these Terms becomes void or
+          illegal;
+        </li>
+        <li>
+          non-payment of any of dues and / or outstanding amounts to any other
+          financial institutions; and / or
+        </li>
+        <li>
+          any event which, with the passage of time, is likely to become an
+          Event of Default.
+        </li>
+      </ol>
     </div>
-  </body>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Lender's Rights on Event of Default -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="terms-section">
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Lender's Rights on Event of Default:
+    </h4>
+    <p>
+      On the happening of any Event of Default, the Lender may at its sole
+      discretion, without prejudice to other rights and claims under these
+      Terms, exercise any or all of the following rights, i.e.,: (a) recall
+      the Loan and / or declare the Loan to become immediately due and
+      payable; (b) levy Default Interest on the Outstanding Amount from the
+      date when the Event of Default occurs until the date when the Event of
+      Default has ceased to exist; and / or (c) exercise any other rights or
+      remedies available to the Lender under applicable law including
+      initiating civil and criminal proceedings.
+    </p>
+
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Unconditional Cancellability:
+    </h4>
+    <p>
+      The Lender reserves the unconditional right to cancel the Loan and / or
+      any tranches advanced / to be advanced (either fully or partially)
+      without giving any prior notice to the Borrower, on the occurrence of
+      any one or more of the following (a) in case the Loan / part of the Loan
+      are not utilised by the Borrower; (b) in case of 'Deterioration in the
+      Creditworthiness' of the Borrower in any manner whatsoever; (c) in case
+      of non-compliance of these Terms. For the purpose of this clause,
+      Deterioration in the Creditworthiness shall mean and include without
+      limitation, the following events: (a) downgrade of the rating of the
+      Borrower by a credit rating agency; and / or (b) any other reason /
+      event in the opinion of the Lender constituting or which may constitute
+      Deterioration in the Creditworthiness.
+    </p>
+
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Disclaimer:
+    </h4>
+    <p>
+      The Borrower agrees and acknowledges that the Lender shall not be liable
+      or responsible for any defect in the consumer durable products / goods
+      purchased by the Borrower, in the event of any complaints / queries with
+      respect to a product purchased from a third party from the proceeds of
+      the Loan. The Borrower shall directly address such complaints / queries
+      with the seller / manufacturer/ retailer or any other third party
+      associated with selling such product.
+    </p>
+  </div>
+
+  <div class="terms-section">
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Disclosure:
+    </h4>
+    <p>
+      The Borrower authorizes the Lender to disclose any information in
+      relation to the Loan with: (a) RBI; (b) credit information companies /
+      bureaus and information utilities; (c) any governmental / regulatory /
+      statutory authority; (d) other financial institutions and industry
+      bodies; (e) affiliates and group companies of the Lender; and / or (f)
+      third party engaged by the Lender for purpose of the Loan including but
+      not limited to KYC collection, recovery of dues and repayment and / or
+      such other services as deemed necessary by the Lender. The Borrower
+      hereby acknowledges and agrees that the RBI and / or any credit bureau,
+      information utilities, any governmental / regulatory / statutory
+      authority may publicly publish such data, subject to applicable laws.
+    </p>
+
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Indemnity:
+    </h4>
+    <p>
+      The Borrower shall indemnify and hold harmless the Lender and its
+      directors, officers and agents, from and against any and all costs,
+      expenses, direct or indirect claims, liabilities, demands and / or
+      claims whatsoever, including any third-party claims for damages incurred
+      as a consequence of occurrence of an Event of Default, breach of the
+      terms and conditions of these Terms or acts of omission and commission
+      on the part of the Borrower, or otherwise on account of the Loan.
+    </p>
+
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Evidence to Debt/ Electronic Evidence:
+    </h4>
+    <p>
+      The Lender may generate physical copies of these Terms from its system
+      or produce these Terms in any other form at its discretion and the same
+      shall be fully binding on the Borrower and such computer generated
+      certificate / statement from the Lender's system shall be conclusive
+      evidence of the existence of the Outstanding Amounts of the Borrower.
+      The Borrower hereby waives any right it may have under contract or
+      applicable law to contest or raise an invalidity against such electronic
+      records.
+    </p>
+  </div>
+
+  <div class="terms-section">
+    <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+      Assignment:
+    </h4>
+    <p>
+      The Lender may, without Borrower's consent or notice can assign its
+      rights & obligations under these Terms to its affiliates or assignee but
+      the Borrower is not entitled to directly or indirectly assign the
+      benefit or obligation of these Terms to any third party.
+    </p>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Additional Terms -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Dispute Resolution:
+      </h4>
+      <p>
+        Any or all disputes, claims, differences arising out of or in
+        connection with these Terms between the Lender and the Borrower shall
+        be settled by arbitration to be referred to a sole arbitrator to be
+        appointed by the Lender and the place of the arbitration shall be Maharashtra.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Governing Law:
+      </h4>
+      <p>
+        In the event of any dispute or controversy arising out of the
+        arbitration clause, shall be governed by laws of India and the Courts
+        at Maharashtra shall have sole and exclusive jurisdiction.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Notices:
+      </h4>
+      <p>
+        Any notice to be given to Borrower in respect of these Terms shall be
+        deemed to have been validly given and received if provided by using
+        telephonic call (recorded) or text message to the registered mobile
+        number of the Borrower, email to registered email id and written
+        notice by courier or registered post to registered address of
+        Borrower.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Joint and Several Liability:
+      </h4>
+      <p>
+        The obligations of the Borrower(s) and Co-Borrowers (if any) under
+        these Terms shall be joint and several.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        NACH Mandate:
+      </h4>
+      <p>
+        The amount mentioned on NACH Mandate for approval from borrower is
+        250% of the existing sanctioned credit limit/ loan amount as it covers
+        possible increase of credit limit in near future, processing fee,
+        interest and other charges levied in the event of default. Lenders,
+        may at their absolute discretion, waive or reduce the charges as
+        mentioned above, on a case to case basis.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        In Witness Whereof:
+      </h4>
+      <p>
+        The Borrower hereby accepts the terms and conditions this Agreement.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Appropriation:
+      </h4>
+      <p>
+        Any payments made by or recovered from the Borrower or otherwise shall
+        be appropriated in a manner deemed fit by the Lender, as per its
+        policies.
+      </p>
+
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        Set-off:
+      </h4>
+      <p>
+        The Lender shall be entitled to, without further notice, set-off any
+        monies with the Lender or any monies payable by the Lender to the
+        Borrower(s) against all Outstanding Amounts of the Borrower with the
+        Lender.
+      </p>
+      <div class="closing-text" style="margin-top: 30px">
+        <p>
+          For any queries, you may write to us at
+          <a href="mailto:info@fundobaba.com">info@fundobaba.com</a>
+        </p>
+        <p>Look forward to serving you.</p>
+        <p>Kind Regards</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Loan Agreement -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="title">LOAN AGREEMENT</div>
+    <div class="terms-section">
+      <p>
+        <strong>THIS LOAN AGREEMENT</strong> is made at the date and place set
+        out in Schedule A hereto
+      </p>
+      <p><strong>BY AND BETWEEN:</strong></p>
+      <p>
+        The entity listed in Schedule A (hereinafter referred to as the
+        "Lender", which expression shall, unless it be repugnant to the
+        subject or context thereof, be deemed to mean and include its
+        successors and assigns).
+      </p>
+      <p><strong>AND</strong></p>
+      <p>
+        The Person(s) listed in Schedule A hereto, having his / her / its /
+        their address as set out in Schedule A (hereinafter referred to as the
+        "Borrower ", which expression shall, unless it be repugnant to the
+        subject or context thereof, be deemed to mean and include his / her /
+        its / their respective heirs, executors, administrators, legal
+        representatives, successors, permitted assigns, partner(s) for the
+        time being, including the legal representatives of the deceased
+        partner(s), if any);
+      </p>
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        WHEREAS:
+      </h4>
+      <ol class="terms-list">
+        <li>
+          Lender is a non-banking finance company within the meaning of the
+          Reserve Bank of India Act, 1934 and is registered with the Reserve
+          Bank of India as a non-banking finance company. Lender is engaged in
+          the business of providing financial services and financial products
+          as required by customers from time to time
+        </li>
+        <li>
+          The Borrower(s) is an employed/salaried individual(s) as per details
+          set out in Schedule A hereto and are in requirement of funds for the
+          purpose more particularly described in the Sanction Letter and Key
+          Fact Statement and has approached the Service Provider of the Lender
+          to avail the Loan,
+        </li>
+        <li>
+          Whereas the Borrower is in need of money and at the request of the
+          Borrower and after scrutinizing all the requisite documents and
+          credibility of the Borrower, the Lender has agreed to grant Loan, to
+          the Borrower in accordance with the terms and conditions hereinafter
+          contained:
+        </li>
+        <li>
+          <strong>NOW, THEREFORE</strong>, in consideration of the
+          representations, warranties, mutual agreements, and covenants set
+          forth in this Agreement, the Lender and Borrower agree as follows:
+        </li>
+      </ol>
+      <h4 style="color: #1a237e; margin-top: 30px; margin-bottom: 15px">
+        DEFINITIONS AND REFERENCE TERMS
+      </h4>
+      <p>
+        The following capitalized words/expressions shall carry the meaning
+        ascribed to them below, throughout this Agreement, unless otherwise
+        stated or unless repugnant to the subject or context thereof:
+      </p>
+      <ol class="terms-list">
+        <li>
+          <strong>"Agreement"</strong> means this Loan Agreement, including
+          the Schedules hereto, each as amended, modified, supplemented and /
+          or restated from time to time, and shall also include Sanction
+          Letter cum Key Fact Statement in accordance with the terms hereof.
+        </li>
+        <li>
+          <strong>"Application Form"</strong> means the application form as
+          prescribed by the Lender (whether through its Service Provider) and
+          filled in by the Borrower, prior to the date hereof, to avail the
+          Loan.
+        </li>
+        <li>
+          <strong>"Borrower"</strong> shall have the meaning ascribed to such
+          term in the Recitals of this Agreement. For the avoidance of doubt,
+          any reference in this Agreement to the term 'Borrower'.
+        </li>
+        <li>
+          <strong>"Collection Account"</strong> means the bank account of the
+          Lender, designated as such, to which all amounts due and payable by
+          the Borrower pursuant to the Loan Documents, are to be remitted.
+        </li>
+        <li>
+          <strong>"Contract Act"</strong> means Indian Contract Act, 1872;
+        </li>
+        <li>
+          <strong>"Approved Bank"</strong> means a designated bank approved by
+          the Lender (whether directly or through the Service Provider) for
+          the purposes related to the Loan.
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Additional Definitions -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="7">
+        <li>
+          <strong>"Delayed Payment Charges"</strong> shall mean the additional
+          amount payable by the Borrower to the Lender on account of any delay
+          in payment of any Instalment and / or bullet payment(s), as more
+          particularly set out in the Sanction Letter. Cum KFS
+        </li>
+        <li>
+          <strong>"Demand Promissory Note"</strong> means the Demand
+          Promissory Note in the format prescribed by the Lender, to be
+          executed by the Borrower, to secure payment of the Loan given to the
+          Borrower pursuant to the terms hereof and the Sanction Letter cum
+          KFS.
+        </li>
+        <li>
+          <strong>"Dishonor Charges"</strong> means the dishonor charges
+          payable by the Borrower to the Lender in the event of dishonor /
+          bouncing of any Repayment Instrument, pursuant to the provisions of
+          the Loan Documents.
+        </li>
+        <li>
+          <strong>"Eligibility Criteria"</strong> means the minimum
+          eligibility criteria set forth by the Lender to judge the credit
+          worthiness of the Borrower, which is subject to change from time to
+          time, at the sole and absolute discretion of the Lender.
+        </li>
+        <li>
+          <strong>"Event of Default"</strong> has the meaning ascribed to such
+          term in Article 8.1 of this Agreement.
+        </li>
+        <li>
+          <strong>"Fee"</strong> means the aggregate amount payable by the
+          Borrower to the Lender / Service Provider, as per the details
+          provided in the Sanction Letter cum Key Fact Statement
+        </li>
+        <li>
+          <strong>"Repayment"</strong> This can be further defined and
+          segregated in/as bellow:
+        </li>
+        <li>
+          <strong>"Installments"</strong> means the equated monthly
+          installment payable by the Borrower at monthly intervals, as
+          detailed in the Sanction Letter cum KFS, during the tenor of the
+          Loan, towards repayment of the principal amount of the Outstanding
+          Balance.
+        </li>
+        <li>
+          <strong>"Bullet Payment"</strong> means the one-time amount payable
+          by the Borrower, as detailed in the Sanction Letter cum KFS, during
+          the tenor of the Loan, towards repayment of the principal amount of
+          the outstanding balance. "Lender" shall have the meaning ascribed to
+          such term in the Recitals of this Agreement.
+        </li>
+        <li>
+          <strong>"Loan"</strong> means any and all term loans sanctioned /
+          disbursed by the Lender to the Borrower pursuant to the provisions
+          of this Agreement and the other Loan Documents; and includes
+          re-borrowing of the paid Loan; and disbursal of new Loan.
+        </li>
+        <li>
+          <strong>"Loan Documents"</strong> means this Agreement, the
+          Application Form (including all documents furnished by the Borrower
+          with the Application Form), Demand Promissory Note, Sanction Letter
+          cum KFS, Welcome Letter and all other documents, instruments,
+          certificates, guarantees and agreements executed and/or delivered by
+          the Borrower or any third party in connection with the Loan in favor
+          of the Lender pursuant to the terms of this Agreement or the other
+          Loan Documents.
+        </li>
+        <li>
+          <strong>"Notice of Demand"</strong> means a notice of demand issued
+          by or on behalf of the Lender.
+        </li>
+        <li>
+          <strong>"Outstanding Balance"</strong> means the balance of the
+          principal amount of the Loan outstanding along with all other
+          amounts payable by the Borrower to the Lender, pursuant to the terms
+          of the Loan Documents, including, without limitation, the Interest,
+          Delayed Payment Charges, Fees, Installments and / or bullet
+          payment(s), Prepayment Charges, Dishonor Charges, Taxes, Lender Swap
+          Charges and other costs, charges, expenses.
+        </li>
+        <li>
+          <strong>"Payment"</strong> means the payment towards Bullet
+          payments, Installments, Interest, Delayed Payment Charges, Fees,
+          Prepayment Charges, Dishonor Charges, Taxes, Lender Swap Charges and
+          other costs, charges, expenses, payable pursuant to the terms of the
+          Loan Documents, in respect of the Loan, through any mode as approved
+          by the Lender.
+        </li>
+        <li>
+          <strong>"Person"</strong> shall mean any individual, corporation,
+          partnership, (including, without limitation, association), company
+          incorporated under the provisions of the Companies Act, 1956 /
+          Companies Act, 2013, trust, unincorporated organization, Hindu
+          undivided family or any governmental authority or political
+          subdivision thereof. The expression shall, unless repugnant to the
+          context or meaning thereof, be deemed to mean and include: (i) in
+          case of a company, its successors and permitted assigns; (ii) in
+          case of a partnership firm, the partners for the time being and from
+          time to time of the partnership firm, their survivor or survivors of
+          them, their respective heirs, administrators, executors, legal
+          representatives and successors of the partner(s); (iii) in case of a
+          trust, the trustee or trustees of the trust for the time being and
+          from time to time; (iv) in case of a Hindu undivided family, the
+          Karta and the members for the time being and from time to time of
+          the said Hindu undivided family and their respective heirs,
+          executors, administrators and legal representatives; (v) in case of
+          an individual proprietor, the proprietor's heirs, administrators,
+          executors and legal representatives;
+        </li>
+        <li>
+          <strong>"Pre-Payment"</strong> means the payment of the Outstanding
+          Balance (or any part thereof) prior to the Scheduled Due Date for
+          the same, according to the procedure prescribed in Article 6 of this
+          Agreement, through any mode as approved by the Lender. The terms
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Additional Definitions (xxiv-xxxi) -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="24">
+        <li>
+          <strong>"Prepayment Charges"</strong> means the charges payable by
+          the Borrower to the Lender in the event of Pre-Payment of the
+          Outstanding Balance (or any part thereof), pursuant to the terms of
+          the Loan Documents.
+        </li>
+        <li>
+          <strong>"Rate of Interest"</strong> or
+          <strong>"Interest"</strong> means the rate at which interest on the
+          Loan is payable by the Borrower to the Lender, as stipulated in the
+          Sanction Letter cum KFS, as amended from time to time with prior
+          intimation to the Borrower.
+        </li>
+        <li>
+          <strong>"Repayment Instruments"</strong> means Post Dated Cheques
+          (“PDC”), Electronic Clearance Service (“ECS”), National Automated
+          Clearing House Mandate ("NACH") and / or Standing Instructions
+          (“SI”) (i.e., the debit clearing service notified by the Reserve
+          Bank of India or the National Payments Corporation of India), for
+          which the Borrower has agreed (in writing) to participate in, for
+          facilitating payment of Instalments and/or Bullet payments.
+        </li>
+        <li>
+          <strong>"Repayment Schedule"</strong> shall mean the repayment
+          schedule of the Instalments and / or bullet payment(s) set out in
+          the Sanction Letter cum Key Fact Statement, being the schedule for
+          repayment of the Instalments and / or bullet payment(s) in relation
+          to the Loan to the Lender.
+        </li>
+        <li>
+          <strong>"Receipt"</strong> means the receipt issued by the Borrower
+          in favor of the Lender, in the form prescribed by the Lender, for
+          acknowledgment of disbursal of the Loan or a part thereof.
+        </li>
+        <li>
+          <strong>"Sanction Letter cum Key Fact Statement"</strong> means the
+          document that include the key terms of the Loan sanctioned by the
+          Lender to the Borrower, in the way clearly understood by the
+          Borrower, bearing reference number as set out in Schedule A and
+          executed by the Borrower and the Lender on the date set out in
+          Schedule A.
+        </li>
+        <li>
+          <strong>"Security"</strong> shall have the meaning set out in the
+          Sanction Letter cum KFS and / or the other Loan Documents.
+        </li>
+        <li>
+          <strong>"Security Documents"</strong> shall mean and include without
+          limitation any documents (including this Agreement) entered into or
+          executed by the Borrower, or any other Person/s for creating and
+          perfecting the Security (if any) to the satisfaction of the Lender.
+        </li>
+        <li>
+          <strong>"Security Interest"</strong> shall mean any mortgage,
+          pledge, hypothecation, assignment, deposit arrangement, encumbrance,
+          lien (statutory or other), preference, priority or other security
+          agreement of any kind or nature whatsoever including, without
+          limitation: (i) any conditional sale or other title retention
+          agreement, any financing or similar statement or notice filed under
+          any recording or notice statute; and (ii) any designation of loss
+          payees or beneficiaries or any similar arrangement under any
+          insurance contract
+        </li>
+        <li>
+          <strong>"Service Provider"</strong> shall mean U.Y. Fincorp Limited, a company incorporated under
+          the provisions of Companies Act, 2013 and having its registered
+          address at 7th Floor B Wing Vaman Techno Center, Andheri East , Mumbai,
+          Maharashtra 400059 which expression shall, unless it be repugnant to the
+          subject or context thereof, include its successors and permitted
+          assigns) and / or any agents / sub- contractors appointed by the
+          Lender. The Service Provider acts as the authorized agent and
+          representative of the Lender and shall undertake all requisite
+          activities/services as mentioned in the Service Agreement executed
+          between the Service Provider and Lender.
+        </li>
+        <li>
+          <strong>"Scheduled Due Date"</strong> means each of the dates on
+          which the Bullet payments, Instalments together with Interest,
+          Delayed Payment Charges, Fees, Prepayment Charges, Dishonor Charges,
+          Taxes, Lender Swap Charges and any other costs, charges, expenses if
+          any, are due and payable by the Borrower to the Lender, pursuant to
+          the terms of the Loan Documents.
+        </li>
+        <li>
+          <strong>"Standing Instructions"</strong> and/or "SI" means the
+          written instructions issued by the Borrower to the Approved Bank
+          where the Borrower maintaining account, of an amount equal to the
+          Instalments or bullet payment(s) in favor of the Lender for
+          repayment of the Loan. It may include other/all applicable
+          (re)payment modes, means Post Dated Cheques ("PDC"), Electronic
+          Clearance Service ("ECS") National Automated Clearing House Mandate
+          ("NACH") and / or Standing Instructions ("SI") (i.e. the debit
+          clearing service notified by the Reserve Bank of India or the
+          National Payments Corporation of India), for which the Borrower has
+          agreed (in writing) to participate in, for facilitating payment of
+          Instalment(s) and / or bullet payment(s)
+        </li>
+        <li>
+          <strong>"Terms and Conditions"</strong> or
+          <strong>"Terms"</strong> mean the terms and conditions as contained
+          in this Agreement, including all covenants, representations, and
+          Schedules herein / hereto.
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <!-- New Page for Additional Definitions (xxxii-xxxvi) -->
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="24"></ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+        LOAN, RATE OF INTEREST, TAXES ETC.
+      </h3>
+      <ol class="terms-list">
+        <li>
+          <strong>Loan:</strong>
+          <ol type="a">
+            <li>
+              The Lender agrees to make available to the Borrower a Loan in
+              the amount specified in the
+              <strong>Sanction Letter cum Key Fact Statement (KFS)</strong>,
+              subject to and strictly in accordance with the terms and
+              conditions set forth in this Agreement and the other Loan
+              Documents executed by the Borrower. The Borrower hereby accepts
+              and agrees to avail the Loan on the said terms.
+            </li>
+            <li>
+              The disbursement of the Loan shall be made by the Lender either
+              in a single lump sum or in such instalments as the Lender may
+              determine at its sole discretion.
+            </li>
+            <li>
+              The Borrower shall, upon request by the Lender, acknowledge the
+              receipt of each disbursed amount by executing a receipt or any
+              other document in a form acceptable to the Lender.
+            </li>
+          </ol>
+        </li>
+        <li>
+          <strong>Terms of Disbursement and drawdowns:</strong>
+          <ol type="a">
+            <li>
+              Subject to the terms and conditions set forth in this Agreement
+              and the other Loan Documents, the Lender may extend to the
+              Borrower a Loan up to an aggregate principal amount as specified
+              in the
+              <strong>Sanction Letter cum Key Fact Statement (KFS)</strong>.
+            </li>
+            <li>
+              The Borrower agrees and undertakes to utilize the Loan solely
+              for the purpose stated in the
+              <strong>Sanction Letter cum KFS</strong>, and for no other
+              purpose whatsoever. The Borrower acknowledges that the Lender
+              shall not be under any obligation to monitor or verify the
+              utilization of the Loan amount and shall not be liable in any
+              manner for the Borrower's use or misuse thereof.
+            </li>
+          </ol>
+        </li>
+        <li>
+          <strong>Rate of Interest:</strong> The Borrower agrees to pay
+          interest and such other penal/additional interest payable on the
+          Loan at such rates as mentioned in the Sanction Letter cum Key Fact
+          Statement.
+        </li>
+        <li>
+          <strong>Direct and Indirect Taxes and Duties:</strong> The Borrower
+          hereby agrees that it shall be its sole liability to pay any and all
+          taxes, duties or cesses including but not limited to service tax,
+          GST, stamp duty, VAT, duties, and/or all other levies by whatever
+          name called, payable in relation to the Loan provided by the Lender
+          and/or the services provided pursuant hereto and/or any or all the
+          Loan Documents (collectively referred to as "Taxes"). The Borrower
+          shall reimburse to the Lender any such Taxes which may become
+          payable and/ or has been paid by the Lender, as and when called upon
+          to do so by the Lender and if the Borrower fails to pay/reimburse
+          the same, such amounts paid by the Lender shall form part of the
+          principal amount of the Loan Disbursed.
+        </li>
+        <li>
+          <strong>Cooling off Period:</strong> The Borrower is allowed a
+          Cooling Off period of 3 days during which the Borrower shall have
+          the option to decide to either continue with Loan or repay the same
+          by paying the entire outstanding Loan amount including interest,
+          charges or any other charges as mentioned in the Sanction Letter cum
+          KFS post which no request for the cancellation of loan shall be
+          entertained by the Lender.
+        </li>
+      </ol>
+
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+        PAYMENTS
+      </h3>
+      <ol class="terms-list">
+        <li>
+          <strong>Payment of Instalments and Bullet Payments</strong>
+          <ol type="a" start="3">
+            <li>
+              The Borrower shall pay to the Lender all Instalments and/or
+              bullet payments (inclusive of Interest), strictly on a monthly
+              basis, on the Scheduled Due Dates, beginning from the first due
+              date and continuing through to the last due date as stipulated
+              in the Sanction Letter cum Key Fact Statement ("Sanction Letter
+              cum KFS"). Time shall be of the essence for such payments. All
+              payments shall be made through Repayment Instruments issued by
+              the Borrower in favor of the Lender.
+            </li>
+            <li>
+              The Borrower shall not instruct or request the Lender to
+              withhold or delay the presentation of any Repayment Instrument.
+              Any delay or failure by the Lender or its Service Provider in
+              presenting a Repayment Instrument shall not affect or defer the
+              Borrower's liability to make timely payments.
+            </li>
+          </ol>
+        </li>
+        <li>
+          <strong>Dishonor of Repayment Instruments</strong>
+          <p>
+            In the event of any Repayment Instrument being dishonored, the
+            Borrower shall be liable to pay Dishonor Charges as specified in
+            the Sanction Letter cum KFS. This shall be without prejudice to
+            any other rights and remedies available to the Lender under law or
+            the Loan Documents.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="3">
+        <li>
+          <strong>Return or Disposal of Repayment Instruments upon
+            Foreclosure</strong>
+          <p>
+            In the event of foreclosure or closure of the Loan, the Lender
+            shall return any unutilized Repayment Instruments held by it
+            within 30 (thirty) days from the date on which the Lender receives
+            a written request from the Borrower. If the Borrower fails to
+            collect such Repayment Instruments within this period, the Lender
+            shall be entitled, at its sole discretion, to destroy them. The
+            Borrower shall not have any claim or right to demand the return of
+            the Repayment Instruments after this period.
+          </p>
+        </li>
+        <li>
+          <strong>Right to Recall in Case of Misrepresentation</strong>
+          <p>
+            The Lender shall have the right to immediately recall the entire
+            Outstanding Balance if it discovers that any information furnished
+            by the Borrower—whether oral or written and whether provided in
+            the Loan Documents, Application Form, or otherwise—relating to
+            income, employment, personal details, or any other material fact,
+            is false, misleading, or incorrect. Such right shall be without
+            prejudice to any other rights or remedies available to the Lender
+            under applicable law.
+          </p>
+        </li>
+        <li>
+          <strong>Repayment to Collection Account</strong>
+          <p>
+            The Borrower agrees that all Repayment Instruments shall be drawn
+            in favor of the Collection Account, the details of which are set
+            out in <strong>Schedule A</strong> to this Agreement. The Lender
+            reserves the right to modify the Collection Account by providing
+            the Borrower with not less than 5 (five) days' written notice.
+            Upon such change, the Borrower shall ensure that all subsequent
+            payments are made to the new Collection Account and shall issue
+            fresh Repayment Instruments accordingly.
+          </p>
+        </li>
+        <li>
+          <strong>Corporate Borrower – Change in Authorized Signatories</strong>
+          <p>
+            Where the Borrower is a corporate entity, it shall not make any
+            change to or revoke any authorization granted to its authorized
+            signatories who have executed the Repayment Instruments, without
+            prior written notice to the Lender. Upon appointing new authorized
+            signatories, the Borrower shall ensure that such signatories
+            deliver replacement Repayment Instruments to the Lender within 3
+            (three) calendar days of their appointment.
+          </p>
+        </li>
+        <li>
+          <strong>Appointment of Agent</strong>
+          <p>
+            The Borrower acknowledges and agrees that
+            <strong>U.Y. Fincorp Limited</strong> has been
+            appointed by the Lender as its authorized agent (“Agent”) for
+            purposes including, but not limited to, disbursement, collection,
+            recovery, and all other incidental matters related to the Loan.
+            The Agent shall act exclusively under the instructions of the
+            Lender.
+          </p>
+        </li>
+      </ol>
+
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+        SECURITY & OTHER TERMS:
+      </h3>
+      <ol class="terms-list">
+        <li>
+          The Borrower shall execute, in favor of the Lender, a
+          <strong>Demand Promissory Note</strong> and such other documents as
+          may be required by the Lender, in a form approved by the Lender,
+          covering the full amount of the Loan along with applicable interest.
+        </li>
+        <li>
+          Any security provided or created by the Borrower under this
+          Agreement and/or any other Loan Documents shall constitute
+          <strong>continuing security</strong>, remaining in full force and
+          effect until the entire Outstanding Balance and all other dues
+          payable under the Loan Documents are fully repaid and discharged to
+          the satisfaction of the Lender
+        </li>
+        <li>
+          Each security interest created under this Agreement or any other
+          Loan Document shall be in addition to, and not in substitution of,
+          any other security, guarantee, lien, indemnity, undertaking, or
+          right that the Lender presently holds or may hold in the future,
+          whether under law or otherwise, in relation to the Outstanding
+          Balance or any part thereof.
+        </li>
+        <li>
+          The security created under this Agreement or any other Loan Document
+          shall not be merged with, and shall not exclude or be prejudiced by,
+          any other security interest, right of recourse, or remedy (including
+          the invalidity thereof) that the Lender presently holds or may
+          acquire in the future in respect of the Borrower or any other person
+          liable for repayment of the Outstanding Balance.
+        </li>
+        <li>
+          The security interest created or to be created in favor of the
+          Lender shall be released only upon full repayment of the Outstanding
+          Balance and settlement of all dues and obligations owed by the
+          Borrower, whether under this Agreement or otherwise, including any
+          obligations owed by the Borrower to affiliates or group companies of
+          the Lender.
+        </li>
+        <li>
+          Upon occurrence of an Event of Default, and without prejudice to any
+          other rights or remedies available to the Lender under applicable
+          law or the Loan Documents, the Lender shall have the right to: e)
+          Declare the entire Outstanding Balance, whether due or payable at
+          such time or not, as
+          <strong>immediately due and payable;</strong> f) Exercise any and
+          all powers and rights available under the Loan Documents or under
+          applicable law; g) Undertake any action permitted, expressly or
+          impliedly, by the Loan Documents or applicable legal provisions.
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="7">
+        <li>
+          The Borrower acknowledges that the powers granted to the Lender
+          under this clause are for <strong>valuable consideration</strong>,
+          are <strong>coupled with interest</strong>, and shall accordingly be
+          <strong>irrevocable</strong> for as long as any portion of the
+          Outstanding Balance remains unpaid.
+        </li>
+        <li>
+          The enforcement of any security interest by the Lender shall not
+          affect the Borrower's continuing liability to the Lender for any
+          <strong>shortfall or deficiency</strong> arising or continuing under
+          this Agreement or any of the Loan Documents in respect of the
+          Outstanding Balance.
+        </li>
+      </ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+        OTHER CONDITIONS
+      </h3>
+      <li>
+        The Borrower agrees and undertakes to comply with the following
+        obligations throughout the tenure of the Loan:
+      </li>
+      <ol class="terms-list" type="a">
+        <li>
+          <strong>Change in Contact and Banking Details :</strong> Promptly
+          notify the Lender of any change in the Borrower’s residential or
+          office address, and/or any modifications to the bank account from
+          which the Repayment Instruments have been issued and associated
+          repayment instructions provided.
+        </li>
+        <li>
+          <strong>Salary Account Continuity :</strong> Ensure continued credit
+          of salary into the same bank account from which Repayment
+          Instruments have been issued towards repayment of the Loan. The
+          Borrower shall not modify, close, or redirect salary credits to any
+          other account without obtaining the Lender’s <strong>prior written consent.</strong>
+        </li>
+        <li>
+          <strong>Change in Employment / Occupation :</strong> : Immediately inform the Lender of any change in
+          employment
+          status, including resignation, termination, job switch, or initiation of a new business or profession. Upon
+          such change, the Borrower shall:
+          <ol type="a">
+            <li>Provide the name and address of the new employer, business, and/or professional establishment;
+            </li>
+            <li>Ensure that salary or business income continues to be credited to the designated repayment account,
+              unless otherwise permitted in writing by the Lender. The Lender reserves the right to terminate this
+              Agreement and the other Loan Documents at its sole discretion in the event of such change, if
+              deemed necessary.
+            </li>
+        </li>
+        <li>
+          <strong>Prohibited Use of Loan :</strong> Not utilize any part of the Loan amount for illegal activities,
+          immoral
+          purposes, gambling, betting, lottery, races, speculative trading, or any activity of a similar prohibited or
+          unethical nature.
+        </li>
+        <li>
+          <strong>Regulatory Compliance :</strong> Obtain and submit all requisite permissions, consents, and approvals
+          to the
+          Lender and/or its service providers, as may be required under applicable law or internal policy, prior to
+          the disbursement of the Loan.
+        </li>
+        <li>
+          <strong>Acknowledgement of Terms :</strong> Acknowledge having read and understood all terms and conditions,
+          privacy policy, and relevant documents made available on the websites of both U.Y. Fincorp Limited
+          (hereinafter
+          referred to as “U.Y. Fincorp Limited”) and the Lender.
+        </li>
+        <li>
+          <strong>Acceptance of Online Terms :</strong> Unconditionally agree to comply with all the terms and
+          conditions,
+          privacy policy, and other legally binding content published on the websites of U.Y. Fincorp Limited
+          (hereinafter
+          referred to as “U.Y. Fincorp Limited”) and the Lender,
+          as may be updated from time to time.
+        </li>
+        <li>
+          <strong>Accuracy of Information : </strong> Confirm that all personal, financial, and employment-related
+          information
+          provided to Tejas Loan and the Lender is true, accurate, and complete in all respects. The Borrower
+          undertakes to immediately inform the Lender of any change or inaccuracy discovered.
+        </li>
+      </ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+        PRE-PAYMENT
+
+      </h3>
+      <ol class="terms-list">
+        <li>The Borrower may, subject to the prior written approval of the Lender, prepay the entire Outstanding
+          Balance or any part thereof (“Prepayment Amount”) by providing at least one (1) calendar day prior
+          written notice to the Lender, expressing the intention to make such prepayment.
+        </li>
+        <li>Upon receiving the Lender’s written approval in response to the Borrower’s notice under Clause 6.1,
+          the Borrower shall remit the Prepayment Amount to the Lender within five (5) calendar days from the
+          date of such approval. Failure to make payment within the specified time frame shall render the
+          prepayment request null and void, unless otherwise agreed by the Lender in writing.
+        </li>
+        <li>Prepayment of the Loan shall be subject to Prepayment Charges as specified in the Sanction Letter
+          cum Key Fact Statement (KFS), as may be amended from time to time. The applicable Prepayment
+          Charges shall be computed on the Prepayment Amount and shall be payable simultaneously with the
+          Prepayment Amount.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list">
+        <li>The Lender shall have the sole and absolute discretion to apply the Prepayment Amount received from
+          the Borrower in the following order of priority:
+          a) First, towards any Prepayment Charges, Interest, Delayed Payment Charges, Fees, Dishonor
+          Charges, Taxes, Lender Swap Charges, and all other costs, expenses, or charges payable under the
+          Loan Documents.
+          b) Thereafter, towards the Bullet Payment or Installments, as applicable, or in such other manner as the
+          Lender may deem appropriate.</li>
+        <li>Upon full and final prepayment of the entire Outstanding Balance, and subject to clearance of all dues,
+          the Lender shall return the Repayment Instruments to the Borrower in accordance with the provisions of
+          relevant Clause of this Agreement.</li>
+      </ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">BORROWER’S REPRESENTATIONS AND WARRANTIES
+      </h3>
+      <ol class="terms-list">
+        <li>The Borrower hereby makes the following representations and warranties to the Lender, which shall be
+          deemed to be continuing and shall remain true and binding throughout the tenure of the Loan and until
+          the discharge of all obligations under the Loan Documents:
+          <ol type="a">
+            <li>The Loan Documents executed and obligations undertaken by the Borrower are valid, binding, and
+              enforceable in accordance with their terms and do not contravene any applicable laws, regulations, or
+              existing contractual obligations of the Borrower.</li>
+            <li>The execution, delivery, and performance of the Loan Documents by the Borrower do not and will not:
+              <ol type="i">
+                <li>violate any applicable law, regulation, or judicial or governmental order;
+                </li>
+                <li>result in a breach or constitute a default under any agreement or instrument to which the Borrower
+                  is a party or by which the Borrower or its assets are bound;</li>
+                <li>cause the creation or imposition of any encumbrance on the Borrower’s assets, except as
+                  permitted under the Loan Documents;</li>
+                <li>Contravene any provision of the Borrower’s constitutional or governing documents (where
+                  applicable).
+                </li>
+              </ol>
+            </li>
+            <li>There are no actions, suits, proceedings, or investigations pending or, to the Borrower’s knowledge,
+              threatened against the Borrower before any court, tribunal, or governmental authority that could
+              materially affect the Borrower’s financial position, the enforceability of the Loan Documents, or the
+              Borrower’s ability to perform its obligations thereunder.</li>
+            <li>Notwithstanding the Repayment Schedule or Loan Tenure, the Lender shall be entitled to demand
+              immediate repayment of the Loan and all Outstanding Balances at any time. Upon such demand, the
+              Borrower shall make immediate payment, and the Lender may adjust any monies lying in any account
+              of the Borrower with the Lender or its branches towards such outstanding dues.</li>
+            <li>Repayment Instruments and Mandates:
+              <ol type="i">
+                <li>The Borrower has issued Repayment Instruments with full knowledge that dishonour of the same
+                  constitutes an offence under the Negotiable Instruments Act, 1881, and/or the Payment and
+                  Settlement Systems Act, 2007, as applicable.
+                </li>
+                <li>No notice shall be required for the presentation of such instruments.</li>
+                <li>The Borrower may authorize payment via direct debit, NACH/ECS, or similar mandates from an
+                  Approved Bank account.</li>
+              </ol>
+            </li>
+            <li>Where the Borrower’s employer is registered for DAS, repayment shall be made through salary
+              deduction. Upon cessation of employment, the Borrower shall promptly provide an alternate
+              Repayment Instrument from an Approved Bank where the Borrower holds a new salary account.</li>
+            <li>The Borrower shall at all times comply with all applicable laws in India, including but not limited to
+              the
+              Prevention of Money Laundering Act, 2002.
+            </li>
+            <li>The Borrower is competent to contract and has taken all necessary steps and obtained requisite
+              authorizations to enter into and perform the Loan Documents.</li>
+            <li>All information, financial or otherwise, provided by the Borrower is true, complete, and not misleading
+              in any material respect as of the date provided and remains valid unless updated or withdrawn in
+              writing.
+            </li>
+            <li>The Borrower is not insolvent, bankrupt, in receivership, or under liquidation and has not taken any
+              steps toward such proceedings.
+            </li>
+            <li>The Borrower confirms that they fully understand the English language and agrees that all
+              communication from the Lender in English shall be binding.
+            </li>
+
+          </ol>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" type="a" start="12">
+        <li>The Borrower has obtained all applicable statutory approvals and consents necessary to execute the
+          Loan Documents and perform obligations thereunder.
+        </li>
+        <li> The Borrower confirms that he/she is gainfully employed at the time of execution of the Loan
+          Documents, is not under notice or intending to resign. In case of resignation, termination, or change in
+          employment, the Borrower shall promptly notify the Lender.</li>
+        <li>The Borrower has duly filed all required tax returns and paid all applicable taxes, including stamp
+          duty on Loan Documents, except where disputes are pending in good faith and proper reserves have
+          been made.
+        </li>
+      </ol>
+      <ol class="terms-list" start="2">
+        <li>Creditworthiness and Non-Default <br>The Borrower affirms that they:
+          <ol type="i">
+            <li>are not identified as a willful defaulter;</li>
+            <li>are not listed on the Reserve Bank of India’s caution lists or defaulters' databases;</li>
+            <li>are not involved in any activities or investigations concerning terrorism, anti-national behavior, or
+              enforcement proceedings by any statutory authority.
+            </li>
+          </ol>
+        </li>
+        <li> Undertaking on Lender Policies <br> The Borrower undertakes to keep themselves updated with the Lender's
+          policies and terms from time to
+          time and agrees to abide by the same.
+        </li>
+        <li>Regular Payments <br> The Borrower warrants timely and regular payments to the Lender as per the terms of
+          the Loan
+          Documents.
+        </li>
+        <li>Authority of Signatories (If Applicable) <br> Where the Borrower is an entity (proprietorship, partnership,
+          LLP, or company), all signatories to the
+          Loan Documents are duly authorized to execute the same on behalf of the Borrower.
+        </li>
+      </ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center"> EVENTS OF DEFAULT</h3>
+      <ol class="terms-list">
+        <li>An event of default (“Event of Default”) shall be deemed to have occurred under the Loan Documents,
+          if:
+          <ol type="a">
+            <li>The Borrower commits a breach or fails or neglects to perform, keep or observe any of the conditions
+              set forth in any of the Loan Documents;</li>
+            <li>Any covenant, representation and/or warranty of the Borrower is found/ proved to be incomplete, false,
+              or incorrect.
+            </li>
+            <li>If the Borrower fails to deliver Repayment Instrument for the Instalments and / or bullet payment(s).
+            </li>
+            <li>Any Repayment Instrument issued by the Borrower in favor of the Lender is dishonored by the
+              Borrower’s bank.
+            </li>
+            <li>The Borrower fail/s to pay the Instalments and / or bullet payment(s) or any other payment comprised in
+              the Outstanding Balance on the Scheduled Due Dates.
+            </li>
+            <li>Any information supplied by the Borrower in the Application Form, or any other Loan Document is found
+              to be materially untrue, false, misleading, or incorrect.
+            </li>
+            <li>The Borrower has admitted to any Person in writing that the Borrower is unable to pay his/her debts and
+              / or that the Borrower is willing to be adjudged bankrupt.</li>
+            <li>If the Borrower commit any act of bankruptcy or makes assignment for the benefit of creditors or
+              consents to the appointment of a trustee or receiver in respect of its properties / assets or insolvency
+              proceedings, whether voluntary or otherwise, are instituted against the Borrower:</li>
+            <li>The receiver is appointed in respect of the assets or properties of the Borrower.
+            </li>
+            <li>The Borrower, being an individual, has an insolvency notice served on him or is declared insane or is
+              convicted of any offence.
+            </li>
+            <li>Any of the Repayment Instrument delivered or to be delivered by the Borrower to the Lender in
+              accordance hereof, are not encashed / acted upon or dishonored for any reason whatsoever, on
+              presentation being made by the Lender.</li>
+          </ol>
+
+      </ol>
+      </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="2">
+        <ol start="12" type="a">
+          <li>Any instruction is given by the Borrower to stop payment on any of the Repayment Instrument.
+          </li>
+          <li> If the Borrower fail/s to create Security Interest in accordance with Article 4.</li>
+          <li>If the Borrower commits a default under any other agreement executed with the Lender or any of its
+            affiliates or group companies.</li>
+          <li>If any other event has occurred which in the opinion of the Lender jeopardizes its interest or would
+            make
+            it difficult for the Lender to recover the Loan or the Outstanding Balance if timely action is not taken.
+          </li>
+          <li>The occurrence of any event which, in the opinion of the Lender, may jeopardize the Borrower’s ability
+            to pay the Lender’s dues.
+          </li>
+        </ol>
+        <li>
+          Upon occurrence of any of the Events of Default and at any time thereafter, the Lender shall have the
+          right, but not the obligation to declare all sums outstanding under the Loan (i.e., the entire Outstanding
+          Balance), whether due or not, immediately repayable and upon the Borrower failing to make the said
+          payments within 7 (seven) days thereof, the Lender may at its sole discretion
+
+          <ol type="a">
+            <li>Require the Borrower to pay liquidated damages equal to all unpaid Instalments <strong>and / or bullet
+                payment(s)</strong> which in the absence of a default would have been payable by the Borrower for the
+              full term
+              hereof together with Interest stipulated in the Sanction Letter cum KFS from the date of such declaration
+              till the date of payment and/or realization; and
+            </li>
+            <li>Exercise any other right or remedy which may be available to the Lender under any applicable law,
+              including the rights available pursuant to the provisions under the loan documents.</li>
+            <li>The Borrower shall also be liable for payment of all legal and other costs and expenses resulting from
+              the defaults or the exercise of the Lender’s remedies.
+            </li>
+          </ol>
+
+        </li>
+      </ol>
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center"> ARTICLE 9: ASSIGNMENT & DELEGATION</h3>
+      <ol class="terms-list">
+        <li>The Borrower shall not assign, transfer, or otherwise dispose of, whether in whole or in part, the Loan or
+          any of its rights or obligations under the Loan Documents to any third party without the prior written
+          consent of the Lender.
+        </li>
+        <li>The Borrower expressly agrees and acknowledges that the Lender shall have the absolute and
+          unfettered right, at its sole discretion, to sell, assign, transfer or otherwise dispose of, whether in whole
+          or
+          in part, its rights, title, and interest in the Loan, the Outstanding Balance, or any part thereof, to any
+          third
+          party, on such terms and in such manner as the Lender may deem fit, without the requirement of any
+          notice to or consent of the Borrower.</li>
+        <li>The Borrower further acknowledges and agrees that, without prejudice to the Lender’s right to perform
+          any obligations or functions under the Loan Documents directly, the Lender shall be entitled to appoint
+          one or more third parties, including but not limited to service providers, agents, or collection agencies
+          (collectively referred to as “Service Providers”), and to delegate to such parties any of the Lender’s
+          functions, rights, or obligations under the Loan Documents, including without limitation:
+          <ol type="a">
+            <li>Collection of all or any portion of the Instalments and/or Outstanding Balance;</li>
+            <li>Communication with the Borrower including issuance of demand notices or payment reminders;
+            </li>
+            <li>Visiting the Borrower’s residence, office, or place of business, or otherwise contacting the Borrower
+              for collection purposes;</li>
+            <li>Issuing valid receipts, acknowledgments, or discharges on behalf of the Lender in respect of any
+              payments received from the Borrower;</li>
+            <li>Performing any other lawful acts or functions as may be delegated by the Lender in connection with
+              the administration, monitoring, or enforcement of the Loan.
+            </li>
+          </ol>
+        </li>
+        <li>The Borrower agrees that any such delegation by the Lender shall be binding upon the Borrower and
+          that all acts done or performed by such Service Providers shall be deemed to have been done or
+          performed by the Lender itself.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">COMPLIANCE WITH THE REGULATIONS</h3>
+      <ol class="terms-list">
+        <li>The Borrower and the Lender agree to comply jointly and severally with all applicable laws and
+          regulations from time to time in force including any amendments, modification or change thereof which
+          may be attracted and the Borrower shall indemnify the Lender in respect of any loss, claim or expense to
+          the Lender as a result of non-compliance with any such laws and regulations by the Borrower
+        </li>
+        <li>The amount of Instalments <strong>and / or bullet payment(s)</strong> shall be increased by incremental
+          taxes,
+          whether sales, excise, security tax or interest tax and other related taxes now levied on this transaction
+          or hereafter to be levied.
+        </li>
+
+      </ol>
+    </div>
+    <div class="terms-section">
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">FURTHER ASSURANCES
+      </h3>
+      <ol class="terms-list">
+        <li>The Borrower shall pay all costs and other expenses incurred by the Lender in enforcing the Loan
+          Documents and/or for recovery of the Loan / Outstanding Balance</li>
+        <li>The Borrower undertake/s to indemnify and keep the Lender indemnified in respect of any cost, loss or
+          liability incurred by the Lender as a result of: (a) the occurrence of any Event of Default; (b) Any
+          information supplied by the Borrower in the Application Form or any other Loan Document is found to be
+          materially untrue, false, misleading or incorrect; (c) failure by the Borrower to pay any amount due under
+          the Loan Documents on its Scheduled Due Date; (d) the Borrower failing to comply with the provisions of
+          any applicable laws; and / or (e) breach of any representation, warranty, covenant or undertaking of the
+          Borrower under the terms of the this Agreement or any of the other Loan Documents.</li>
+        <li>In addition to the obligations and documents which the Lender expressly require the Borrower to
+          execute, deliver and perform, the Borrower hereby agree to execute, deliver, and perform, such further
+          acts or documents which the Lender may reasonably require, from time to time, to effectuate the
+          purposes of these Terms and Conditions or any of the other Loan Documents.</li>
+      </ol>
+    </div>
+    <div class="terms-section">
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">NOTICE / AUTHORISATION</h3>
+      <ol class="terms-list">
+        <li>Any notice / letter / other communication sent by the Lender to the Borrower shall be sent at the latest
+          address of the Borrower available in the records of the Lender and in English language (which the
+          Borrower acknowledges and accepts) and the same shall be deemed to have been delivered on expiry of
+          48 hours after it has been sent by registered post / courier / other modes of delivery. Any notice to be
+          sent to the Lender by the Borrower shall be sent by pre-paid Registered A.D. at its registered office or at
+          such other address as may be intimated by the Lender to the Borrower. The Borrower shall immediately
+          intimate the Lender of any change in its office / residential address Borrower.
+        </li>
+        <li>The Borrower hereby authorize the Lender to contact the Borrower in relation to provision of information
+          about new products of the Lender, offers, promotions and also for the purpose of receiving feedback or
+          conducting surveys and hereby expressly agree to exempt such actions for the purpose of ‘Do Not Call /
+          Disturb’ guidelines issued by the Telecom Regulatory and Development Authority or any other authority.</li>
+      </ol>
+    </div>
+    <div class="terms-section">
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">CONSENT TO DISCLOSURE
+      </h3>
+      <ol class="terms-list">
+        <li>The Borrower understands and acknowledges that, as a pre-condition for the grant of the Loan by the
+          Lender, the Lender requires the Borrower’s express consent for the disclosure and use of certain
+          information and data pertaining to the Borrower. Accordingly, the Borrower hereby unconditionally
+          consents and agrees to the disclosure and furnishing by the Lender, to such parties and in such manner
+          as the Lender may deem fit or as may be authorized by the Reserve Bank of India (RBI), of the following:
+          <ol type="a">
+            <li>any personal, financial, or credit-related information and data relating to the Borrower;
+            </li>
+            <li>information or data relating to the Loan and/or any credit facility availed or to be availed by the
+              Borrower from the Lender;</li>
+            <li>information regarding any obligations undertaken or to be undertaken by the Borrower in relation to
+              such credit facilities;</li>
+            <li>Information regarding any default or non-compliance by the Borrower in the discharge of any of the
+              aforesaid obligations.
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+      <ol class="terms-list" start="2">
+        <li>The Borrower declares and affirms that all information and data provided by the Borrower to the Lender,
+          whether submitted in writing or communicated orally, is true, complete, accurate, and not misleading in
+          any respect.
+        </li>
+        <li>
+          The Borrower further agrees and acknowledges that:
+          <ol type="a">
+            <li> the Credit Information Bureau (India) Limited (CIBIL) and/or any other credit information company or
+              agency authorized by the RBI may use and process the said information and data disclosed by the
+              Lender in such manner as may be deemed appropriate by them;</li>
+            <li>CIBIL and/or such other authorized agency may furnish, for consideration, the processed information
+              or any reports, scores, or products derived therefrom to banks, financial institutions, credit grantors,
+              or
+              other registered users, as permitted under applicable law and regulations;</li>
+            <li>Notwithstanding anything to the contrary contained in this Agreement, the Loan Documents, or any
+              applicable law, the Borrower agrees that in the event of default in repayment of the Loan, any
+              instalment thereof, or any part of the Outstanding Balance on the Scheduled Due Date(s), the Lender
+              and/or the Reserve Bank of India shall have an unqualified right to disclose, report, or publish the
+              name of the Borrower as a “defaulter” in such manner and through such media as they may, in their
+              sole discretion, deem appropriate.
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+    <div class="terms-section">
+      <h3 style="margin-top: 20px; color: #1a237e; text-align: center">MISCELLANEOUS</h3>
+      <ol class="terms-list">
+        <li><strong>Interpretation:</strong> Unless the subject or context otherwise requires or unless otherwise
+          stated, in this
+          Agreement: Unless the context otherwise requires or unless expressly stated to the contrary, in this
+          Agreement:
+        </li>
+        <ol type="a">
+          <li>References to “Articles”, “Sections”, or “Schedules” are to the Articles, Sections, and Schedules of
+            this Agreement and shall be deemed to include all amendments and modifications thereto
+          </li>
+          <li>References to any law, statute, regulation, or provision thereof shall include such law, statute,
+            regulation, or provision as amended, re-enacted, substituted, or supplemented from time to time.
+          </li>
+          <li>The headings and titles used in this Agreement are for reference and convenience only and shall not
+            affect the construction or interpretation of any provision of this Agreement.</li>
+          <li>Words denoting the singular shall include the plural and vice versa, as the context may require.
+          </li>
+          <li>References to any gender shall include all genders—male, female, and neuter—as the context may
+            require.
+          </li>
+          <li>The Sanction Letter cum Key Fact Statement (KFS), all Schedules, and the Recitals form an integral
+            and binding part of this Agreement and shall be read in conjunction with the provisions hereof.</li>
+          <li>In the event any payment under this Agreement becomes due on a day which is not a Business Day,
+            such payment shall be made on the next succeeding Business Day. Notwithstanding the actual date of
+            payment, the calculation of interest and other charges shall be made with reference to the originally
+            scheduled due date, unless otherwise agreed by the Lender and notified in writing to the Borrower.
+          </li>
+
+        </ol>
+        <li><strong>Effective Date of Terms:</strong> These Terms and Conditions shall become binding on the Borrower
+          and the
+          Lender on and from the date of execution hereof. These Terms and Conditions shall be in force till all the
+          monies due and payable to the Lender under the Loan Documents as well as all other agreement(s),
+          document(s) that may be subsisting / executed between the Borrower and the Lender are fully paid to the
+          satisfaction of the Lender.
+        </li>
+        <li><strong>Representatives and Assigns:</strong> The Borrower, his/her/its/their heirs, legal representatives,
+          executors,
+          administrators, successors, permitted assigns, partner(s) for the time being, including the legal
+          representatives of the deceased partner(s), if any) shall be bound by all the covenants of these Terms
+          and Conditions.
+        </li>
+        <li><strong>Non-Waiver:</strong> Any omission or delay on the part of the Lender, in exercising any of rights,
+          powers or
+          remedy accruing to the Lender, upon failure by the Borrower in the due and punctual fulfilment of the
+          obligations of the Borrower hereunder, shall not be deemed to constitute a waiver by the Lender of any of
+          its rights to require such due and punctual performance by the Borrower.
+        </li>
+
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <div class="terms-section">
+
+      <ol class="terms-list" start="5">
+        <li><strong>Governing Law and Jurisdiction:</strong> These Terms and Conditions shall be construed and governed
+          in all
+          respects, including validity, interpretation, and effect in accordance with the laws of India. All disputes
+          arising out of these Terms and Conditions shall be subject to the exclusive jurisdiction of the courts or
+          tribunals at - Maharashtra, India.
+        </li>
+        <li><strong>Dispute Resolution:</strong> Any question, dispute or claim arising out of or in connection with
+          these Terms
+          and Conditions or the other Loan Documents including any question on its existence, validity or
+          termination shall be referred to and finally adjudicated through arbitration by a sole arbitrator and in
+          accordance with the Arbitration and Conciliation Act, 1996. The sole arbitrator will be appointed by the
+          Lender. The venue for such arbitration shall be Maharashtra, India. The arbitration award given by the sole
+          arbitrator appointed as aforesaid shall be final and binding on all the parties in connection with any
+          question of facts or law arising in the course of arbitration or with respect to any award made. Further,
+          the present clause shall survive the termination of these Terms and Conditions and the other Loan
+          Documents. The Courts at Maharashtra, India shall have exclusive jurisdiction (subject to the arbitration
+          proceedings which are to be also conducted in Maharashtra, India) over any or all disputes arising out of
+          this Agreement and the other Loan Documents. The present clause along with the clause for payment of
+          Interest and other Outstanding Balance by the Borrower shall survive the termination of this Agreement
+          and the other Loan Documents.
+        </li>
+        <li><strong>Confidentiality:</strong> The Lender shall exercise reasonable care and diligence while handling any
+          confidential information pertaining to the Borrower. However, the Borrower hereby acknowledges and
+          agrees that the Lender shall be entitled to disclose, without any further notice or reference to the
+          Borrower, any information or documentation relating to the Borrower, the Loan, or any of the transactions
+          contemplated under the Loan Documents, in the following circumstances:
+          <ol type="a">
+            <li>to the Lender’s affiliates, group companies, or subsidiaries;</li>
+            <li>to any actual or prospective transferees, assignees, or purchasers of any rights, obligations or
+              interests in the Loan and/or the Outstanding Balance;</li>
+            <li>to any regulatory, governmental, judicial, statutory, or quasi-judicial authority, including but not
+              limited
+              to disclosures made in compliance with any law, rule, regulation, directive, order, notification or
+              instruction issued by the Reserve Bank of India or any other governmental authority;
+            </li>
+            <li>in connection with the exercise of the Lender’s rights, remedies, powers, or obligations under the
+              Loan Documents;</li>
+            <li>to the Lender’s employees, directors, officers, advisors, agents, consultants, service providers and/or
+              subcontractors, on a need-to-know basis, for the purpose of fulfilling the Lender’s obligations under
+              the Loan Documents, or for evaluating or pursuing any business relationship with the Borrower;
+            </li>
+            <li>to any credit information bureau, credit rating agency, data repository, or other service providers or
+              agencies engaged by the Lender. <br>
+
+              In addition to the above, the Lender shall have the right to disclose, without prior notice to the
+              Borrower, all or any information or documentation, including but not limited to:
+              <ol type="a">
+                <li>personal and financial information and data relating to the Borrower;
+                </li>
+                <li>details of any credit facility availed or proposed to be availed by the Borrower;</li>
+                <li>any default or delay in repayment, or any other non-compliance with the terms of the Loan
+                  Documents;</li>
+              </ol>
+              to any governmental, taxation, regulatory or judicial authority or agency, including but not limited to
+              the
+              Income Tax Department, Credit Rating Agencies, Credit Information Companies (CICs), or any other
+              authority, body, or department, for the purpose of compliance, regulatory reporting, or protection of the
+              Lender’s interests. <br><br> The Borrower expressly waives any right to privacy, confidentiality, or
+              non-disclosure with respect to
+              the disclosures set out herein and further waives any right to initiate legal proceedings for defamation,
+              breach of confidentiality, or any related claim in respect of such disclosures made in accordance with
+              this Clause.
+
+
+            </li>
+          </ol>
+        </li>
+        <li><strong>Costs and Expenses:</strong> The Borrower shall forthwith on demand being made, pay to the Lender,
+          on a
+          full indemnity basis, all costs and expenses (including legal costs) incurred and/or to be incurred by the
+          Lender and / or Service Provider for the enforcement of these Terms and Conditions, the other Loan
+          Documents and realization/recovery of the amount of the Outstanding Balance from the Borrower, if any.
+        </li>
+        <li><strong>Amendments:</strong> These Terms and Conditions may be amended by the Lender at any time. Any such
+          amendment shall take effect only prospectively i.e., after the amendment of the Terms and Conditions.
+          However, the Lender shall upon such variation or amendment being made, inform the Borrower in
+          respect of any variation or amendment in the Terms and Conditions and/or other charges as are
+          applicable to the Loan.
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <h3 style="margin-top: 20px; color: #1a237e; text-align: center">
+      SCHEDULE A
+    </h3>
+    <h4 style="font-weight: bold; text-align: center; margin-bottom: 15px">
+      AGREEMENT PARTICULARS
+    </h4>
+    <table class="kfs-table">
+      <tr>
+        <th>S.NO.</th>
+        <th>PARTICULAR</th>
+        <th>DETAILS</th>
+      </tr>
+      <tr>
+        <td>1.</td>
+        <td>Date of Execution</td>
+        <td>{{ Sanction Date }}</td>
+      </tr>
+      <tr>
+        <td>2.</td>
+        <td>Place of Execution</td>
+        <td>{{ City }}</td>
+      </tr>
+      <tr>
+        <td>3.</td>
+        <td>Name of the Lender</td>
+        <td>U.Y. Fincorp Limited</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Name of the Service Provider</td>
+        <td>U.Y. Fincorp Limited</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Name of the DLA</td>
+        <td>FundoBaba</td>
+      </tr>
+      <tr>
+        <td>4.</td>
+        <td>Name of the Borrower</td>
+        <td>{{Customer Name}}</td>
+      </tr>
+      <tr>
+        <td>5.</td>
+        <td>Address of the Borrower</td>
+        <td>{{ Address of the Customer }}</td>
+      </tr>
+      <tr>
+        <td>6.</td>
+        <td>Name of the Employer</td>
+        <td>{{ Employer name }}</td>
+      </tr>
+      <tr>
+        <td>7.</td>
+        <td>Address of the Employer</td>
+        <td>{{ Employer address }}</td>
+      </tr>
+      <tr>
+        <td>8.</td>
+        <td>Reference number of Sanction Letter cum KFS</td>
+        <td>{{ Loan Account Number }}</td>
+      </tr>
+      <tr>
+        <td>9.</td>
+        <td>Date of Execution of Sanction Letter cum KFS</td>
+        <td>{{ Date_of_sanction_letter }}</td>
+      </tr>
+      <tr>
+        <td>10.</td>
+        <td>Bank Account Details</td>
+        <td>{{ bank Account Number }}</td>
+      </tr>
+      <tr>
+        <td>11.</td>
+        <td>Sanctioned Loan Amount</td>
+        <td>INR {{ Loan Recommended }}</td>
+      </tr>
+    </table>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+
+  <div class="header-wrapper">
+    <img src="./Header.webp" alt="Header" class="header-img" />
+  </div>
+  <div class="content">
+    <table class="kfs-table">
+      <tr>
+        <td>12.</td>
+        <td>Interest Rate</td>
+        <td>
+          Interest on the Loan: Interest on the Loan: {{ interest }}% from the
+          date of disbursal until the date of repayment. In the event of
+          failure to make payment on due date, a penal interest of {{
+          penal_interest }}% shall be applicable from the due date until the
+          date of payment.
+        </td>
+      </tr>
+      <tr>
+        <td>13.</td>
+        <td>Processing Fee</td>
+        <td>
+          A processing fee, {{processing fee }}% of the loan amount +
+          applicable taxes.
+        </td>
+      </tr>
+      <tr>
+        <td>14.</td>
+        <td>Late Fee</td>
+        <td>
+          In case of delay in payment of Amount Due, Lender shall charge late
+          payment charges of double of Interest rates.
+        </td>
+      </tr>
+      <tr>
+        <td>15.</td>
+        <td>Maximum Interest Rate</td>
+        <td>The Interest rate on the Loan shall not exceed 50% per Month.</td>
+      </tr>
+      <tr>
+        <td>16.</td>
+        <td>Cooling Period</td>
+        <td>3 days</td>
+      </tr>
+    </table>
+  </div>
+  <div class="content" style="margin-top: 40px">
+    <p>
+      The Lender, may at its sole discretion, waive or reduce the charges as
+      mentioned above, on a case-to-case basis.
+    </p>
+    <p>
+      <b>IN WITNESS WHEREOF</b> the Borrower hereby accepts the terms and
+      conditions this Agreement.<br />
+      <b>I/we, the Borrower acknowledge that I/we are well versed in and fully
+        understand English language, a copy of the Loan Documents has been
+        furnished to me/us in English language, as specially requested by
+        me/us and that I/we have read and have understood the contents of the
+        Loan Documents and hereby agree, accept, and undertake to abide by the
+        same</b>
+    </p>
+    <p style="margin-top: 40px; font-size: 22px">
+      ____________________________________________
+      <span style="font-size: 28px">✍</span>
+    </p>
+    <p style="font-weight: bold">
+      SIGNED AND DELIVERED by the within named Borrower
+    </p>
+  </div>
+  <div class="footer-wrapper">
+    <img src="./Footer.webp" alt="Footer" class="footer-img" />
+  </div>
+</body>
 </html>
   `
 };
