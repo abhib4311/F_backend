@@ -378,7 +378,7 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
         <tr>
           <td>Processing Fee</td>
           <td>
-            Lender will charge a processing fee of INR ${p}
+            Lender will charge a processing fee of INR ${pf_amount}
             plus applicable taxes.
           </td>
         </tr>
