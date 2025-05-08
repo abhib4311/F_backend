@@ -342,6 +342,7 @@ const checkWhiteListedUser = async (pan) => {
       pan: pan,
     },
   });
+  console.log("Hii----------- 2" , whiteListedUser)
   if (whiteListedUser) return true;
   return false;
 }
