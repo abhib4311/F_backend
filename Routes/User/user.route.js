@@ -34,7 +34,7 @@ import authenticateUser from "../../Middlewares/user.js";
 import { faceMatchHandler } from "../../controllers/User/face.match.controller.js";
 import { processBankStatement } from "../../controllers/User/process.bank.controller.js";
 import { callbackBankStatement } from "../../controllers/User/callback.bank.statement.js";
-import { sendEncryptedRequest, status_check } from "../../controllers/User/banking_integration.js"
+import { sendEncryptedRequest } from "../../controllers/User/banking_integration.js"
 import { verifyStaticToken } from "../../utils/verify_static_token.js";
 
 import fileUpload from "express-fileupload";
@@ -94,8 +94,8 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
-router.post("/auto-payment", sendEncryptedRequest)
-router.post("/status-check", status_check)
+router.post("/auto-payment", sendEncryptedRequest) // BANK API
+// router.post("/status-check", status_check)
 
 // ---------------------------------------------------------------------------------//
 // Post loan Routes
