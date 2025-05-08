@@ -6,7 +6,7 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
   try {
     console.log("HTML content received for PDF generation:---->");
     browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium-browser', // or use Puppeteer’s downloaded one
+      executablePath: '/snap/bin/chromium', // or use Puppeteer’s downloaded one
       headless: 'new',
       args: [
         '--no-sandbox',
