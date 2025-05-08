@@ -166,8 +166,9 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
     };
 
     const response = await axios.post(url, requestBody, { headers });
-    console.log("<<========Encrypted Response=========>>", response.data);
+    // console.log("<<========Encrypted Response=========>>", response.data);
 
+    console.log("Hii----- 22222222")
     // Decrypt response
     const encryptedKeyBuffer = Buffer.from(
       response?.data?.encryptedKey,
