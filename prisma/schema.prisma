@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("MYSQL_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRESQL_DATABASE_URL")
 }
 
 model Lead {
@@ -388,7 +388,7 @@ model Employee_Role {
   role        Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
   @@id([employee_id, role_id])
-  @@index([role_id], map: "Employee_Role_role_id_fkey")
+  @@index([role_id]) // Removed map
 }
 
 model Employee_Logs {
@@ -399,8 +399,9 @@ model Employee_Logs {
   updated_at  DateTime @updatedAt
   employee    Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
 
-  @@index([employee_id], map: "Employee_Logs_employee_id_fkey")
+  @@index([employee_id]) // Removed map
 }
+
 
 model Counter {
   id             Int      @id @default(autoincrement())
