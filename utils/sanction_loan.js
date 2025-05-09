@@ -1,5 +1,12 @@
-const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, footerImageBase64 , elegible_loan_amount , bank_account_number , address) => {
-
+const generateLoanHTML = (
+  sanction_detail,
+  user_detail,
+  headerImageBase64,
+  footerImageBase64,
+  elegible_loan_amount,
+  bank_account_number,
+  address
+) => {
   const {
     loan_no,
     loan_amount,
@@ -13,17 +20,24 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
     tenure,
     apr,
     gst,
-    sanction_date
+    sanction_date,
   } = sanction_detail;
   // const { full_name } = { full_name: "abhishek" };
   const { full_name } = user_detail;
 
-
-  const date = new Date(repayment_date);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  const formattedRepaymentDate = `${day}/${month}/${year}`;
+  const formatDateToDDMMYYYY = (dateInput) => {
+    const date = new Date(dateInput);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  // const date = new Date(repayment_date);
+  // const day = String(date.getDate()).padStart(2, "0");
+  // const month = String(date.getMonth() + 1).padStart(2, "0");
+  // const year = date.getFullYear();
+  const formattedRepaymentDate = formatDateToDDMMYYYY(repayment_date);
+  const formattedSanctionDate = formatDateToDDMMYYYY(sanction_date)
   return `
  <!DOCTYPE html>
 <html lang="en">
@@ -345,9 +359,9 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
       </p>
 
       <p>
-        With reference to your application dated {{Date of Application}} for a
+        With reference to your application dated ${formattedSanctionDate} for a
         Short Term Loan, we have the pleasure of sanctioning you an amount of
-        Rs. ${loan_amount} (in figures) (in words) {{amount in Words}}
+        Rs. ${loan_amount}
         subject to the following terms and conditions:
       </p>
 
@@ -512,7 +526,7 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
       <tr>
         <td class="kfs-td">(o)</td>
         <td class="kfs-td">Repayment Date</td>
-        <td class="kfs-td">${repayment_date}</td>
+        <td class="kfs-td">${formattedRepaymentDate}</td>
       </tr>
       <!-- <tr>
           <td class="kfs-td">(p)</td>
@@ -544,7 +558,7 @@ const generateLoanHTML = (sanction_detail, user_detail, headerImageBase64, foote
           <td class="kfs-td">
             Rate of annualized penal charges in case of delayed payments
           </td>
-          <td class="kfs-td">Double of (m)</td>
+          <td class="kfs-td">Double of (h)</td>
         </tr> -->
       <!-- <tr>
           <td class="kfs-td" colspan="3">
@@ -2669,7 +2683,7 @@ Andheri East , Mumbai, Maharashtra
       <tr>
         <td>1.</td>
         <td>Date of Execution</td>
-        <td>${sanction_date}</td>
+        <td>${formattedSanctionDate}</td>
       </tr>
       <tr>
         <td>2.</td>
@@ -2709,7 +2723,7 @@ Andheri East , Mumbai, Maharashtra
       <tr>
         <td>7.</td>
         <td>Date of Execution of Sanction Letter cum KFS</td>
-        <td>${sanction_date}</td>
+        <td>${formattedSanctionDate}</td>
       </tr>
       <tr>
         <td>8.</td>
@@ -2799,8 +2813,7 @@ Andheri East , Mumbai, Maharashtra
 </body>
 
 </html>
-  `
+  `;
 };
-
 
 export default generateLoanHTML;
