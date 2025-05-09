@@ -1316,6 +1316,7 @@ export const getDocument = async (req, res) => {
                 document_type: true,
                 document_url: true,
                 created_at: true,
+                remarks:true
             },
             orderBy: {
                 created_at: 'desc'
