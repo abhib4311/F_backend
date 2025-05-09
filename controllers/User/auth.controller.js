@@ -837,6 +837,7 @@ export const requestLoan = asyncHandler(async (req, res) => {
             lead_stage: LEAD_STAGE.LOAN_REQUESTED,
             loan_amount,
             tenure,
+            loan_no
           },
         }),
         // ...addressOperations,

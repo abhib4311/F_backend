@@ -855,7 +855,7 @@ export const disbursed = asyncHandler(async (req, res) => {
 
       // Fetch sanction data
       const sanction = await tx.sanction.findUnique({
-        where: { pan: lead.pan },
+        where: { loan_no: lead.loan_no },
         select: {
           id: true,
           net_disbursal: true,
