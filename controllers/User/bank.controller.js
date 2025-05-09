@@ -468,7 +468,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         document_url: s3Url,
         customer_id: userId,
         lead_id: lead.id,
-        remarks: `Uploaded bank statement Password is : ${password}`,
+        remarks: `${password}`,
       },
     });
 
