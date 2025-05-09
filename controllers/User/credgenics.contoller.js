@@ -29,13 +29,13 @@ export const sendDataToCredgenics = async (loan_no) => {
         })
     ])
 
-    if (!collection || !disbursal || !sanction || !lead) {
-        return res.status(404).json({
-            success: false,
-            message: "Proper data not found for sending Credgenics"
+    // if (!collection || !disbursal || !sanction || !lead) {
+    //     return res.status(404).json({
+    //         success: false,
+    //         message: "Proper data not found for sending Credgenics"
 
-        })
-    }
+    //     })
+    // }
 
     const data = {
         loan_no: loan_no,
