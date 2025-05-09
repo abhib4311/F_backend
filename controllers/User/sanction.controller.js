@@ -855,7 +855,7 @@ export const disbursed = asyncHandler(async (req, res) => {
 
       // Fetch sanction data
       const sanction = await tx.sanction.findUnique({
-        where: { loan_no: lead.loan_no },
+        where: { pan: lead.pan },
         select: {
           id: true,
           net_disbursal: true,
@@ -901,7 +901,7 @@ export const disbursed = asyncHandler(async (req, res) => {
         throw new ResponseError(
           400,
           "Already disbursed",
-          `Loan ${lead.loan_no} already disbursed`
+          `Loan already disbursed`
         );
       }
 
