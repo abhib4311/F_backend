@@ -40,7 +40,10 @@ if (process.env.NODE_ENV !== "test") {
 }
 var corsOption = {
   origin: [
+    "https://www.crm.fundobaba.com",
+    "https://www.crm.fundobaba.com/",
     "https://crm.fundobaba.com",
+    "https://crm.fundobaba.com/",
     "https://blinkrloan.com",
     "https://www.blinkrloan.com",
     "https://149.5.61.77",
