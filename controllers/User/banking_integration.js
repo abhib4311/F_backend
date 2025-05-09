@@ -83,11 +83,13 @@ export const sendEncryptedRequest = async (
     logger.warn(`Initiate Auto Disbursal API LEAD-ID${lead.id}`);
     const timestamp = getCurrentTimestamp();
 
+    const formattedAmount = parseFloat(amount).toFixed(2);
+    console.log("Formatted Amount -->" , formattedAmount)
     const requestParams = {
       localTxnDtTime: timestamp,
       beneAccNo: beneAccNo,
       beneIFSC: beneIFSC,
-      amount: amount,
+      amount: formattedAmount,
       tranRefNo: ref_no,
       paymentRef: "IMPSTransferP2A",
       senderName: "UY fincorp",
