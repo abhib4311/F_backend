@@ -29,7 +29,7 @@ export const calculateRepaymentDate = (salaryDateInput) => {
     const repaymentDate = new Date(today.getTime() + (tenure * MS_PER_DAY));
 
     return {
-        tenure,
-        repaymentDate: repaymentDate.toISOString().split("T")[0]
+        repaymentDate,
+        tenure
     };
 }

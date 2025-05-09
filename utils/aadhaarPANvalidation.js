@@ -34,8 +34,8 @@ export const validatePANwithAadhaar = (panData, aadhaarData, bankData) => {
   };
 
   try {
-    result.aadhaarLinked = panData.result?.aadhaarLinked === true;
-    const aadhaarMatch = panData.result?.aadhaarMatch;
+    result.aadhaarLinked = panData.data?.aadhaar_linked === true;
+    const aadhaarMatch = panData.data?.aadhaar_linked;
 
     if (!result.aadhaarLinked) {
       mismatches.push("PAN not linked with Aadhaar");
@@ -45,17 +45,17 @@ export const validatePANwithAadhaar = (panData, aadhaarData, bankData) => {
     }
 
     const aadhaarDOB = standardizeDOB(aadhaarData?.data?.dob);
-    const panDOB = standardizeDOB(panData.result?.dob);
+    const panDOB = standardizeDOB(panData.data?.dob);
 
     result.profileMatches.dob = aadhaarDOB === panDOB;
     if (!result.profileMatches.dob) {
       mismatches.push(`DOB mismatch: Aadhaar(${aadhaarDOB}) vs PAN(${panDOB})`);
     }
 
-    const genderMap = { F: "FEMALE", M: "MALE" };
+    const genderMap = { F: "F", M: "M" };
     const aadhaarGender =
       genderMap[aadhaarData?.data?.gender] || "";
-    const panGender = (panData.result?.gender || "").toUpperCase();
+    const panGender = (panData.data?.gender || "").toUpperCase();
 
     result.profileMatches.gender = aadhaarGender === panGender;
     if (!result.profileMatches.gender) {
@@ -66,7 +66,7 @@ export const validatePANwithAadhaar = (panData, aadhaarData, bankData) => {
     // Name validation with bank account
     const names = {
       aadhaar: aadhaarData?.data?.full_name,
-      pan: panData.result?.name,
+      pan: panData.data?.full_name,
       bank: bankData?.beneficiary_name
     };
     const nameResult = nameMatcher.matchDocuments(names);
@@ -86,7 +86,7 @@ export const validatePANwithAadhaar = (panData, aadhaarData, bankData) => {
     result.mismatchReasons = mismatches;
     result.nameMatchScore = `Name match score: ${(nameResult.overallScore * 100).toFixed(1)}%  
     1.AadhaarName : ${aadhaarData?.data?.full_name} 
-    2.PAN name :${panData.result?.name} 
+    2.PAN name :${panData.data?.name} 
     3.Bank Name :${bankData?.beneficiary_name}`
   } catch (error) {
     console.error("Validation error:", error);
@@ -192,26 +192,10 @@ export const validatePANwithAadhaar = (panData, aadhaarData, bankData) => {
 
 */
 
-// const panDetails = {
-//   "result": {
-//     "dob": "1990-05-15",
-//     "name": "RAJESH KUMAR SINGH",
-//     "gender": "MALE",
-//     "aadhaarLinked": true,
-//     "aadhaarMatch": true
-//   }
-// }
-// const aadhaarDetails = {
-//   result: {
-//     dataFromAadhaar: {
-//       name: "Rajesh Kumar Singh",
-//       dob: "15-05-1990",
-//       gender: "M"
-//     }
-//   }
-// }
+// const panDetails = { "data": { "dob": "2002-04-20", "email": null, "gender": "M", "status": "valid", "address": { "zip": "", "city": "", "full": "", "state": "", "line_1": "", "line_2": "", "country": "", "street_name": "" }, "category": "person", "client_id": "pan_comprehensive_rOAsqcprkyscTcxlDJgg", "dob_check": false, "full_name": "AYUSH DIXIT", "input_dob": null, "less_info": false, "pan_number": "FSPPD4469E", "dob_verified": false, "phone_number": null, "aadhaar_linked": true, "masked_aadhaar": "XXXXXXXX8328", "full_name_split": ["AYUSH", "", "DIXIT"] }, "message": null, "success": true, "status_code": 200, "message_code": "success" }
+// const aadhaarDetails = { "data": { "dob": "2002-04-20", "zip": "274001", "gender": "M", "status": "success_aadhaar", "address": { "po": "Deoria", "loc": "", "vtc": "Deoria", "dist": "Deoria", "house": "665 Ward No 13", "state": "Uttar Pradesh", "street": "Uma Nagar", "country": "India", "subdist": "Bhatpar Rani", "landmark": "" }, "care_of": "C/O: Satendra Kumar Dixit", "raw_xml": "https://aadhaar-kyc-docs.s3.amazonaws.com/fintechcloud/aadhaar_xml/832820250509001725851/832820250509001725851-2025-05-08-184726447236.xml?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAY5K3QRM5FYWPQJEB%2F20250508%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250508T184726Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=5ab7a2565ce474a8a22716a54b95d430ae72fb6d7fcd5391a5be93166c2cf0f3", "zip_data": "https://aadhaar-kyc-docs.s3.amazonaws.com/fintechcloud/aadhaar_xml/832820250509001725851/832820250509001725851-2025-05-08-184726346783.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAY5K3QRM5FYWPQJEB%2F20250508%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250508T184726Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=f806ca06fa125766afdf7b54aadca3ed3e7521b983e02ac136c9453206e8b371", "client_id": "aadhaar_v2_ugnoxedpoMmpYfrxmoft", "full_name": "Ayush Dixit", "has_image": true, "email_hash": "", "face_score": -1, "share_code": "7187", "aadhaar_pdf": null, "face_status": false, "mobile_hash": "5b4c5a0f8d7218802754aaf648bae1647a881e0d7071e28707efb022da84e680", "reference_id": "832820250509001725851", "uniqueness_id": "57cceb3662f21fb38fa9333fa9cd3fbcb93d4708b12b9811e7e7f2796d4d8571", "aadhaar_number": "XXXXXXXX8328", "mobile_verified": false }, "message": null, "success": true, "status_code": 200, "message_code": "success" }
 // const bankDetails = {
-//   beneficiary_name: "Uvesh",
+//   beneficiary_name: "Mr. Ayush Dixit",
 // }
 // // console.log(panDetails, aadhaarDetails, bankDetails)
 // console.log(validatePANwithAadhaar(panDetails, aadhaarDetails, bankDetails))
