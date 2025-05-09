@@ -1,183 +1,95 @@
-// import fs from 'fs';
-// import path from 'path';
-// import crypto from 'crypto';
-// import axios from 'axios';
-// import { exec } from 'child_process';
-// import util from 'util';
-// import dotenv from 'dotenv';
-// dotenv.config();
-// const execPromise = util.promisify(exec);
+const fs = require('fs');
+const crypto = require('crypto');
+const axios = require('axios');
+const { exec } = require('child_process');
 
-// // Error Map
-// const errorMap = {
-//     '501': 'Internal exception. Please do status check after sometime',
-//     '401': 'Unauthorized. Check the API Key',
-//     '429': 'Too Many Requests. Maintain the TPS defined',
-//     '403': 'Forbidden. Check the IP address & API Key',
-//     '997': 'Bad request or internal exception. Check request packet and do status check',
-//     '8010': 'INTERNAL_SERVICE_FAILURE. Contact ICICI Tech team',
-//     '8011': 'Host Not Found. Contact ICICI Tech team',
-//     '8012': 'BACKEND_CONNECTION_TIMEOUT. Contact ICICI Tech team',
-//     '8013': 'BACKEND_READ_TIMEOUT. Contact ICICI Tech team',
-//     '8014': 'Bad URL. Contact ICICI Tech team',
-//     '8015': 'Invalid decrypted request. Contact ICICI Tech team',
-//     '8016': 'Request Decryption Failure. Check encryption and certificate',
-//     '8017': 'Request Schema Validation Failure. Contact ICICI Tech team',
-//     '8018': 'Response Schema Validation Failure. Contact ICICI Tech team',
-//     '8019': 'Response Encryption Failure. Contact ICICI Tech team',
-//     '8099': 'Blank Response from Backend. Do status check',
-//     '8123': 'Configured amount limit exceeded',
-//     '8096': 'Invalid request. Request failed'
-// };
-
-// // Utility functions
-// function generateRandom16Digit() {
-//     return crypto.randomBytes(8).toString('hex').slice(0, 16);
+// function getCurrentTimestamp() {
+//     const now = new Date();
+//     const year = now.getFullYear().toString();
+//     const month = (now.getMonth() + 1).toString().padStart(2, '0');
+//     const day = now.getDate().toString().padStart(2, '0');
+//     const hours = now.getHours().toString().padStart(2, '0');
+//     const minutes = now.getMinutes().toString().padStart(2, '0');
+//     const seconds = now.getSeconds().toString().padStart(2, '0');
+//     return ${year}${month}${day}${hours}${minutes}${seconds};
 // }
 
-// async function decryptResponse(encryptedKey, encryptedData) {
-//     try {
-//         // Decrypt session key with private key
-//         const privateKeyPath = path.join(process.cwd(), 'certs', 'private.key');
-//         const opensslCommand = `openssl rsautl -decrypt -inkey "${privateKeyPath}"`;
+//imps
+const requestParams = {
+    "localTxnDtTime": getCurrentTimestamp(),
+    "beneAccNo": "",
+    "beneIFSC": "",
+    "amount": "1",
+    "tranRefNo": getCurrentTimestamp(),
+    "paymentRef": "",
+    "senderName": "",
+    "mobile": "",
+    "retailerCode": "rcode",
+    "passCode": "",
+    "bcID": ""
+};
 
-//         const { stdout: decryptedKey } = await execPromise(
-//             opensslCommand,
-//             { input: Buffer.from(encryptedKey, 'base64') }
-//         );
+console.log("<<========Request Params=========>>", JSON.stringify(requestParams));
 
-//         // Decrypt data with AES
-//         const decipher = crypto.createDecipheriv(
-//             'aes-128-cbc',
-//             Buffer.from(decryptedKey.trim(), 'utf8'),
-//             Buffer.from(encryptedData.slice(0, 16), 'utf8')
-//         );
+const sessionKey = "1234567890123456"; // 16-byte session key
+const iv = "1234567890123456"; // 16-byte IV
 
-//         const decrypted = Buffer.concat([
-//             decipher.update(encryptedData.slice(16)),
-//             decipher.final()
-//         ]);
+//ICICI Public Key
+const publicKeyPath = "C:/Users/HP/Desktop/New folder (2)/iciciCompositePublicKey.txt";//icici public certificate 
+const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+const encryptedKey = crypto.publicEncrypt(
+    {
+        key: publicKey,
+        padding: crypto.constants.RSA_PKCS1_PADDING
+    },
+    Buffer.from(sessionKey)
+);
+const cipher = crypto.createCipheriv('aes-128-cbc', Buffer.from(sessionKey, 'utf8'), Buffer.from(iv, 'utf8'));
+let encryptedData = cipher.update(JSON.stringify(requestParams), 'utf8', 'base64');
+encryptedData += cipher.final('base64');
 
-//         return JSON.parse(decrypted.toString());
-//     } catch (error) {
-//         throw new Error(`Decryption failed: ${error.message}`);
-//     }
-// }
-
-// // IMPS Payment Initiation
-// async function initiatePayment() {
-
-//     try {
-//         // Validate request
-//         // const requiredFields = [
-//         //     'localTxnDtTime', 'beneAccNo', 'benelFSC',
-//         //     'amount', 'tranRefNo', 'senderName', 'mobile'
-//         // ];
-//         // const missingFields = requiredFields.filter(field => !req.body[field]);
-
-//         // if (missingFields.length > 0) {
-//         //     return res.status(400).json({
-//         //         success: false,
-//         //         message: `Missing required fields: ${missingFields.join(', ')}`
-//         //     });
-//         // }
-
-//         // Construct request payload
-//         const requestParams = {
-//             ...req.body,
-//             retailerCode: 'rcode',
-//             passCode: process.env.IMPS_PASSCODE,
-//             bcID: process.env.IMPS_BCID
-//         };
-
-//         // Generate encryption components
-//         const sessionKey = generateRandom16Digit();
-//         const iv = generateRandom16Digit();
-
-//         // Encrypt session key with ICICI public key
-//         const publicKey = fs.readFileSync(
-//             path.join(process.cwd(), 'certs', 'icici_public.pem'),
-//             'utf8'
-//         );
-
-//         const encryptedKey = crypto.publicEncrypt(
-//             { key: publicKey, padding: crypto.constants.RSA_PKCS1_PADDING },
-//             Buffer.from(sessionKey)
-//         );
-
-//         // Encrypt payload with AES
-//         const cipher = crypto.createCipheriv('aes-128-cbc', sessionKey, iv);
-//         let encryptedData = cipher.update(JSON.stringify(requestParams), 'utf8', 'base64');
-//         encryptedData += cipher.final('base64');
-
-//         // Construct final request
-//         const requestBody = {
-//             requestId: `imps_${Date.now()}`,
-//             encryptedKey: encryptedKey.toString('base64'),
-//             iv: Buffer.from(iv).toString('base64'),
-//             encryptedData,
-//             oaepHashingAlgorithm: 'NONE'
-//         };
-
-//         // Send request to ICICI
-//         const response = await axios.post(
-//             process.env.IMPS_PAYMENT_URL,
-//             requestBody,
-//             {
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     apikey: process.env.ICICI_API_KEY,
-//                     'x-priority': '0100'
-//                 }
-//             }
-//         );
-
-//         // Handle encrypted response
-//         if (!response.data.encryptedKey || !response.data.encryptedData) {
-//             throw new Error('Invalid response structure from bank');
-//         }
-
-//         const decryptedResponse = await decryptResponse(
-//             response.data.encryptedKey,
-//             response.data.encryptedData
-//         );
-
-//         // Handle bank response
-//         if (!decryptedResponse.success) {
-//             const errorCode = decryptedResponse.errorCode || decryptedResponse.responseCode;
-//             throw new Error(errorMap[errorCode] || 'Unknown error occurred');
-//         }
-
-//         res.json({
-//             success: true,
-//             data: decryptedResponse,
-//             tranRefNo: requestParams.tranRefNo
-//         });
-
-//     } catch (error) {
-//         console.error('Payment Error:', error);
-
-//         // Handle Axios errors
-//         if (axios.isAxiosError(error)) {
-//             const statusCode = error.response?.status || 500;
-//             const errorCode = error.response?.data?.errorCode;
-
-//             return res.status(statusCode).json({
-//                 success: false,
-//                 errorCode,
-//                 message: errorMap[errorCode] || error.message
-//             });
-//         }
-
-//         // Handle known error codes
-//         const errorCode = Object.keys(errorMap).find(code =>
-//             error.message.includes(code)
-//         );
-
-//         res.status(500).json({
-//             success: false,
-//             errorCode: errorCode || 'UNKNOWN_ERROR',
-//             message: errorCode ? errorMap[errorCode] : error.message
-//         });
-//     }
-// };
+const requestBody = {
+    requestId: req_${Date.now()},
+    encryptedKey: encryptedKey.toString('base64'),
+    iv: Buffer.from(iv, 'utf8').toString('base64'),
+    encryptedData: encryptedData,
+    oaepHashingAlgorithm: "NONE",
+    service: "",
+    clientInfo: "",
+    optionalParam: ""
+};
+console.log("Request: ",(requestBody));
+const url = "https://apibankingonesandbox.icicibank.com/api/v1/composite-payment";
+const headers = {
+    "cache-control": "no-cache",
+    "accept": "application/json",
+    "content-type": "application/json",
+    "apikey": "",
+    "x-priority": ""// mode of transction 
+};
+axios.post(url, requestBody, { headers })
+    .then(response => {
+        console.log("<<========Response=========>>", response.data);
+        const privateKeyPath = "C:/Users/HP/Desktop/New folder (2)/domainCompositePrivateKey.txt";// your private key
+        const encryptedKeyBuffer = Buffer.from(response.data.encryptedKey, 'base64');
+        const tempEncryptedKeyPath = "encrypted_key.bin";
+        fs.writeFileSync(tempEncryptedKeyPath, encryptedKeyBuffer);
+        const opensslCommand = openssl rsautl -decrypt -inkey "${privateKeyPath}" -in "${tempEncryptedKeyPath}";
+        exec(opensslCommand, (err, stdout, stderr) => {
+            if (err) {
+                console.error(Error executing OpenSSL: ${stderr});
+                return;
+            }
+            const decryptedSessionKey = stdout.trim();
+            const encryptedResponseData = Buffer.from(response.data.encryptedData, 'base64');
+            const responseIv = encryptedResponseData.slice(0, 16);
+            const encryptedPayload = encryptedResponseData.slice(16);
+            const decipher = crypto.createDecipheriv('aes-128-cbc', Buffer.from(decryptedSessionKey, 'utf8'), responseIv);
+            let decryptedData = decipher.update(encryptedPayload, 'base64', 'utf8');
+            decryptedData += decipher.final('utf8');
+            console.log("<<========Decrypted Response=========>>", JSON.parse(decryptedData));
+        });
+    })
+    .catch(error => {
+        console.error("Error:", error.message);
+    });

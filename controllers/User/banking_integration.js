@@ -117,7 +117,7 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
   // Public key encryption
   const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
   const publicKey = fs.readFileSync(publicKeyPath, "utf8");
-  console.log("---------->", publicKey);
+  console.log(" ------------- BANK PUBLIC---------->", publicKey);
 
   const encryptedKey = crypto.publicEncrypt(
     {
@@ -161,7 +161,7 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
       "cache-control": "no-cache",
       accept: "application/json",
       "content-type": "application/json",
-      apikey: process.env.ICICI_API_KEY || "",
+      apikey: process.env.ICICI_API_KEY,
       "x-priority": "0100",
     };
 
