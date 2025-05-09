@@ -750,7 +750,7 @@ export const requestLoan = asyncHandler(async (req, res) => {
         repayment_date: new Date(repaymentDate),
         repayment_amount: loanDetails.repaymentAmount,
         processing_fee: loanDetails.pfAmount,
-        roi: 0.9,
+        roi: 1,
         pf_percent: loanDetails.pfPercent,
         pf_amount: loanDetails.pfAmount,
         insurance: loanDetails.insurance,

@@ -4,131 +4,135 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const sendDataToCredgenics = async (req, res) => {
-    try {
-        const { loan_no } = req.params;
+export const sendDataToCredgenics = async (loan_no) => {
 
-        const [collection, disbursal, sanction, lead] = await Promise.all([
-            prisma.collection.findFirst({
-                where: {
-                    loan_no: loan_no
-                }
-            }),
-            prisma.disbursal.findFirst({
-                where: {
-                    loan_no: loan_no
-                }
-            }),
-            prisma.sanction.findFirst({
-                where: {
-                    loan_no: loan_no
-                }
-            }),
-            prisma.lead.findFirst({
-                where: {
-                    loan_no: loan_no
-                }
-            })
-        ])
+    const [collection, disbursal, sanction, lead] = await Promise.all([
+        prisma.collection.findFirst({
+            where: {
+                loan_no: loan_no
+            }
+        }),
+        prisma.disbursal.findFirst({
+            where: {
+                loan_no: loan_no
+            }
+        }),
+        prisma.sanction.findFirst({
+            where: {
+                loan_no: loan_no
+            }
+        }),
+        prisma.lead.findFirst({
+            where: {
+                loan_no: loan_no
+            }
+        })
+    ])
 
-        if (!collection || !disbursal || !sanction || !lead) {
-            return res.status(404).json({
-                success: false,
-                message: "Data not found"
-
-            })
-        }
-
-        const data = {
-            loan_no: loan_no,
-            collection: collection,
-            disbursal: disbursal,
-            sanction: sanction,
-            lead: lead
-        }
-
-        const payload = {
-            loan_id: data.loan_no,
-            client_customer_id: data.lead.customer_id,
-            loan_type: "Personal Loan",
-            applicant_name: data.lead.full_name,
-            applicant_email_details: [
-                {
-                    applicant_email: data.lead.personal_email,
-                    applicant_email_type: "PERSONAL"
-                },
-                {
-                    email: data.lead.office_email,
-                    email_type: "OFFICE"
-                }
-            ],
-            applicant_gender: data.lead.gender,
-            applicant_contact_details: [
-                {
-                    applicant_contact_number: data.lead.mobile,
-                    applicant_contact_number_type: "PERSONAL",
-
-                }
-            ],
-            "applicant_monthly_income": 40000,
-            "applicant_cibil_score": 820,
-            "applicant_occupation": "Job",
-            "applicant_aadhar_number": data.lead.aadhaar,
-            "applicant_language": "hi",
-            "applicant_pan_number": data.lead.pan,
-            "total_loan_amount": data.sanction.loan_amount,
-            "loan_tenure": data.sanction.tenure,
-            "client_loan_sanction_date": data.sanction.sanction_date,
-            "loan_end_date": new Date(new Date(data.sanction.sanction_date).setMonth(new Date(data.sanction.sanction_date).getMonth() + data.sanction.tenure)),
-            "interest_on_loan": "",
-            "tenure_finished": false,
-            "security_type": "",
-            "backed_by_surety": false,
-            "loan_nbfc_name": "DEVASHISH CAPITAL  PVT. LTD.",
-            "loan_nbfc_cin": "",
-            "emi_amount": data.sanction.repayment_amount,
-            "product_type": "",
-            "credit_account_number": "",
-            "credit_account_holder_name": data.lead.full_name,
-            "credit_bank_name": "HDFC ",
-            "credit_account_holder_type": "",
-            "credit_bank_ifsc_code": "",
-            "tags": "tag1,tag2",
-            "agent_email": "",
-            // "document_details": [
-            //     {
-            //         "security_mode": "NACH",
-            //         "document_number": "757493",
-            //         "document_bank_name": "HDFC Bank",
-            //         "document_bank_ifsc_code": "",
-            //         "document_amount": 50000,
-            //         "document_date": "2018-04-10",
-            //         "document_dishonour_date": "2018-04-12",
-            //         "document_signature_name": "",
-            //         "document_bounce_bank_account_number": "",
-            //         "document_bounce_bank_ifsc_code": "",
-            //         "document_bounce_charges": 100,
-            //         "document_bounce_bank_name": "Yes Bank",
-            //         "document_bounce_bank_address": "",
-            //         "document_bounce_memo_date": "2018-04-12",
-            //         "reason_of_document_bounce": "",
-            //         "document_bounce_memo_reference_number": "",
-            //         "document_sequence_number": "",
-            //         "document_bounce_memo_return_date": "2019-06-23"
-            //     }
-            // ],
-        }
-
-        const response = await fetchUploadDataCredgenicsApi(payload);
-
-
-    } catch (error) {
-        console.error("Error in sendDataToCredgenics:", error);
-        return res.status(500).json({
+    if (!collection || !disbursal || !sanction || !lead) {
+        return res.status(404).json({
             success: false,
-            message: "Internal server error while sending data to Credgenics"
+            message: "Proper data not found for sending Credgenics"
+
         })
     }
+
+    const data = {
+        loan_no: loan_no,
+        collection: collection,
+        disbursal: disbursal,
+        sanction: sanction,
+        lead: lead
+    }
+
+    const payload = {
+        loan_id: data?.loan_no,
+        client_customer_id: data?.lead?.customer_id,
+        loan_type: "Personal Loan",
+        applicant_name: data?.lead?.full_name,
+        applicant_email_details: [
+            {
+                applicant_email: data?.lead?.personal_email,
+                applicant_email_type: "PERSONAL"
+            },
+            {
+                email: data?.lead?.office_email,
+                email_type: "OFFICE"
+            }
+        ],
+        applicant_gender: data?.lead?.gender,
+        applicant_contact_details: [
+            {
+                applicant_contact_number: data?.lead?.mobile,
+                applicant_contact_number_type: "PERSONAL",
+
+            }
+        ],
+        "applicant_monthly_income": 40000,
+        "applicant_cibil_score": lead?.credit_score,
+        "applicant_occupation": "Job",
+        "applicant_aadhar_number": data.lead.aadhaar,
+        "applicant_language": "hi",
+        "applicant_pan_number": data.lead.pan,
+        "total_loan_amount": data.sanction.loan_amount,
+        "loan_tenure": data.sanction.tenure,
+        "client_loan_sanction_date": data.sanction.sanction_date,
+        "loan_end_date": data.sanction.repayment_date,
+        "interest_on_loan": "",
+        "tenure_finished": false,
+        "security_type": "",
+        "backed_by_surety": false,
+        "loan_nbfc_name": "DEVASHISH CAPITAL  PVT. LTD.",
+        "loan_nbfc_cin": "",
+        "emi_amount": data.sanction.repayment_amount,
+        "product_type": "",
+        "credit_account_number": "",
+        "credit_account_holder_name": data.lead.full_name,
+        "credit_bank_name": "HDFC ",
+        "credit_account_holder_type": "",
+        "credit_bank_ifsc_code": "",
+        "tags": "tag1,tag2",
+        "agent_email": "",
+        // "document_details": [
+        //     {
+        //         "security_mode": "NACH",
+        //         "document_number": "757493",
+        //         "document_bank_name": "HDFC Bank",
+        //         "document_bank_ifsc_code": "",
+        //         "document_amount": 50000,
+        //         "document_date": "2018-04-10",
+        //         "document_dishonour_date": "2018-04-12",
+        //         "document_signature_name": "",
+        //         "document_bounce_bank_account_number": "",
+        //         "document_bounce_bank_ifsc_code": "",
+        //         "document_bounce_charges": 100,
+        //         "document_bounce_bank_name": "Yes Bank",
+        //         "document_bounce_bank_address": "",
+        //         "document_bounce_memo_date": "2018-04-12",
+        //         "reason_of_document_bounce": "",
+        //         "document_bounce_memo_reference_number": "",
+        //         "document_sequence_number": "",
+        //         "document_bounce_memo_return_date": "2019-06-23"
+        //     }
+        // ],
+    }
+
+
+    await prisma.api_Logs.create({
+        data: {
+            pan: lead.pan,
+            api_type: "CREDGENICS",
+            api_provider: 1,
+            api_request: {},
+            api_response: payload,
+            api_status: true,
+            customer_id: lead.customer_id,
+            lead_id: lead.id,
+        }
+    })
+    // const response = await fetchUploadDataCredgenicsApi(payload);
+
+
 }
 
 

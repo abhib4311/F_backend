@@ -19,7 +19,7 @@ import {
   getLoanDetails,
   previewSanction,
   redirectUrl,
-  // disbursed,
+  disbursed,
   getCongratulationPageDetails,
 } from "../../controllers/User/sanction.controller.js";
 import {
@@ -80,7 +80,7 @@ router.post("/preview-sanction",
   authenticateUser,
   previewSanction); // Done
 router.post("/redirect-url", authenticateUser, redirectUrl); // Done
-// router.post("/disbursed", authenticateUser, disbursed); // Done
+router.post("/disbursed", authenticateUser, disbursed); // BANK API
 router.get(
   "/congratulation-page",
   authenticateUser,
@@ -94,7 +94,7 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
-router.post("/auto-payment", sendEncryptedRequest) // BANK API
+// router.post("/auto-payment", sendEncryptedRequest)
 // router.post("/status-check", status_check)
 
 // ---------------------------------------------------------------------------------//

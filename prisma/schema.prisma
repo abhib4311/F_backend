@@ -184,6 +184,7 @@ model Disbursal {
   payment_mode           String
   amount                 Decimal?  @db.Decimal(10, 2)
   utr                    String?
+  status                 String?
   transaction_history_id Int?
   disbursal_date         DateTime?
   is_active              Boolean   @default(true)

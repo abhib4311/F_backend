@@ -6,7 +6,6 @@ import { promisify } from "util";
 import path from "path";
 import dotenv from "dotenv";
 import asyncHandler from "../../utils/asyncHandler.js";
-import { ResponseError } from "../../utils/responseError.js";
 
 
 dotenv.config();
@@ -71,90 +70,79 @@ function generateTransactionId(length = 6) {
 
 
 // Main function
-export const sendEncryptedRequest = asyncHandler(async (req, res) => {
-  console.log("----------- HII-1 ------------------------")
-  const timestamp = getCurrentTimestamp();
-
-  // ----------- UAT REQUEST ------------ 
-  // const requestParams = {
-  //   "localTxnDtTime": timestamp,
-  //   "beneAccNo": "123456041",
-  //   "beneIFSC": "NPCI0000001",
-  //   "amount": "1.00",
-  //   "tranRefNo": timestamp,
-  //   "paymentRef": "IMPSTransferP2A",
-  //   "senderName": "Pratik Mundhe",
-  //   "mobile": "9999988888",
-  //   "retailerCode": "rcode",
-  //   "passCode": "447c4524c9074b8c97e3a3c40ca7458d",
-  //   "bcID": "IBCKer00055",
-  // };
-
-  const requestParams = {
-    "localTxnDtTime": timestamp,
-    "beneAccNo": "2649697009",
-    "beneIFSC": "KKBK0004265",
-    "amount": "1.00",
-    "tranRefNo": generateTransactionId(),
-    "paymentRef": "IMPSTransferP2A",
-    "senderName": "UY fincorp",
-    "mobile": "9896956566",
-    "retailerCode": "rcode",
-    "passCode": "0f1f8b6dcebd4e5d89f20a78a06a3c26",
-    "bcID": "IBCUY01852",
-  };
-
-
-  console.log(
-    "<<========Request Params=========>>",
-    JSON.stringify(requestParams)
-  );
-
-  // AES session key and IV
-  const sessionKey = generateRandom16Digit();
-  const iv = generateRandom16Digit();
-
-  // Public key encryption
-  const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
-  const publicKey = fs.readFileSync(publicKeyPath, "utf8");
-  console.log(" ------------- BANK PUBLIC---------->", publicKey);
-
-  const encryptedKey = crypto.publicEncrypt(
-    {
-      key: publicKey,
-      padding: crypto.constants.RSA_PKCS1_PADDING,
-    },
-    Buffer.from(sessionKey)
-  );
-
-  // AES encrypt request data
-  const cipher = crypto.createCipheriv(
-    "aes-128-cbc",
-    Buffer.from(sessionKey, "utf8"),
-    Buffer.from(iv, "utf8")
-  );
-  let encryptedData = cipher.update(
-    JSON.stringify(requestParams),
-    "utf8",
-    "base64"
-  );
-  encryptedData += cipher.final("base64");
-
-  // Construct request body
-  const requestBody = {
-    requestId: `req_${Date.now()}`,
-    encryptedKey: encryptedKey.toString("base64"),
-    iv: Buffer.from(iv, "utf8").toString("base64"),
-    encryptedData,
-    oaepHashingAlgorithm: "NONE",
-    service: "",
-    clientInfo: "",
-    optionalParam: "",
-  };
-
-  console.log("<<========Final Request Body=========>>", requestBody);
-
+export const sendEncryptedRequest = async (beneAccNo, beneIFSC, amount,) => {
   try {
+    const ref_no = generateTransactionId()
+    let data = {
+      tranRefNo: ref_no
+    }
+    console.log("----------- HII-1 ------------------------")
+    const timestamp = getCurrentTimestamp();
+
+    const requestParams = {
+      "localTxnDtTime": timestamp,
+      "beneAccNo": beneAccNo,
+      "beneIFSC": beneIFSC,
+      "amount": amount,
+      "tranRefNo": ref_no,
+      "paymentRef": "IMPSTransferP2A",
+      "senderName": "UY fincorp",
+      "mobile": "9896956566",
+      "retailerCode": "rcode",
+      "passCode": "0f1f8b6dcebd4e5d89f20a78a06a3c26",
+      "bcID": "IBCUY01852",
+    };
+
+
+    console.log(
+      "<<========Request Params=========>>",
+      JSON.stringify(requestParams)
+    );
+
+    // AES session key and IV
+    const sessionKey = generateRandom16Digit();
+    const iv = generateRandom16Digit();
+
+    // Public key encryption
+    const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
+    const publicKey = fs.readFileSync(publicKeyPath, "utf8");
+    console.log(" ------------- BANK PUBLIC---------->", publicKey);
+
+    const encryptedKey = crypto.publicEncrypt(
+      {
+        key: publicKey,
+        padding: crypto.constants.RSA_PKCS1_PADDING,
+      },
+      Buffer.from(sessionKey)
+    );
+
+    // AES encrypt request data
+    const cipher = crypto.createCipheriv(
+      "aes-128-cbc",
+      Buffer.from(sessionKey, "utf8"),
+      Buffer.from(iv, "utf8")
+    );
+    let encryptedData = cipher.update(
+      JSON.stringify(requestParams),
+      "utf8",
+      "base64"
+    );
+    encryptedData += cipher.final("base64");
+
+    // Construct request body
+    const requestBody = {
+      requestId: `req_${Date.now()}`,
+      encryptedKey: encryptedKey.toString("base64"),
+      iv: Buffer.from(iv, "utf8").toString("base64"),
+      encryptedData,
+      oaepHashingAlgorithm: "NONE",
+      service: "",
+      clientInfo: "",
+      optionalParam: "",
+    };
+
+    console.log("<<========Final Request Body=========>>", requestBody);
+
     const url = process.env.ICICI_BANK_COMPOSITE_API;
     console.log("--->", url)
     const headers = {
@@ -202,179 +190,75 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
       JSON.parse(decryptedData)
     );
 
-    if (!decryptedData?.success) {
-      const errorCode = decryptedData?.errorCode;
-      throw new ResponseError(errorMap[errorCode] || 'Unknown error occurred');
+    // dummy response 
+    /*
+     {
+      ActCode: '0',
+      Response: 'Transaction Successful',
+      BankRRN: '512911028888',
+      BeneName: 'Prem Kushum',
+      success: true,
+      TransRefNo: '202505090531104F2TTU'
+    }
+    */
+    const parsedData = JSON.parse(decryptedData);
+    data = {
+      ...parsedData,
     }
 
-    if (decryptedData?.success) {
-      if (decryptedData?.ActCode != "0") {
-        throw new ResponseError(decryptedData?.Response || 'Unknown error occurred from BANK API');
+    // 997 and 501 error code for 
+    // condition for pending payment 
+    if (!parsedData?.success || parsedData?.ActCode !== "0") {
+      const errorCode = parsedData?.ActCode;
+      if (errorCode == '997' || errorCode == '501') {
+
+        data.status = "PENDING"
+        return data
+      }
+      else {
+        data.status = "FAILED"
+        return data
       }
     }
 
+    // for sucess condition
+    if (parsedData?.ActCode == "0") {
+      data.status = "SUCCESS"
+      return data
+    }
 
-    return res.status(200).json({
-      success: true,
-      data: decryptedData,
-      tranRefNo: requestParams?.tranRefNo
-    });
+    // fallback condition
+    data.status = "FAILED"
+    return data
+
   } catch (error) {
-    // console.log('Payment Error:-->', error);
-    
-    // Handle Axios errors
+    // Axios error handling
     if (axios.isAxiosError(error)) {
       const statusCode = error.response?.status || 500;
       const errorCode = error.response?.data?.errorCode;
-      console.log("------------ ERROR ----------" , error?.response?.data)
-      return res.status(statusCode).json({
+
+      if (statusCode === 501 || errorCode === '501') {
+        return {
+          success: false,
+          status: "PENDING",
+          message: errorMap['501']
+        };
+      }
+
+      return {
         success: false,
-        errorCode,
-        message: errorMap[errorCode] || error.message
-      });
+        status: "FAILED",
+        message: errorMap[errorCode]
+      };
     }
 
-    console.log('Payment Error:-->', error);
-    // Handle known error codes
-    const errorCode = Object.keys(errorMap).find(code =>
-      error.message.includes(code)
-    );
-
-    res.status(500).json({
+    // Fallback error handler
+    const knownErrorCode = Object.keys(errorMap).find(code => error.message.includes(code));
+    return {
       success: false,
-      errorCode: errorCode || 'UNKNOWN_ERROR',
-      message: errorCode ? errorMap[errorCode] : error.message
-    });
+      status: "FAILED",
+      errorCode: knownErrorCode || 'UNKNOWN_ERROR',
+      message: knownErrorCode ? errorMap[knownErrorCode] : error.message
+    }
   }
-});
-
-
-
-// const status_check = async () => {
-//   const timestamp = getCurrentTimestamp();
-
-//   const requestParams = {
-
-//     transRefNo: 20250501191601,
-//     date: "2/05/2025",
-//     recon360: "N",
-//     passCode: "447c4524c9074b8c97e3a3c40ca7458d",
-//     bcID: "IBCKer00055",
-
-//   };
-
-//   console.log(
-//     "<<========Request Params=========>>",
-//     JSON.stringify(requestParams)
-//   );
-
-//   // AES session key and IV
-//   const sessionKey = generateRandom16Digit();
-//   const iv = generateRandom16Digit();
-
-//   // Public key encryption
-//   const publicKeyPath = path.join(process.cwd(), "certs", "public_key.pem");
-//   const publicKey = fs.readFileSync(publicKeyPath, "utf8");
-//   console.log("---------->", publicKey);
-
-//   const encryptedKey = crypto.publicEncrypt(
-//     {
-//       key: publicKey,
-//       padding: crypto.constants.RSA_PKCS1_PADDING,
-//     },
-//     Buffer.from(sessionKey)
-//   );
-
-//   // AES encrypt request data
-//   const cipher = crypto.createCipheriv(
-//     "aes-128-cbc",
-//     Buffer.from(sessionKey, "utf8"),
-//     Buffer.from(iv, "utf8")
-//   );
-//   let encryptedData = cipher.update(
-//     JSON.stringify(requestParams),
-//     "utf8",
-//     "base64"
-//   );
-//   encryptedData += cipher.final("base64");
-
-//   // Construct request body
-//   const requestBody = {
-//     requestId: `req_${Date.now()}`,
-//     encryptedKey: encryptedKey.toString("base64"),
-//     iv: Buffer.from(iv, "utf8").toString("base64"),
-//     encryptedData,
-//     oaepHashingAlgorithm: "NONE",
-//     service: "",
-//     clientInfo: "",
-//     optionalParam: "",
-//   };
-
-//   console.log("<<========Final Request Body=========>>", requestBody);
-
-//   try {
-//     const url = process.env.ICICI_BANK_STATUS_CHECK;
-//     console.log("--->", url)
-//     const headers = {
-//       "cache-control": "no-cache",
-//       accept: "application/json",
-//       "content-type": "application/json",
-//       apikey: process.env.ICICI_API_KEY || "",
-//       "x-priority": "0100",
-//     };
-
-//     const response = await axios.post(url, requestBody, { headers });
-//     console.log("<<========Encrypted Response=========>>", response.data);
-
-//     // Decrypt response
-//     const encryptedKeyBuffer = Buffer.from(
-//       response.data.encryptedKey,
-//       "base64"
-//     );
-//     const tempEncryptedKeyPath = path.join(process.cwd(), "encrypted_key.bin");
-//     fs.writeFileSync(tempEncryptedKeyPath, encryptedKeyBuffer);
-
-//     const privateKeyPath = path.join(process.cwd(), "certs", "private.key");
-//     const opensslCommand = `openssl rsautl -decrypt -inkey "${privateKeyPath}" -in "${tempEncryptedKeyPath}"`;
-//     const { stdout: decryptedKey } = await exec(opensslCommand);
-//     const decryptedSessionKey = decryptedKey.trim();
-
-//     const encryptedResponseData = Buffer.from(
-//       response.data.encryptedData,
-//       "base64"
-//     );
-//     const responseIv = encryptedResponseData.slice(0, 16);
-//     const encryptedPayload = encryptedResponseData.slice(16);
-
-//     const decipher = crypto.createDecipheriv(
-//       "aes-128-cbc",
-//       Buffer.from(decryptedSessionKey, "utf8"),
-//       responseIv
-//     );
-//     let decryptedData = decipher.update(encryptedPayload, undefined, "utf8");
-//     decryptedData += decipher.final("utf8");
-
-//     console.log(
-//       "<<========Decrypted Response=========>>",
-//       JSON.parse(decryptedData)
-//     );
-//     return decryptedData
-//   } catch (error) {
-//     if (error.response) {
-//       console.log(
-//         "Third Party API Error :",
-//         error.response || "Third Party API Error"
-//       );
-//     } else {
-//       console.log(
-//         "<<========Error during API Call=========>>",
-//         error
-//       );
-//     }
-//     return error
-//   }
-// };
-
-// Run it
-
-// export { sendEncryptedRequest };
+}

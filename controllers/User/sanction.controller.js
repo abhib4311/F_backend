@@ -23,6 +23,8 @@ import path from "path";
 import convertImageToBase64 from "../../utils/imageToBase64.js";
 import { fileURLToPath } from 'url';
 import { calculateRepaymentDate } from "../../utils/calculateTenure.js";
+import { sendEncryptedRequest } from "./banking_integration.js";
+import { sendDataToCredgenics } from "./credgenics.contoller.js";
 
 const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
@@ -493,13 +495,13 @@ export const previewSanction = asyncHandler(async (req, res) => {
     throw new ResponseError(400, "Sanction not found");
   }
   const bankDetails = await prisma.bank_Details.findFirst({
-    where:{
-      pan:lead_detail.pan
+    where: {
+      pan: lead_detail.pan
     },
-    orderBy:{
-      created_at : "desc"
+    orderBy: {
+      created_at: "desc"
     }
-   
+
   })
 
   // Generate PDF content
@@ -759,225 +761,292 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   });
 });
 
-// Done
-// export const disbursed = asyncHandler(async (req, res) => {
-//   // Use transaction for all database operations
+// Disbursed (API)
+export const disbursed = asyncHandler(async (req, res) => {
+  console.log('Starting disbursed function');
 
-//   const user = await tx.customer.findUnique({
-//     where: { id: req.user.id },
-//   });
+  const result = await prisma.$transaction(async (tx) => {
+    console.log('Starting transaction');
+    // Destructure frequently used values
+    const user = await tx.customer.findFirst({
+      where: {
+        id: req.user.id
+      }
+    })
+    if (!user) {
+      throw new ResponseError(400, "User not found", `User not found with ID ${req.user.id}`);
+    }
 
-//   if (!user) throw new ResponseError(400, "User not found");
+    const lead = await tx.lead.findFirst({
+      where: {
+        customer_id: user.id
+      },
+      orderBy: {
+        created_at: "desc"
+      }
+    })
 
-//   const lead = await tx.lead.findFirst({
-//     where: { customer_id: user.id },
-//     orderBy: { created_at: "desc" },
-//   });
+    if (!lead) {
+      // console.log('Lead not found for loan:', lead);
+      throw new ResponseError(400, "Lead not found", `No lead found with lead number ${user.customer_no}`);
+    }
+    if (lead.is_rejected) {
+      console.log('Lead is rejected:', lead.id);
+      throw new ResponseError(400, "Lead rejected", `Lead is rejected with lead number ${lead.lead_no}`);
+    }
+    if (lead.is_disbursed) {
+      console.log('Lead already disbursed:', lead.id);
+      throw new ResponseError(400, "Already disbursed", `Lead is already disbursed with lead number ${lead.lead_no}`);
+    }
+    if (lead.is_kyc_reject) {
+      console.log('Lead KYC rejected:', lead.id);
+      throw new ResponseError(400, "KYC rejected", `Lead is KYC rejected with lead number ${lead.lead_no}`);
+    }
 
-//   if (!lead) throw new ResponseError(400, "No lead found for this user");
-//   if (lead.is_rejected) throw new ResponseError(400, "Lead is rejected");
 
-//   const sanction_Information = await tx.sanction.findFirst({
-//     where: { lead_id: lead.id },
-//   });
+    // Fetch sanction data
+    const sanction = await tx.sanction.findUnique({
+      where: { loan_no: lead.loan_no },
+      select: {
+        id: true,
+        net_disbursal: true,
+        loan_amount: true,
+        repayment_date: true,
+        repayment_amount: true,
+        roi: true,
+        tenure: true,
+        is_eSigned: true,
+        is_rejected: true,
+        is_disbursed: true
+      }
+    });
+    console.log('Sanction found:', sanction);
 
-//   if (lead.is_disbursed)
-//     throw new ResponseError(400, "Loan is already disbursed");
-//   if (lead.is_kyc_reject) throw new ResponseError(400, "Kyc is rejected");
-//   if (sanction_Information.is_eSign_pending)
-//     throw new ResponseError(400, "E-sign is pending");
-//   if (sanction_Information.is_rejected)
-//     throw new ResponseError(400, "Loan is already rejected");
-//   if (sanction_Information.is_disbursed)
-//     throw new ResponseError(400, "Loan is already disbursed");
+    // Validate sanction
+    if (!sanction) {
+      console.log('Sanction not found for loan:', lead);
+      throw new ResponseError(400, "Sanction not found", `No sanction found for lead ${lead.lead_no}`);
+    }
+    if (!sanction.is_eSigned) {
+      console.log('Sanction not eSigned:', sanction.id);
+      throw new ResponseError(400, "Sanction not eSigned", `Sanction not signed for lead ${lead.lead_no}`);
+    }
+    if (sanction.is_rejected) {
+      console.log('Sanction rejected:', sanction.id);
+      throw new ResponseError(400, "Sanction rejected", `Sanction rejected for lead ${lead.lead_no}`);
+    }
+    if (sanction.is_disbursed) {
+      console.log('Sanction already disbursed:', sanction.id);
+      throw new ResponseError(400, "Already disbursed", `Loan ${lead.loan_no} already disbursed`);
+    }
 
-//   const existingDisbursal = await tx.disbursal.findFirst({
-//     where: { lead_id: lead.id },
-//   });
 
-//   if (existingDisbursal?.is_disbursed)
-//     throw new ResponseError(400, "Payment already processed for this lead");
+    // Prepare core data
+    const leadId = lead.id;
+    const pan = lead.pan;
+    const customerId = lead.customer_id;
+    const netDisbursal = sanction.net_disbursal;
+    // console.log('Core data prepared:', { leadId, pan, customerId, netDisbursal });
 
-//   const sanction = await tx.sanction.findFirst({
-//     where: {
-//       lead_id: lead.id,
-//       is_eSigned: true,
-//     },
-//   });
+    // Check existing disbursal
+    console.log('Checking existing disbursal for lead:', leadId);
+    const existingDisbursal = await tx.disbursal.findUnique({
+      where: { lead_id: leadId },
+      select: { id: true, is_disbursed: true, status: true }
+    });
+    console.log('Existing disbursal:', existingDisbursal);
 
-//   if (!sanction)
-//     throw new ResponseError(400, "No sanction found for this lead");
+    if (existingDisbursal?.is_disbursed) {
+      console.log('Payment already processed for lead:', leadId);
+      throw new ResponseError(400, "Payment processed", `Payment exists for lead ${lead.lead_no}`);
+    }
+    if (existingDisbursal?.status) {
+      if (existingDisbursal?.status == "PENDING") {
+        throw new ResponseError(400, "YOUR PAYMENT IS IN PENDING STATE", `YOUR PAYMENT IS IN PENDING STATE ${lead.lead_no}`);
+      }
+      if (existingDisbursal?.status == "FAILED") {
+        throw new ResponseError(400, "YOUR PAYMENT IS IN FAILED STATE", `YOUR PAYMENT IS IN FAILED STATE ${lead.lead_no}`);
+      }
+    }
 
-//   let disbursement;
+    const bank_Details = await tx.bank_Details.findFirst(
+      {
+        where: {
+          pan: user.pan
+        },
+        orderBy: {
+          created_at: "desc"
+        }
 
-//   await prisma.$transaction(async (tx) => {
-//     if (existingDisbursal && !existingDisbursal.is_disbursed) {
-//       disbursement = await tx.disbursal.update({
-//         where: { id: existingDisbursal.id },
-//         data: {
-//           payable_account: "04652151000852",
-//           payment_mode: "BANK_TRANSFER",
-//           amount: sanction.net_disbursal,
-//           disbursal_date: new Date(),
-//           loan_amount: sanction.loan_amount,
-//           repayment_date: sanction.repayment_date,
-//           repayment_amount: sanction.repayment_amount,
-//           roi: sanction.roi,
-//           tenure: sanction.tenure,
-//           is_rejected: false,
-//           rejected_by: null,
-//         },
-//       });
-//     } else {
-//       disbursement = await tx.disbursal.create({
-//         data: {
-//           // lead_id: lead.id,
-//           lead: {
-//             connect: { id: lead.id },
-//           },
-//           pan: user.pan,
-//           sanction_id: sanction.id,
-//           loan_no: sanction.loan_no,
-//           payable_account: "04652151000852",
-//           payment_mode: "BANK_TRANSFER",
-//           amount: sanction.net_disbursal,
-//           disbursal_date: new Date(),
-//           loan_amount: sanction.loan_amount,
-//           repayment_date: sanction.repayment_date,
-//           repayment_amount: sanction.repayment_amount || 5000,
-//           roi: sanction.roi,
-//           tenure: sanction.tenure,
-//         },
-//       });
-//     }
+      }
 
-//     // this data come from bank table 
-//     const { apiResponse, apiRequest } = await disburseLoanAPI({
-//       account_number: "04652151000285",
-//       ifsc: "IFSC0465",
-//       amount: sanction.net_disbursal,
-//       customer_name: user.full_name,
-//       loan_no: sanction.loan_no,
-//       pan: user.pan,
-//     });
+    )
+    if (!bank_Details?.bank_acc_no) {
+      throw new ResponseError(400, "YOUR bank_acc_no not found in DB ", `YOUR bank_acc_no not found in DB ${lead.lead_no}`);
 
-//     await tx.api_Logs.create({
-//       data: {
-//         pan: user.pan,
-//         api_type: API_TYPE.LOAN_DISBURSEMENT,
-//         api_provider: 1,
-//         api_request: apiRequest || null,
-//         api_response: apiResponse || null,
-//         api_status: apiResponse?.payment_status === "SUCCESS",
-//         lead_id: lead.id,
-//         customer_id: user.id,
-//       },
-//     });
+    }
+    if (!bank_Details?.ifsc_code) {
+      throw new ResponseError(400, "YOUR ifsc_code not found in DB ", `YOUR ifsc_code not found in DB ${lead.lead_no}`);
 
-//     const transactionHistory = await tx.transaction_History.create({
-//       data: {
-//         lead_id: lead.id,
-//         loan_no: sanction.loan_no,
-//         utr: apiResponse.transaction_id,
-//         disbursal_id: disbursement.id,
-//         sanction_id: sanction.id,
-//         amount: sanction.net_disbursal,
-//         transaction_response: apiResponse,
-//       },
-//     });
+    }
+    // call the ICICI bank API
+    const bank_response = await sendEncryptedRequest(
+      bank_Details.bank_acc_no, bank_Details.ifsc_code, netDisbursal
+    )
 
-//     if (apiResponse?.payment_status === "SUCCESS") {
-//       await tx.disbursal.update({
-//         where: { id: disbursement.id },
-//         data: {
-//           is_disbursed: true,
-//           utr: apiResponse.transaction_id,
-//           transaction_history_id: transactionHistory.id,
-//         },
-//       });
+    if (!bank_response.success) {
+      throw new ResponseError(400, `PAYMENT  ${bank_response.status}  AT BANK RESPONSE`, `PAYMENT  ${bank_response.status} AT BANK RESPONSE ${lead.lead_no}`);
+    }
 
-//       await tx.collection.create({
-//         data: {
-//           customer_id: user.id,
-//           pan: user.pan,
-//           lead_id: lead.id,
-//           loan_no: sanction.loan_no,
-//           payment_mode: "BANK_TRANSFER",
-//           received_amount: 0,
-//           repayment_type: "DISBURSEMENT",
-//           date_of_recived: new Date(),
-//           payment_verification: 1,
-//           collection_active: true,
-//           remarks: "Initial loan disbursement",
-//         },
-//       });
+    // {
+    //   "localTxnDtTime": timestamp,
+    //   "beneAccNo": beneAccNo,
+    //   "beneIFSC": beneIFSC,
+    //   "amount": amount,
+    //   "tranRefNo": ref_no,
+    //   "paymentRef": "IMPSTransferP2A",
+    //   "senderName": "UY fincorp",
+    //   "mobile": "9896956566",
+    //   "retailerCode": "rcode",
+    //   "passCode": "0f1f8b6dcebd4e5d89f20a78a06a3c26",
+    //   "bcID": "IBCUY01852",
+    // };
+    // Create disbursal data
+    const disbursalData = {
+      payable_account: "IBCUY01852",
+      payment_mode: "AUTO_DISBURSED",
+      amount: netDisbursal,
+      disbursal_date: new Date(),
+      loan_amount: sanction.loan_amount,
+      repayment_date: sanction.repayment_date,
+      repayment_amount: sanction.repayment_amount,
+      roi: sanction.roi,
+      tenure: sanction.tenure,
+      // disbursed_by: employeeId,
+      // channel: details.channel,
+      // remarks: details.remarks,
+      pan,
+      is_disbursed: true,
+      sanction_id: sanction.id,
+      loan_no: sanction.loan_no
+    };
+    console.log('Disbursal data prepared:', disbursalData);
 
-//       await tx.lead.update({
-//         where: { id: lead.id },
-//         data: {
-//           is_disbursed: true,
-//           lead_stage: LEAD_STAGE.DISBURSED,
-//         },
-//       });
+    // Upsert disbursal record
+    console.log('Creating/updating disbursal record');
+    const disbursement = existingDisbursal
+      ? await tx.disbursal.update({
+        where: { id: existingDisbursal.id },
+        data: disbursalData
+      })
+      : await tx.disbursal.create({
+        data: { ...disbursalData, lead_id: leadId }
+      });
+    console.log('Disbursal record created/updated:', disbursement);
 
-//       // add lead log
-//       await tx.lead_Logs.create({
-//         data: {
-//           customer_id: user.id,
-//           lead_id: lead.id,
-//           pan: user.pan,
-//           remarks: "Loan disbursed successfully",
-//         },
-//       });
-//       return {
-//         success: true,
-//         message: "Loan disbursed successfully",
-//         data: {
-//           disbursement_id: disbursement.id,
-//           loan_no: disbursement.loan_no,
-//           amount: disbursement.amount,
-//           transaction_id: apiResponse.transaction_id,
-//         },
-//       };
-//     } else {
-//       await tx.disbursal.update({
-//         where: { id: disbursement.id },
-//         data: {
-//           is_rejected: true,
-//           rejected_by: 999,
-//         },
-//       });
-//       // update lead log on failure status
-//       await tx.lead_Logs.create({
-//         data: {
-//           customer_id: user.id,
-//           lead_id: lead.id,
-//           pan: user.pan,
-//           remarks: "Loan disbursement failed",
-//         },
-//       });
+    // Create transaction history
+    console.log('Creating transaction history');
+    const transactionHistory = await tx.transaction_History.create({
+      data: {
+        lead_id: leadId,
+        loan_no: sanction.loan_no,
+        utr: bank_response?.BankRRN,
+        payable_account: "IBCUY01852",
+        bank_name: "ICICI",
+        ifsc: "IFSC",
+        payment_mode: "AUTO_DISBURSED",
+        disbursal_id: disbursement.id,
+        sanction_id: sanction.id,
+        amount: netDisbursal
+      }
+    });
+    console.log('Transaction history created:', transactionHistory);
 
-//       await tx.lead.update({
-//         where: { id: lead.id },
-//         data: {
-//           is_disbursed: false,
-//           is_rejected: true,
-//           rejected_by: 999,
-//           rejection_remarks: apiResponse?.message || "Loan disbursement failed",
-//           lead_stage: LEAD_STAGE.DISBURSAL_FAILED,
-//         },
-//       });
+    // Finalize disbursal
+    console.log('Finalizing disbursal');
+    await tx.disbursal.update({
+      where: { id: disbursement.id },
+      data: {
+        is_disbursed: true,
+        utr: bank_response?.BankRRN,
+        transaction_history_id: transactionHistory.id
+      }
+    });
 
-//       throw new ResponseError(
-//         400,
-//         apiResponse?.message || "Loan disbursement failed"
-//       );
-//     }
-//   }, { timeout: 50000 });
+    // Parallelize all subsequent operations
+    console.log('Starting parallel operations');
+    await Promise.all([
+      // Collection tracking
+      tx.collection.create({
+        data: {
+          customer_id: customerId,
+          pan: user.pan,
+          lead_id: leadId,
+          loan_no: sanction.loan_no,
+          received_amount: 0,
+          collection_active: true
+        }
+      }).then(() => console.log('Collection record created')),
 
-//   // Return success response outside transaction
-//   return res.status(200).json({ message: "amount disbursed sucessfully" });
-// });
+      // Payment record
+      tx.payment.create({
+        data: {
+          pan: user.pan,
+          lead_id: leadId,
+          loan_no: sanction.loan_no,
+          lead_no: lead.lead_no
+        }
+      }).then(() => console.log('Payment record created')),
+
+      // Lead status update
+      tx.lead.update({
+        where: { id: leadId },
+        data: {
+          is_disbursed: true,
+          lead_stage: LEAD_STAGE.DISBURSED
+        }
+      }).then(() => console.log('Lead status updated')),
+
+      // Activity logging
+      // tx.employee_Logs.create({
+      //   data: {
+      //     employee_id: employeeId,
+      //     remarks: `${netDisbursal} disbursed to ${loan_no}`
+      //   }
+      // }).then(() => console.log('Employee log created')),
+
+      tx.lead_Logs.create({
+        data: {
+          customer_id: customerId,
+          lead_id: leadId,
+          pan: user.pan,
+          remarks: `Amount: ${netDisbursal} Disbursed by 999`
+        }
+      }).then(() => console.log('Lead log created'))
+
+    ]);
+    //---------------------------------- Send data to Credgenics ----------------------------------
+
+
+    await sendDataToCredgenics(sanction.loan_no)
+    // console.log("----------->", reponse)
+    // if (!reponse?.success) {
+    //   throw new ResponseError(400, "Data not sent to Credgenics", `Data not sent to Credgenics for loan ${lead.loan_no}`)
+    // }
+
+    // console.log('All parallel operations completed');
+
+    return {
+      disbursement_id: disbursement?.id,
+      loan_no: sanction?.loan_no,
+      amount: netDisbursal,
+      transaction_id: bank_response?.BankRRN
+    };
+
+
+  }, { timeout: 50000 })
+
+});
 
 
 export const getCongratulationPageDetails = asyncHandler(async (req, res) => {
