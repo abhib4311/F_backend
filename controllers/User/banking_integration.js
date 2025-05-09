@@ -95,7 +95,7 @@ export const sendEncryptedRequest = asyncHandler(async (req, res) => {
     "beneAccNo": "2649697009",
     "beneIFSC": "KKBK0004265",
     "amount": "1.00",
-    "tranRefNo": generateTransactionId,
+    "tranRefNo": generateTransactionId(),
     "paymentRef": "IMPSTransferP2A",
     "senderName": "UY fincorp",
     "mobile": "9896956566",
