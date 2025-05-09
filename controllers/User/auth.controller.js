@@ -768,13 +768,14 @@ export const requestLoan = asyncHandler(async (req, res) => {
         where: { lead_id: leadId },
       });
 
+      let loan_no 
       if (existingSanction) {
         await prisma.sanction.update({
           where: { id: existingSanction.id },
           data: sanctionData,
         });
       } else {
-        const loan_no = await nextSequence(prisma, "loan_no", "FUNDOLOAN", 10);
+          loan_no = await nextSequence(prisma, "loan_no", "FUNDOLOAN", 10);
         await prisma.sanction.create({
           data: {
             ...sanctionData,
