@@ -896,14 +896,14 @@ export const disbursed = asyncHandler(async (req, res) => {
           `Sanction rejected for lead ${lead.lead_no}`
         );
       }
-      if (sanction.is_disbursed) {
-        console.log("Sanction already disbursed:", sanction.id);
-        throw new ResponseError(
-          400,
-          "Already disbursed",
-          `Loan already disbursed`
-        );
-      }
+      // if (sanction.is_disbursed) {
+      //   console.log("Sanction already disbursed:", sanction.id);
+      //   throw new ResponseError(
+      //     400,
+      //     "Already disbursed",
+      //     `Loan already disbursed`
+      //   );
+      // }
 
       // Prepare core data
       const leadId = lead.id;
