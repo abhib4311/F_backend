@@ -182,7 +182,7 @@ const applyMultipliers = (amount, score, type) => {
       maxLoanAmount = amount * 0.5;
     } else if (score >= 700) {
       maxLoanAmount = amount * 0.3;
-    } else if (score >= 650) {
+    } else if (score >= 600) {
       maxLoanAmount = amount * 0.2;
     }
   } else if (type === "WHITE_LISTED"){
