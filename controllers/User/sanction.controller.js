@@ -1058,7 +1058,7 @@ export const disbursed = asyncHandler(async (req, res) => {
         where: {
           loan_no: lead.loan_no,
         },
-        date: {
+        data: {
           is_disbursed: true,
         },
       });
