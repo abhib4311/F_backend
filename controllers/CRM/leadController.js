@@ -1085,7 +1085,7 @@ export const getLoanDetails = async (req, res) => {
         // Single query to fetch all related data
         const loanData = await prisma.lead.findUnique({
             where: { id: leadId },
-            // select: selectFilter
+            select: selectFilter
         });
 
         if (!loanData) {

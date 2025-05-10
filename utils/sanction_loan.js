@@ -367,7 +367,7 @@ const generateLoanHTML = (
 
       <ol>
         <li>Loan Amount: ${loan_amount}</li>
-        <li>Interest Rate: ${roi}</li>
+        <li>Interest Rate: ${roi} %</li>
       </ol>
 
       <p>
@@ -786,9 +786,9 @@ Andheri East , Mumbai, Maharashtra
       <tr>
         <td>1</td>
         <td>${loan_amount}</td>
-        <td>${roi}</td>
+        <td>${interest_amount}</td>
         <td>${pf_amount}</td>
-        <td>${repayment_amount}</td>
+        <td>${formattedRepaymentDate}</td>
         <td>${repayment_amount}</td>
       </tr>
     </table>
@@ -2733,7 +2733,7 @@ Andheri East , Mumbai, Maharashtra
       <tr>
         <td>9.</td>
         <td>Sanctioned Loan Amount</td>
-        <td>INR ${elegible_loan_amount}</td>
+        <td>INR ${loan_amount}</td>
       </tr>
     </table>
   </div>
@@ -2760,7 +2760,7 @@ Andheri East , Mumbai, Maharashtra
         <td>13.</td>
         <td>Processing Fee</td>
         <td>
-          A processing fee, ${pf_amount}% of the loan amount +
+          A processing fee, 10% of the loan amount +
           applicable taxes.
         </td>
       </tr>

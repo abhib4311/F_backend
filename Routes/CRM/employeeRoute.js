@@ -3,8 +3,8 @@ import { createEmployee, updateEmployee, login, logout, creteNewPassword, getPro
 import { authenticateEmployee, authorizeRoles } from '../../Middlewares/employee.js';
 const router = Router();
 
-router.post('/create', authenticateEmployee, authorizeRoles('Admin'), createEmployee);
-router.put('/update/:id', authenticateEmployee, authorizeRoles('Admin'), updateEmployee);
+router.post('/create', authenticateEmployee, authorizeRoles('ADMIN'), createEmployee);
+router.put('/update/:id', authenticateEmployee, authorizeRoles('ADMIN'), updateEmployee);
 router.post('/login', login);
 router.post('/logout', authenticateEmployee, logout);
 // router.put('/create-new-password', authenticateEmployee, authorizeRoles('Admin', 'Screener', 'Credit-Analyst'), creteNewPassword);

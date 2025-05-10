@@ -97,25 +97,24 @@ router.get('/closed', fetchAllClosedLeadsWithDetails);
 // // ====================== Lead Details & Utilities ======================
 // // ======================================================================
 
-router.get('/customer-detail/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getCustomerDetails);
-router.get('/loan-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), getLoanDetails);
-router.get('/bank-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getBankDetails);
+router.get('/customer-detail/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-ANALYST'), getCustomerDetails);
+router.get('/loan-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getLoanDetails);
+router.get('/bank-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getBankDetails);
 
 // Third-party data and audit logs
-router.get('/third-party-api-data/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getThirdPartyApiResponse);
-router.get('/lead-logs/:id', authorizeRoles('ADMIN', 'SALES-OPS'), getLeadLogs);
+router.get('/third-party-api-data/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getThirdPartyApiResponse);
+router.get('/lead-logs/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getLeadLogs);
 
 // Address and document management
-router.get('/address/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getAddress);
-router.get('/documents/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getDocument);
+router.get('/address/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getAddress);
+router.get('/documents/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getDocument);
 
 // Secure URL generation
-router.get('/generate-presigned-url', authorizeRoles('ADMIN', 'SALES-OPS', 'CREDIT-ANALYST'), presignedUrl);
+router.get('/generate-presigned-url', authorizeRoles('ADMIN', 'SALES-OPS', 'CREDIT-ANALYST', 'DISBURSAL-HEAD'), presignedUrl);
 
 // Reference details
-router.get('/reference-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getReferenceDetails);
-router.get('/bsa-report/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS'), getBSAReport);
-
+router.get('/reference-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getReferenceDetails);
+router.get('/bsa-report/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getBSAReport);
 // // ======================================================================
 // // ====================== Disbursal Route ======================
 // // ======================================================================

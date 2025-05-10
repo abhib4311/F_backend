@@ -856,18 +856,6 @@ export const disbursed = asyncHandler(async (req, res) => {
       // Fetch sanction data
       const sanction = await tx.sanction.findUnique({
         where: { loan_no: lead.loan_no },
-        select: {
-          id: true,
-          net_disbursal: true,
-          loan_amount: true,
-          repayment_date: true,
-          repayment_amount: true,
-          roi: true,
-          tenure: true,
-          is_eSigned: true,
-          is_rejected: true,
-          is_disbursed: true,
-        },
       });
       console.log("Sanction found:", sanction);
 
@@ -1066,6 +1054,14 @@ export const disbursed = asyncHandler(async (req, res) => {
           transaction_history_id: transactionHistory.id,
         },
       });
+      await tx.sanction.update({
+        where: {
+          loan_no: lead.loan_no,
+        },
+        date: {
+          is_disbursed: true,
+        },
+      });
 
       // Parallelize all subsequent operations
       console.log("Starting parallel operations");
@@ -1152,7 +1148,7 @@ export const disbursed = asyncHandler(async (req, res) => {
     { timeout: 50000 }
   );
   return res.status(200).json({
-    message : "Disbursed Sucessfully"
+    message: "Disbursed Sucessfully",
     // disbursement_id: disbursement?.id,
     // loan_no: sanction?.loan_no,
     // amount: netDisbursal,
