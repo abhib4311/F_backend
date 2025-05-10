@@ -105,7 +105,7 @@ const importData = async () => {
 
         // Process Blacklisted PAN (CSV)
         await processFile.csv(
-            './utils/blacklisted_pan.csv',
+            './blacklisted_pan.csv',
             (row) => ({
                 pan: row.pancard?.trim(),
                 customer_name: row.customer_name?.trim(),
@@ -117,7 +117,7 @@ const importData = async () => {
 
         // Process Pincodes (XLSX)
         await processFile.xlsx(
-            './utils/PINCODE MASTER.xlsx',
+            './PINCODE MASTER.xlsx',
             (row) => ({
                 pincode: String(row.Pincode?.toString().trim()),
                 district: row.DISTRICT?.trim(),
@@ -129,7 +129,7 @@ const importData = async () => {
 
         // Process Whitelisted (CSV)
         await processFile.csv(
-            './utils/whitelisted_users.csv', 
+            './whitelisted_users.csv', 
             (row) => ({
                 customer_name: row.customer_name?.trim(),
                 pan: row.pan?.trim(),
