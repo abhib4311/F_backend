@@ -183,7 +183,7 @@ const estimateSalary = (data) => {
 
   for (let i = 0; i < lastThreeMonths.length; i++) {
     const month = lastThreeMonths[i].month;
-    totalSalary += parseFloat(lastThreeMonths[i].totalSalary);
+    totalSalary += parseFloat(lastThreeMonths[i]?.totalSalary);
   }
   const averageThreeMonthsSalary = totalSalary / 3;
   const salary = Math.round(averageThreeMonthsSalary);
@@ -265,7 +265,7 @@ const performFraudCheck = (data) => {
 
   for (let i = 0; i < lastThreeMonths.length; i++) {
     const month = lastThreeMonths[i].month;
-    if (lastThreeMonths[i].totalSalary === 0) {
+    if (lastThreeMonths[i]?.totalSalary === 0) {
       return {
         basicValidationStatus: false,
         message: `Salary not available for ${month}`,
@@ -341,10 +341,24 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
 };
 
 const getSalary = (data) => {
-  const salaries = data?.data[0]?.salary;
-  return salaries[0]?.totalSalary;
-  // Assuming you want the salary from the first month
-  // You can modify this logic based on your requirements
+  const salaries = data?.data?.[0]?.salary;
+  if (!Array.isArray(salaries)) {
+    console.error("Salary data is not an array");
+    return 0;
+  }
+  if (salaries.length === 0) {
+    console.error("No salary entries found");
+    return 0;
+  }
+  const firstSalaryEntry = salaries[0];
+  if (
+    !firstSalaryEntry ||
+    typeof firstSalaryEntry.totalSalary === "undefined"
+  ) {
+    console.error("Total salary is missing in the first entry");
+    return 0;
+  }
+  return firstSalaryEntry.totalSalary;
 };
 
 /*
