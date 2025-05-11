@@ -669,16 +669,18 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       "*************************************************** 3 *******************************************************************"
     );
     if (!ifscCode) {
-      is_bre_reject = true,
-      await prisma.lead.update({
-        where: {
-          id: lead.id,
-        },
-        data: {
-          is_bre_reject: true,
-          lead_stage: "BRE_REJECTED",
-        },
-      });
+      console.log("IN IFSC CODE NOT FOUND");
+      (is_bre_reject = true),
+        await prisma.lead.update({
+          where: {
+            id: lead.id,
+          },
+          data: {
+            is_bre_reject: true,
+            lead_stage: "BRE_REJECTED",
+          },
+        });
+      cosole.log("is_bre_reject==>", is_bre_reject);
       remarks = "BSA REJECTED DUE TO NOT FOUND IFSC_CODE";
     }
     console.log("IN LAST -->", "is_bre_reject : ", is_bre_reject);
