@@ -525,9 +525,9 @@ export const verifyEmailOTP = asyncHandler(async (req, res) => {
 
 
 export const addEmployement = asyncHandler(async (req, res) => {
-  console.log("/user/add-employement", req.body);
+  // console.log("/user/add-employement", req.body);
   const { employee_type, company_name, salary_date, net_salary } = req.body;
-  console.log("employeetype-->" , employee_type)
+  console.log("employeetype------>" , employee_type)
   const userId = req.user.id;
   // console.log("req.body---->>>",req.body)
   await prisma.$transaction(
@@ -546,6 +546,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
 
       // Handle self-employed case first
       if (employee_type === Employee_Type.SELF_EMPLOYED) {
+        console.log("IN SELF EMPLOYED")
         const [updatedLead] = await Promise.all([
           prisma.lead.update({
             where: { id: lead.id },
