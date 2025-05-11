@@ -477,7 +477,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         document_url: s3Url,
         customer_id: userId,
         lead_id: lead.id,
-        remarks: `${password}`,
+        remarks: password,
       },
     });
 
@@ -649,6 +649,12 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     if (maxLoanAmount > 100000) maxLoanAmount = 100000;
 
     let lead_stage = is_bre_reject ? "BRE_REJECTED" : "BRE_APPROVED";
+    let remarks = "BSA + BRE ran successfully";
+    if (!ifscCode) {
+      lead_stage = "BRE_REJECTED";
+      remarks = "BSA REJECTED DUE TO NOT FOUND IFSC_CODE";
+    }
+    console.log("All correct");
 
     await prisma.lead.update({
       where: {
@@ -665,9 +671,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     console.log(
       "*************************************************** 3 *******************************************************************"
     );
-
-    console.log("All correct");
-    await asyncLeadLogs(userId, leadId, pan, "BSA + BRE ran successfully");
+    await asyncLeadLogs(userId, leadId, pan, remarks);
 
     return res.status(200).json({
       isSuccess: true,
