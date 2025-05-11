@@ -341,8 +341,8 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
 };
 
 const getSalary = (data) => {
-  const salaries = data.data[0].salary;
-  return salaries[0].totalSalary;
+  const salaries = data?.data[0]?.salary;
+  return salaries[0]?.totalSalary;
   // Assuming you want the salary from the first month
   // You can modify this logic based on your requirements
 };
@@ -615,6 +615,12 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
 
     // const averageSalary = parseFloat(estimateSalary(downloadResponse));
     const averageSalary = parseFloat(getSalary(downloadResponse));
+    if (isNaN(averageSalary) || averageSalary <= 0) {
+      return res.status(400).json({
+        message: "Valid salary data not found in the bank statement.",
+        isSuccess: false,
+      });
+    }
     const repaymentDateValue = repaymentDate(downloadResponse);
     /*
         const whiteListedUser = await prisma.whitelisted_users.findFirst({
