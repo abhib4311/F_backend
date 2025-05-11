@@ -615,7 +615,7 @@ export const approveBreRejectedLeadManually = async (req, res) => {
         leadUpdateData.elegible_loan_amount = Number(calculated_loan_amount);
       }
       if (remarks !== undefined) {
-        leadUpdateData.approval_remarks = remarks;
+        leadUpdateData.rejection_remarks = remarks;
       }
       if (salary_date !== undefined) {
         leadUpdateData.salary_date = new Date(salary_date);
