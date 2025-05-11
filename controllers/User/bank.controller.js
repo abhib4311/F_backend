@@ -13,7 +13,13 @@ import asyncHandler from "../../utils/asyncHandler.js";
 
 const prisma = new PrismaClient();
 
-const uploadBsaCartApiInitiate = async (file, userId, leadId, pan, password) => {
+const uploadBsaCartApiInitiate = async (
+  file,
+  userId,
+  leadId,
+  pan,
+  password
+) => {
   try {
     console.log("file-1 --------------------------------->");
     const uploadedFile = file;
@@ -56,17 +62,24 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan, password) => 
       },
       body: form.getBuffer(),
     };
-    console.log("uploadRequestConfig --------------------------------->", uploadRequestConfig);
+    console.log(
+      "uploadRequestConfig --------------------------------->",
+      uploadRequestConfig
+    );
     const uploadResponse = await fetch(
       process.env.CARTBI_API_UPLOAD,
       uploadRequestConfig
     );
-    console.log("uploadResponse --------------------------------->", uploadResponse);
+    console.log(
+      "uploadResponse --------------------------------->",
+      uploadResponse
+    );
     if (!uploadResponse.ok) {
       const errorText = await uploadResponse.text();
       throw new ResponseError(
         uploadResponse?.status || 500,
-        `Failed to upload file: HTTP ${uploadResponse?.status || "unknown"
+        `Failed to upload file: HTTP ${
+          uploadResponse?.status || "unknown"
         }. Response: ${errorText || "No response text available"}`
       );
     }
@@ -80,7 +93,10 @@ const uploadBsaCartApiInitiate = async (file, userId, leadId, pan, password) => 
       uploadResponseData,
       true
     );
-    console.log("uploadResponseData --------------------------------->", uploadResponseData);
+    console.log(
+      "uploadResponseData --------------------------------->",
+      uploadResponseData
+    );
 
     return uploadResponseData;
   } catch (error) {
@@ -185,18 +201,17 @@ const applyMultipliers = (amount, score, type) => {
     } else if (score >= 600) {
       maxLoanAmount = amount * 0.2;
     }
-  } else if (type === "WHITE_LISTED"){
-    if(score >= 750){
-      maxLoanAmount = amount * 0.80;
+  } else if (type === "WHITE_LISTED") {
+    if (score >= 750) {
+      maxLoanAmount = amount * 0.8;
     } else if (score >= 700) {
       maxLoanAmount = amount * 0.75;
-    } else if (score >= 650){
-      maxLoanAmount = amount * 0.65
+    } else if (score >= 650) {
+      maxLoanAmount = amount * 0.65;
     } else {
-      maxLoanAmount = amount * 0.50;
+      maxLoanAmount = amount * 0.5;
     }
   } else {
-
   }
   return maxLoanAmount;
 };
@@ -266,18 +281,7 @@ const performFraudCheck = (data) => {
 };
 const repaymentDate = (data) => {
   const salaries = data.data[0].salary;
-  const lastThreeMonths = salaries.slice(-3); // Get the last three months
-
-  // Extract transaction dates from the last three months
-  const lastThreeDates = lastThreeMonths.map(
-    (month) => month.transactions[0].transactionDate // Assuming one transaction per month
-  );
-
-  // Calculate the average timestamp
-  const totalTimestamp = lastThreeDates.reduce((sum, date) => sum + date, 0);
-  const averageTimestamp = totalTimestamp / lastThreeDates.length;
-
-  // Convert the average timestamp to a Date object
+  const averageTimestamp = salaries[0].transactions[0].transactionDate;
   const averageDate = new Date(averageTimestamp);
 
   return averageDate; // Return the average date in Date format
@@ -335,6 +339,15 @@ const asyncLeadLogs = async (userId, leadId, pan, remarks) => {
     },
   });
 };
+
+const getSalary = (data) => {
+  const salaries = data.data[0].salary;
+  return salaries[0].totalSalary;
+  // Assuming you want the salary from the first month
+  // You can modify this logic based on your requirements
+};
+
+/*
 const checkWhiteListedUser = async (pan) => {
   console.log("Hii----------- 1")
   const whiteListedUser = await prisma.whitelisted_users.findFirst({
@@ -346,10 +359,12 @@ const checkWhiteListedUser = async (pan) => {
   if (whiteListedUser) return true;
   return false;
 }
+*/
+
+const checkWhiteListedUser = false;
 
 const uploadBankStatement = asyncHandler(async (req, res) => {
   try {
-    console.log("Inside uploadBankStatement controller");
     let is_bre_complete = false;
     let is_bsa_complete = false;
     let is_bre_reject = false;
@@ -387,15 +402,17 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     }
     const leadId = lead.id;
 
-    const bureauReport = await prisma.api_Logs.findFirst({
-      where: {
-        pan: pan,
-        api_type: "CREDIT_REPORT",
-      },
-      orderBy: {
-        created_at: "desc",
-      },
-    }).then(console.log("bureauReport---->>>PULLED FROM DB"));
+    const bureauReport = await prisma.api_Logs
+      .findFirst({
+        where: {
+          pan: pan,
+          api_type: "CREDIT_REPORT",
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+      })
+      .then(console.log("bureauReport---->>>PULLED FROM DB"));
 
     if (!bureauReport.api_response.success) {
       return res
@@ -405,12 +422,10 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
 
     const score = bureauReport?.api_response?.data?.credit_score || null;
     if (!score) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Credit Score not found, will be contacted by our team manually",
-        });
+      return res.status(400).json({
+        message:
+          "Credit Score not found, will be contacted by our team manually",
+      });
     }
     if (!req.files || !req.files.file) {
       return res
@@ -423,12 +438,6 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     if (uploadedFile.mimetype !== "application/pdf") {
       return res.status(400).json({ message: "Uploaded File is not a PDF" });
     }
-
-    //checking the first page of the document
-    // const isFileBankStatement = await checkKeywordsInFirstPage(req.files.file);
-    // if (!isFileBankStatement) {
-    //     return res.status(400).json({ message: 'File is not a bank statement' });
-    // }
 
     const bucketName = process.env.AWS_S3_BUCKET;
     const apiUploadResponse = await uploadBsaCartApiInitiate(
@@ -472,7 +481,9 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       },
     });
 
-    const isWhitelisted = await checkWhiteListedUser(pan);
+    // const isWhitelisted = await checkWhiteListedUser(pan);
+
+    const isWhitelisted = false;
 
     const breRequestConfig = {
       method: "POST",
@@ -481,7 +492,6 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         "customer-type": isWhitelisted ? "whitelisted" : "",
       },
       body: JSON.stringify(bureauReport.api_response),
-
     };
 
     const breUrl =
@@ -494,7 +504,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     );
 
     if (!breResponse.ok) {
-      throw new ResponseError(breResponse.status, `Something went wrong!`);
+      throw new ResponseError(breResponse.status, `Error Came from BRE`);
     }
 
     await asyncLeadLogs(userId, leadId, pan, "BRE Ran Successfully");
@@ -565,22 +575,20 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       },
     });
 
-    console.log("Performing Fraud Check");
+    // const fraudCheck = performFraudCheck(downloadResponse);
+    // console.log("fraudCheck ---> ", fraudCheck);
 
-    const fraudCheck = performFraudCheck(downloadResponse);
-    console.log("fraudCheck ---> ", fraudCheck);
-
-    if (!fraudCheck.basicValidationStatus) {
-      is_bre_reject = true;
-      if (fraudCheck.fraud) {
-        await asyncLeadLogs(userId, leadId, pan, "FRAUD DETECTED!!!");
-      }
-      return res.status(400).json({
-        isSuccess: true,
-        message: fraudCheck.message,
-        fraud: fraudCheck.fraud,
-      });
-    }
+    // if (!fraudCheck.basicValidationStatus) {
+    //   is_bre_reject = true;
+    //   if (fraudCheck.fraud) {
+    //     await asyncLeadLogs(userId, leadId, pan, "FRAUD DETECTED!!!");
+    //   }
+    //   return res.status(400).json({
+    //     isSuccess: true,
+    //     message: fraudCheck.message,
+    //     fraud: fraudCheck.fraud,
+    //   });
+    // }
 
     const bankDetails = downloadResponse?.data[0];
     const {
@@ -591,7 +599,6 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       accountType,
       accountName,
     } = bankDetails;
-
 
     // if (
     //   !bankName ||
@@ -606,6 +613,17 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     //     .json({ message: "Incomplete bank details in the response" });
     // }
 
+    // const averageSalary = parseFloat(estimateSalary(downloadResponse));
+    const averageSalary = parseFloat(getSalary(downloadResponse));
+    const repaymentDateValue = repaymentDate(downloadResponse);
+    /*
+        const whiteListedUser = await prisma.whitelisted_users.findFirst({
+          where: {
+            pan: pan,
+          },
+        });
+    */
+    console.log("Performing Fraud Check");
     await prisma.bank_Details.create({
       data: {
         customer_id: userId,
@@ -620,26 +638,12 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       },
     });
 
-    const averageSalary = parseFloat(estimateSalary(downloadResponse));
-    const repaymentDateValue = repaymentDate(downloadResponse);
-
-    const whiteListedUser = await prisma.whitelisted_users.findFirst({
-      where: {
-        pan: pan,
-      },
-    });
-
-    console.log("Calulating maxLoanAmount");
-    console.log("whiteListedUser ---> ", JSON.stringify(whiteListedUser));
-    console.log("isWhitelisted ---> ", isWhitelisted);
-
-    let maxLoanAmount = !isWhitelisted ? applyMultipliers(averageSalary, score, "CIBIL") : applyMultipliers(whiteListedUser?.previous_loan_amount, score, "WHITE_LISTED");
+    // let maxLoanAmount = !isWhitelisted ? applyMultipliers(averageSalary, score, "CIBIL") : applyMultipliers(whiteListedUser?.previous_loan_amount, score, "WHITE_LISTED");
+    let maxLoanAmount = applyMultipliers(averageSalary, score, "CIBIL");
     if (maxLoanAmount === 0) {
-      return res
-        .status(400)
-        .json({
-          message: "No loan amount available for the given Credit Score",
-        });
+      return res.status(400).json({
+        message: "No loan amount available for the given Credit Score",
+      });
     }
 
     if (maxLoanAmount > 100000) maxLoanAmount = 100000;
