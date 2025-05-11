@@ -651,6 +651,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     let lead_stage = is_bre_reject ? "BRE_REJECTED" : "BRE_APPROVED";
     let remarks = "BSA + BRE ran successfully";
     if (!ifscCode) {
+      is_bre_reject = true;
       lead_stage = "BRE_REJECTED";
       remarks = "BSA REJECTED DUE TO NOT FOUND IFSC_CODE";
     }
@@ -666,6 +667,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
         is_bsa_complete: true,
         lead_stage: lead_stage,
         salary_date: repaymentDateValue,
+        is_bre_reject,
       },
     });
     console.log(
