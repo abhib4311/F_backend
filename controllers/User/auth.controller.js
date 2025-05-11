@@ -544,7 +544,7 @@ export const addEmployement = asyncHandler(async (req, res) => {
         throw new ResponseError(400, "Employee type already filled");
 
       // Handle self-employed case first
-      if (employee_type === Employee_Type.SELF_EMPLOYED) {
+      if (employee_type.employee_type === Employee_Type.SELF_EMPLOYED) {
         const [updatedLead] = await Promise.all([
           prisma.lead.update({
             where: { id: lead.id },
