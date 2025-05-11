@@ -1108,7 +1108,7 @@ export const disbursed = asyncHandler(async (req, res) => {
             pan,
             api_type: "BANK_AUTO_DISBURSAL",
             api_provider: 1,
-            api_request: {},
+            api_request: bank_Details || {},
             api_response: bank_response,
             api_status: bank_response?.success,
             customer_id: user.id,

@@ -574,25 +574,15 @@ export const approveBreRejectedLeadManually = async (req, res) => {
       salary_date,
       bank_acc_no,
     } = req.body;
-    if (!calculated_loan_amount) {
-      return res.status(400).json({
-        success: false,
-        message: "Loan amount is required",
-      });
-    }
+
     // Validation check
-    if (!leadId) {
-      return res.status(400).json({
-        success: false,
-        message: "Lead ID is required",
-      });
-    }
-    if (isNaN(leadId)) {
+    if (!leadId || isNaN(leadId)) {
       return res.status(400).json({
         success: false,
         message: "Invalid lead ID",
       });
     }
+
     // Check if the lead exists
     const lead = await prisma.lead.findUnique({
       where: { id: leadId },
@@ -603,6 +593,7 @@ export const approveBreRejectedLeadManually = async (req, res) => {
         message: "Lead not found",
       });
     }
+
     // Check if the lead is already rejected
     if (lead.is_rejected) {
       return res.status(400).json({
@@ -610,43 +601,72 @@ export const approveBreRejectedLeadManually = async (req, res) => {
         message: "Lead is rejected",
       });
     }
-    // Reject the lead
+
     await prisma.$transaction(async (tx) => {
-      //update lead
+      // Prepare lead update data
+      const leadUpdateData = {
+        approved_by: employeeId,
+        is_bre_reject: false,
+        lead_stage: LEAD_STAGE.BRE_APPROVED,
+      };
+
+      // Conditionally add loan amount and remarks to lead
+      if (calculated_loan_amount !== undefined) {
+        leadUpdateData.elegible_loan_amount = Number(calculated_loan_amount);
+      }
+      if (remarks !== undefined) {
+        leadUpdateData.approval_remarks = remarks;
+      }
+      if (salary_date !== undefined) {
+        leadUpdateData.salary_date = new Date(salary_date);
+      }
+
+      // Update lead
       await tx.lead.update({
         where: { id: leadId },
-        data: {
-          approved_by: employeeId,
-          is_bre_reject: false,
-          elegible_loan_amount: Number(calculated_loan_amount),
-          approval_remarks: remarks,
-          lead_stage: LEAD_STAGE.MANUALLY_APPROVE,
-        },
+        data: leadUpdateData,
       });
-      //prepare log
+
+      // Handle bank details
+      if (ifsc_code !== undefined || bank_acc_no !== undefined) {
+        const bankUpdateData = {};
+        if (ifsc_code !== undefined) bankUpdateData.ifsc_code = ifsc_code;
+        if (bank_acc_no !== undefined) bankUpdateData.bank_acc_no = bank_acc_no;
+
+        // Upsert bank details
+        await tx.bank_Details.updateMany({
+          where: { lead_id: leadId },
+          data: bankUpdateData,
+        });
+      }
+
+      // Prepare logs
       const customerId = lead.customer_id;
-      const emp_name = req.employee.f_name + " " + req.employee.l_name;
-      await prisma.lead_Logs.create({
+      const emp_name = `${req.employee.f_name} ${req.employee.l_name}`;
+
+      await tx.lead_Logs.create({
         data: {
           customer_id: customerId,
           lead_id: leadId,
           pan: lead.pan,
-          remarks: `Approved by ${emp_name} `,
+          remarks: `Approved by ${emp_name}`,
         },
       });
-      await prisma.employee_Logs.create({
+
+      await tx.employee_Logs.create({
         data: {
           employee_id: employeeId,
-          remarks: `Approved the Lead ${leadId} `,
+          remarks: `Approved the Lead ${leadId}`,
         },
       });
     });
+
     return res.status(200).json({
       success: true,
       message: "Lead Approved successfully",
     });
   } catch (error) {
-    return handleError(res, error, "reject lead");
+    return handleError(res, error, "approve lead");
   }
 };
 export const rejectBreRejectedLeadManually = async (req, res) => {
@@ -998,13 +1018,11 @@ export const fetchLeadDetailsById = async (req, res) => {
     });
   } catch (error) {
     console.error("Fetch error:", error.message);
-    res
-      .status(500)
-      .json({
-        success: true,
-        message: "Failed to fetch lead",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: true,
+      message: "Failed to fetch lead",
+      error: error.message,
+    });
   }
 };
 
@@ -1186,12 +1204,10 @@ export const getThirdPartyApiResponse = async (req, res) => {
     const apiType = req.query.api_type;
 
     if (isNaN(leadId) || !apiType) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "Invalid lead ID or missing apiType",
-        });
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid lead ID or missing apiType",
+      });
     }
     const selectFilter = {
       api_response: true,
@@ -1220,13 +1236,11 @@ export const getThirdPartyApiResponse = async (req, res) => {
     });
   } catch (error) {
     console.error("Fetch error:", error);
-    res
-      .status(500)
-      .json({
-        success: true,
-        message: "Failed to fetch third-party lead data",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: true,
+      message: "Failed to fetch third-party lead data",
+      error: error.message,
+    });
   }
 };
 export const getLeadLogs = async (req, res) => {
@@ -1258,13 +1272,11 @@ export const getLeadLogs = async (req, res) => {
     });
   } catch (error) {
     console.error("Fetch error:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch lead logs",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch lead logs",
+      error: error.message,
+    });
   }
 };
 export const getAddress = async (req, res) => {
