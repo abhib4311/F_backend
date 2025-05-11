@@ -657,6 +657,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
     }
     console.log("All correct");
 
+    console.log("IN LAST -->" ,"is_bre_reject : " ,is_bre_reject)
     await prisma.lead.update({
       where: {
         id: lead.id,
