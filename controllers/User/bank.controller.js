@@ -669,6 +669,7 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
       "*************************************************** 3 *******************************************************************"
     );
     if (!ifscCode) {
+      is_bre_reject = true,
       await prisma.lead.update({
         where: {
           id: lead.id,
