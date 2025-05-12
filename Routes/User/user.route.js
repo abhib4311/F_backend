@@ -9,6 +9,7 @@ import {
   logout,
   getUserProfile,
   requestLoan,
+  requestLoanAmount
 } from "../../controllers/User/auth.controller.js";
 import { uploadBankStatement } from "../../controllers/User/bank.controller.js";
 import {
@@ -64,6 +65,7 @@ router.post(
   verifyStaticToken,
   callbackBankStatement
 );
+router.get("/request-loan-amount" ,authenticateUser , requestLoanAmount)
 router.post("/request-loan", authenticateUser, requestLoan); // Done
 
 // ---------------------------------------------------------------------------------//

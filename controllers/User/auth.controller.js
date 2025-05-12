@@ -527,7 +527,7 @@ export const verifyEmailOTP = asyncHandler(async (req, res) => {
 export const addEmployement = asyncHandler(async (req, res) => {
   // console.log("/user/add-employement", req.body);
   const { employee_type, company_name, salary_date, net_salary } = req.body;
-  console.log("employeetype------>" , employee_type)
+  console.log("employeetype------>", employee_type)
   const userId = req.user.id;
   // console.log("req.body---->>>",req.body)
   await prisma.$transaction(
@@ -770,14 +770,14 @@ export const requestLoan = asyncHandler(async (req, res) => {
         where: { lead_id: leadId },
       });
 
-      let loan_no 
+      let loan_no
       if (existingSanction) {
         await prisma.sanction.update({
           where: { id: existingSanction.id },
           data: sanctionData,
         });
       } else {
-          loan_no = await nextSequence(prisma, "loan_no", "FUNDOLOAN", 10);
+        loan_no = await nextSequence(prisma, "loan_no", "FUNDOLOAN", 10);
         await prisma.sanction.create({
           data: {
             ...sanctionData,
@@ -864,6 +864,31 @@ export const requestLoan = asyncHandler(async (req, res) => {
     { timeout: 30000 }
   );
 });
+export const requestLoanAmount = asyncHandler(async (req, res) => {
+
+  const user = await prisma.customer.findUnique({
+    where: { id: req.user.id },
+  });
+
+  // find latest lead
+  const lead = await prisma.lead.findFirst({
+    where: { customer_id: user.id },
+    orderBy: { created_at: "desc" },
+  });
+  if (lead.is_rejected) {
+    return res.status(400).json({ message: "Your Lead has been rejected" })
+  }
+
+  if (!lead?.elegible_loan_amount) {
+    return res.status(400).json({ message: "Elegible Amount Not Found related to this lead" })
+  }
+  return res.status(200).json({
+    message: "Max Loan Amount get Successfully!",
+    max_loan_amount: lead?.elegible_loan_amount
+  })
+
+
+})
 
 export const getJourney = asyncHandler(async (req, res) => {
   const user = await prisma.customer.findUnique({
