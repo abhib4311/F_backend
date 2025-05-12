@@ -743,7 +743,8 @@ export const requestLoan = asyncHandler(async (req, res) => {
       const { repaymentDate, tenure } = calculateRepaymentDate(
         lead.salary_date
       );
-      const loanDetails = calculateLoanDetails(loan_amount, tenure, 10); // 10% intrest rate 
+      const loanDetails = calculateLoanDetails(Number(loan_amount), Number(tenure), 10); // 10% intrest rate 
+      console.log("---- CALCULATION -->" ,loanDetails )
 
       // Sanction data preparation
       const sanctionData = {

@@ -24,15 +24,15 @@ export const calculateLoanDetails = (loanAmount, tenureDays, pfPercent) => {
   const insurance = 0 // now static
   const dailyInterestRate = 0.01; // 1% per day
 
-  const pfAmount = Math.round((loanAmount * pfPercent) / 100);
-  const gst = Math.round(pfAmount * 0.18);
-  const totalAdminFees = Math.round(pfAmount + insurance + gst);
-  const netDisbursal = Math.round(loanAmount - totalAdminFees);
-  const interestAmount = Math.round(loanAmount * dailyInterestRate * tenureDays);
-  const repaymentAmount = Math.round(loanAmount + interestAmount);
-  const netAdminFee = Math.round((totalAdminFees / 118) * 100);
+  const pfAmount = Math.round((Number(loanAmount) * Number(pfPercent)) / 100);
+  const gst = Math.round(Number(pfAmount) * 0.18);
+  const totalAdminFees = Math.round(Number(pfAmount) + Number(insurance) + Number(gst));
+  const netDisbursal = Math.round(Number(loanAmount) - Number(totalAdminFees));
+  const interestAmount = Math.round(Number(loanAmount) * Number(dailyInterestRate) * Number(tenureDays));
+  const repaymentAmount = Math.round(Number(loanAmount) + Number(interestAmount));
+  const netAdminFee = Math.round((Number(totalAdminFees) / 118) * 100);
   const apr = Number(
-    (((totalAdminFees + interestAmount) / loanAmount) * (365 / tenureDays) * 100).toFixed(2)
+    (((Number(totalAdminFees) + Number(interestAmount)) / Number(loanAmount)) * (365 / Number(tenureDays)) * 100).toFixed(2)
   );
 
   return {
