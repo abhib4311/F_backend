@@ -80,7 +80,7 @@ router.post("/preview-sanction",
   authenticateUser,
   previewSanction); // Done
 router.post("/redirect-url", authenticateUser, redirectUrl); // Done
-router.post("/disbursed", authenticateUser, disbursed); // BANK API
+// router.post("/disbursed", authenticateUser, disbursed); // BANK API
 router.get(
   "/congratulation-page",
   authenticateUser,

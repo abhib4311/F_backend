@@ -53,6 +53,7 @@ var corsOption = {
     "https://www.fundobaba.com/",
     "http://192.168.218.96:5173",
     "http://192.168.218.96:5173/",
+    "http://10.6.24.209:5173/",
     process.env.FRONTEND_URL,
     process.env.FRONTEND_URL_DEV
   ],
