@@ -364,7 +364,7 @@ export const sendEncryptedRequest = async (
       localTxnDtTime: timestamp,
       beneAccNo: beneAccNo,
       beneIFSC: beneIFSC,
-      amount: "10.00",
+      amount: formattedAmount,
       tranRefNo: ref_no,
       paymentRef: "IMPSTransferP2A",
       senderName: "UY fincorp",
