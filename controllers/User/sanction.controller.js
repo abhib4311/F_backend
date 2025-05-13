@@ -792,6 +792,9 @@ export const redirectUrl = asyncHandler(async (req, res) => {
 
 // Disbursed (API)
 export const disbursed = asyncHandler(async (req, res) => {
+  const count = 1000
+  logger.warn(`Starting disbursed function ${count++}`)
+  logger.warn(`Starting transaction ${count++}`)
   console.log("Starting disbursed function");
   console.log("Starting transaction");
   // Destructure frequently used values
@@ -855,6 +858,7 @@ export const disbursed = asyncHandler(async (req, res) => {
     where: { loan_no: lead.loan_no },
   });
   console.log("Sanction found:", sanction);
+  logger.warn(`Sanction found: ${count++}`, sanction)
 
   // Validate sanction
   if (!sanction) {
@@ -904,6 +908,7 @@ export const disbursed = asyncHandler(async (req, res) => {
     select: { id: true, is_disbursed: true, status: true },
   });
   console.log("Existing disbursal:", existingDisbursal);
+  logger.warn(`Existing disbursal: ${count++}`, existingDisbursal);
 
   if (existingDisbursal?.is_disbursed) {
     console.log("Payment already processed for lead:", leadId);
@@ -953,15 +958,35 @@ export const disbursed = asyncHandler(async (req, res) => {
     );
   }
 
+  function generateTransactionId(length = 6) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomPart = '';
+    for (let i = 0; i < length; i++) {
+      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    const now = new Date();
+    const timestamp = now.getFullYear().toString() +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      String(now.getDate()).padStart(2, '0') +
+      String(now.getHours()).padStart(2, '0') +
+      String(now.getMinutes()).padStart(2, '0') +
+      String(now.getSeconds()).padStart(2, '0');
+
+    return `${timestamp}${randomPart}`.toUpperCase(); // e.g., "20250502143023A9BZLQ"
+  }
+  const refId = generateTransactionId()
+  logger.warn(`REFERENCE ID--> IN SANCTION CONTROLLER : ${count++} -->`, refId)
   // call the ICICI bank API
   const bank_response = await sendEncryptedRequest(
     bank_Details.bank_acc_no,
     bank_Details.ifsc_code,
     netDisbursal,
-    lead
+    lead,
+    refId
   );
   logger.warn(
-    `Auto Disbursal API reponse in Sanction Controller Bank Response: ${JSON.stringify(
+    `Auto Disbursal API reponse in Sanction Controller Bank Response: ${count++} , ${JSON.stringify(
       bank_response
     )}`
   );
@@ -974,7 +999,7 @@ export const disbursed = asyncHandler(async (req, res) => {
     );
   }
   logger.warn(
-    `Auto Disbursal API reponse in Sanction Controller Sucessfully Execute: `
+    `Auto Disbursal API reponse in Sanction Controller Sucessfully Execute: ${count++}`
   );
 
   // {
@@ -992,6 +1017,7 @@ export const disbursed = asyncHandler(async (req, res) => {
   // };
   // Create disbursal data
   await prisma.$transaction(async (tx) => {
+    logger.warn(`In TRANSACTION --> ${count++}`)
     const disbursalData = {
       payable_account: "IBCUY01852",
       payment_mode: "AUTO_DISBURSED",
@@ -1066,36 +1092,36 @@ export const disbursed = asyncHandler(async (req, res) => {
     await Promise.all([
       // Collection tracking
       tx.collection.create({
-          data: {
-            customer_id: customerId,
-            pan: user.pan,
-            lead_id: leadId,
-            loan_no: sanction.loan_no,
-            received_amount: 0,
-            collection_active: true,
-          },
-        })
+        data: {
+          customer_id: customerId,
+          pan: user.pan,
+          lead_id: leadId,
+          loan_no: sanction.loan_no,
+          received_amount: 0,
+          collection_active: true,
+        },
+      })
         .then(() => console.log("Collection record created")),
 
       // Payment record
       tx.payment.create({
-          data: {
-            pan: user.pan,
-            lead_id: leadId,
-            loan_no: sanction.loan_no,
-            lead_no: lead.lead_no,
-          },
-        })
+        data: {
+          pan: user.pan,
+          lead_id: leadId,
+          loan_no: sanction.loan_no,
+          lead_no: lead.lead_no,
+        },
+      })
         .then(() => console.log("Payment record created")),
 
       // Lead status update
       tx.lead.update({
-          where: { id: leadId },
-          data: {
-            is_disbursed: true,
-            lead_stage: LEAD_STAGE.DISBURSED,
-          },
-        })
+        where: { id: leadId },
+        data: {
+          is_disbursed: true,
+          lead_stage: LEAD_STAGE.DISBURSED,
+        },
+      })
         .then(() => console.log("Lead status updated")),
 
       tx.api_Logs.create({
@@ -1129,10 +1155,12 @@ export const disbursed = asyncHandler(async (req, res) => {
       })
         .then(() => console.log("Lead log created")),
     ]);
-  } , {timeout:120000})
+  }, { timeout: 120000 })
   //---------------------------------- Send data to Credgenics ----------------------------------
 
+  logger.warn(`After Transaction ${count++}`)
   await sendDataToCredgenics(sanction?.loan_no);
+  logger.warn(`After CREDGENICS ${count++}`)
   // console.log("----------->", reponse)
   // if (!reponse?.success) {
   //   throw new ResponseError(400, "Data not sent to Credgenics", `Data not sent to Credgenics for loan ${lead.loan_no}`)
