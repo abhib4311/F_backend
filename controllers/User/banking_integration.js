@@ -49,24 +49,7 @@ export const getCurrentTimestamp = () => {
 const generateRandom16Digit = () => {
   return crypto.randomBytes(8).toString("hex").slice(0, 16);
 };
-function generateTransactionId(length = 6) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let randomPart = "";
-  for (let i = 0; i < length; i++) {
-    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
 
-  const now = new Date();
-  const timestamp =
-    now.getFullYear().toString() +
-    String(now.getMonth() + 1).padStart(2, "0") +
-    String(now.getDate()).padStart(2, "0") +
-    String(now.getHours()).padStart(2, "0") +
-    String(now.getMinutes()).padStart(2, "0") +
-    String(now.getSeconds()).padStart(2, "0");
-
-  return `${timestamp}${randomPart}`.toUpperCase(); // e.g., "20250502143023A9BZLQ"
-}
 
 // Main function
 export const sendEncryptedRequest = async (
@@ -89,7 +72,7 @@ export const sendEncryptedRequest = async (
       localTxnDtTime: timestamp,
       beneAccNo: beneAccNo,
       beneIFSC: beneIFSC,
-      amount: formattedAmount,
+      amount: "10.00",
       tranRefNo: ref_no,
       paymentRef: "IMPSTransferP2A",
       senderName: "UY fincorp",
