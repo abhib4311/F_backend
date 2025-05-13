@@ -97,7 +97,7 @@ export const sendEncryptedRequest = async (
     const encryptedKey = crypto.publicEncrypt(
       {
         key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       },
       Buffer.from(sessionKey)
     );
@@ -165,7 +165,7 @@ export const sendEncryptedRequest = async (
     let decryptedSessionKey = crypto.privateDecrypt(
       {
         key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       },
       encryptedKeyBuffer
     ).toString("utf8");
