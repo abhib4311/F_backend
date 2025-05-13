@@ -156,7 +156,12 @@ export const sendEncryptedRequest = async (
     // Decrypt response
 
     const encryptedKeyBuffer = Buffer.from(response?.data?.encryptedKey, "base64");
-    const privateKey = fs.readFileSync(path.join(process.cwd(), "certs", "private.key"), "utf8");
+    const privateKeyPem = fs.readFileSync(path.join(process.cwd(), "certs", "private.key"), "utf8");
+    const privateKey = crypto.createPrivateKey({
+      key: privateKeyPem,
+      format: 'pem',
+    });
+
     logger.warn(`encryptedKeyBuffer---> ${encryptedKeyBuffer}`)
     logger.warn(`privateKey---> ${privateKey}`)
     logger.warn(`Encrypted buffer length: ${encryptedKeyBuffer.length}`);
@@ -170,8 +175,8 @@ export const sendEncryptedRequest = async (
           padding: crypto.constants.RSA_PKCS1_PADDING,
         },
         encryptedKeyBuffer
-      );
-      decryptedSessionKey = decryptedSessionKey.toString('utf8').trim(); // Trim whitespace
+      ).toString('utf8').trim();
+      // decryptedSessionKey = decryptedSessionKey.toString('utf8').trim(); // Trim whitespace
       logger.warn(`Decrypted Session Key (Length: ${decryptedSessionKey.length}): ${decryptedSessionKey}`);
     } catch (decryptError) {
       logger.error(`Decryption Error: ${decryptError.message}`);
