@@ -162,16 +162,23 @@ export const sendEncryptedRequest = async (
     logger.warn(`Encrypted buffer length: ${encryptedKeyBuffer.length}`);
 
 
-    let decryptedSessionKey = crypto.privateDecrypt(
-      {
-        key: privateKey.toString(),
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      encryptedKeyBuffer
-    )
-    decryptedSessionKey = decryptedSessionKey.toString('utf8')
+    let decryptedSessionKey;
+    try {
+      decryptedSessionKey = crypto.privateDecrypt(
+        {
+          key: privateKey, // No need for .toString() as it's already a string
+          padding: crypto.constants.RSA_PKCS1_PADDING,
+        },
+        encryptedKeyBuffer
+      );
+      decryptedSessionKey = decryptedSessionKey.toString('utf8').trim(); // Trim whitespace
+      logger.warn(`Decrypted Session Key (Length: ${decryptedSessionKey.length}): ${decryptedSessionKey}`);
+    } catch (decryptError) {
+      logger.error(`Decryption Error: ${decryptError.message}`);
+      throw new Error('Failed to decrypt session key');
+    }
 
-    logger.warn("decryptedSessionKey:", decryptedSessionKey);
+    // logger.warn("decryptedSessionKey:", decryptedSessionKey);
     // logger.warn("decryptedSessionKey---->", decryptedSessionKey)
 
     // Keep AES decryption same
