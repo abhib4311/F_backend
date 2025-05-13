@@ -812,7 +812,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
 
 // Disbursed (API)
 export const disbursed = asyncHandler(async (req, res) => {
-  const count = 1000
+  let count = 1000
   logger.warn(`Starting disbursed function ${count++}`)
   logger.warn(`Starting transaction ${count++}`)
   console.log("Starting disbursed function");

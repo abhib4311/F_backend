@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import asyncHandler from "../../utils/asyncHandler.js";
 import logger from "../../utils/logger.js";
 
-const count = 2000;
+let count = 2000;
 dotenv.config();
 const errorMap = {
   501: "Internal exception. Please do status check after sometime",
