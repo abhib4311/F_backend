@@ -97,7 +97,7 @@ export const sendEncryptedRequest = async (
     const encryptedKey = crypto.publicEncrypt(
       {
         key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        padding: crypto.constants.RSA_PKCS1_PADDING,
       },
       Buffer.from(sessionKey)
     );
@@ -145,7 +145,7 @@ export const sendEncryptedRequest = async (
     );
 
     const response = await axios.post(url, requestBody, { headers });
-    // console.log("<<========Encrypted Response=========>>", response.data);
+    console.log("<<========Encrypted Response=========>>", response.data);
     logger.warn(
       `Response of Auto Disbursal API LEAD-ID${lead?.id
       } , Response : ${JSON.stringify(response?.data)}  , 
@@ -164,14 +164,15 @@ export const sendEncryptedRequest = async (
 
     let decryptedSessionKey = crypto.privateDecrypt(
       {
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        key: privateKey.toString(),
+        padding: crypto.constants.RSA_PKCS1_PADDING,
       },
       encryptedKeyBuffer
-    ).toString("utf8");
+    )
+    decryptedSessionKey = decryptedSessionKey.toString('utf8')
 
     logger.warn("decryptedSessionKey:", decryptedSessionKey);
-    logger.warn("decryptedSessionKey---->", decryptedSessionKey)
+    // logger.warn("decryptedSessionKey---->", decryptedSessionKey)
 
     // Keep AES decryption same
     const encryptedResponseData = Buffer.from(response?.data?.encryptedData, "base64");
