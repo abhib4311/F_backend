@@ -49,6 +49,23 @@ export const getCurrentTimestamp = () => {
 const generateRandom16Digit = () => {
   return crypto.randomBytes(8).toString("hex").slice(0, 16);
 };
+function generateTransactionId(length = 6) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let randomPart = '';
+  for (let i = 0; i < length; i++) {
+    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  const now = new Date();
+  const timestamp = now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') +
+    String(now.getHours()).padStart(2, '0') +
+    String(now.getMinutes()).padStart(2, '0') +
+    String(now.getSeconds()).padStart(2, '0');
+
+  return `${timestamp}${randomPart}`.toUpperCase(); // e.g., "20250502143023A9BZLQ"
+}
 
 
 // Main function
@@ -67,7 +84,7 @@ export const sendEncryptedRequest = async (
     const timestamp = getCurrentTimestamp();
 
     const formattedAmount = parseFloat(amount).toFixed(2);
-    console.log("Formatted Amount -->" , formattedAmount)
+    console.log("Formatted Amount -->", formattedAmount)
     const requestParams = {
       localTxnDtTime: timestamp,
       beneAccNo: beneAccNo,
@@ -144,8 +161,7 @@ export const sendEncryptedRequest = async (
     const response = await axios.post(url, requestBody, { headers });
     // console.log("<<========Encrypted Response=========>>", response.data);
     logger.warn(
-      `Response of Auto Disbursal API LEAD-ID${
-        lead?.id
+      `Response of Auto Disbursal API LEAD-ID${lead?.id
       } , Response : ${JSON.stringify(response?.data)}`
     );
 
@@ -205,8 +221,7 @@ export const sendEncryptedRequest = async (
       const errorCode = parsedData?.ActCode;
       if (errorCode == "997" || errorCode == "501") {
         logger.warn(
-          `Auto Disbursal API LEAD-ID${
-            lead?.id
+          `Auto Disbursal API LEAD-ID${lead?.id
           } , Pending Status: ${JSON.stringify(parsedData)}`
         );
 
@@ -214,8 +229,7 @@ export const sendEncryptedRequest = async (
         return data;
       } else {
         logger.warn(
-          `Auto Disbursal API LEAD-ID${
-            lead?.id
+          `Auto Disbursal API LEAD-ID${lead?.id
           } , Failed Status: ${JSON.stringify(parsedData)}`
         );
         data.status = "FAILED";
