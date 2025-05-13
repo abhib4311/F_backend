@@ -615,6 +615,25 @@ export const previewSanction = asyncHandler(async (req, res) => {
   }
 
   // Update database records
+  function generateTransactionId(length = 6) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomPart = '';
+    for (let i = 0; i < length; i++) {
+      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    const now = new Date();
+    const timestamp = now.getFullYear().toString() +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      String(now.getDate()).padStart(2, '0') +
+      String(now.getHours()).padStart(2, '0') +
+      String(now.getMinutes()).padStart(2, '0') +
+      String(now.getSeconds()).padStart(2, '0');
+
+    return `${timestamp}${randomPart}`.toUpperCase(); // e.g., "20250502143023A9BZLQ"
+  }
+  const remarks = generateTransactionId()
+
   await prisma.$transaction(
     async (tx) => {
       await tx.sanction.update({
@@ -622,6 +641,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
         data: {
           is_eSign_pending: true,
           document_id: clientId,
+          remarks: remarks
         },
       });
 
@@ -958,24 +978,15 @@ export const disbursed = asyncHandler(async (req, res) => {
     );
   }
 
-  function generateTransactionId(length = 6) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let randomPart = '';
-    for (let i = 0; i < length; i++) {
-      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    const now = new Date();
-    const timestamp = now.getFullYear().toString() +
-      String(now.getMonth() + 1).padStart(2, '0') +
-      String(now.getDate()).padStart(2, '0') +
-      String(now.getHours()).padStart(2, '0') +
-      String(now.getMinutes()).padStart(2, '0') +
-      String(now.getSeconds()).padStart(2, '0');
-
-    return `${timestamp}${randomPart}`.toUpperCase(); // e.g., "20250502143023A9BZLQ"
+  if (!sanction?.remarks) {
+    throw new ResponseError(
+      400,
+      "Transacion Reference No not found",
+      `Transacion Reference No not found ${lead.lead_no}`
+    );
   }
-  const refId = generateTransactionId()
+  logger.warn(` remarks --->, ${sanction?.remarks}`)
+  const refId = sanction?.remarks
   logger.warn(`REFERENCE ID--> IN SANCTION CONTROLLER : ${count++} -->`, refId)
   // call the ICICI bank API
   const bank_response = await sendEncryptedRequest(
