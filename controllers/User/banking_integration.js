@@ -159,23 +159,18 @@ export const sendEncryptedRequest = async (
     const privateKey = fs.readFileSync(path.join(process.cwd(), "certs", "private.key"), "utf8");
     logger.warn(`encryptedKeyBuffer---> ${encryptedKeyBuffer}`)
     logger.warn(`privateKey---> ${privateKey}`)
-    logger.warn("Encrypted buffer length:", encryptedKeyBuffer.length);
+    logger.warn(`Encrypted buffer length: ${encryptedKeyBuffer.length}`);
 
-    // Decrypt session key using private key
-    try {
-      const decryptedSessionKey = crypto.privateDecrypt(
-        {
-          key: privateKey,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        },
-        encryptedKeyBuffer
-      ).toString("utf8");
 
-      logger.warn("decryptedSessionKey:", decryptedSessionKey);
-    } catch (err) {
-      logger.error("Decryption failed:", err.message);
-      logger.error("Stack trace:", err.stack);
-    }
+    let decryptedSessionKey = crypto.privateDecrypt(
+      {
+        key: privateKey,
+        padding: crypto.constants.RSA_PKCS1_PADDING,
+      },
+      encryptedKeyBuffer
+    ).toString("utf8");
+
+    logger.warn("decryptedSessionKey:", decryptedSessionKey);
     logger.warn("decryptedSessionKey---->", decryptedSessionKey)
 
     // Keep AES decryption same
