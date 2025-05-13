@@ -162,11 +162,11 @@ export const sendEncryptedRequest = async (
     const decryptedSessionKey = crypto.privateDecrypt(
       {
         key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
       },
       encryptedKeyBuffer
     ).toString("utf8");
-    logger.warn("decryptedSessionKey---->" , decryptedSessionKey)
+    logger.warn("decryptedSessionKey---->", decryptedSessionKey)
 
     // Keep AES decryption same
     const encryptedResponseData = Buffer.from(response?.data?.encryptedData, "base64");
