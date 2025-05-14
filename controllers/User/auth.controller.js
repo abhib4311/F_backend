@@ -86,7 +86,7 @@ export const sendOTP = asyncHandler(async (req, res) => {
     ]);
 
     if (blackListedPan) {
-      throw new ResponseError(400, "PAN is blacklisted");
+      throw new ResponseError(400, `PAN is blacklisted : ${PAN}`);
     }
 
     // Validate serviceable pincode
@@ -744,7 +744,7 @@ export const requestLoan = asyncHandler(async (req, res) => {
         lead.salary_date
       );
       const loanDetails = calculateLoanDetails(Number(loan_amount), Number(tenure), 10); // 10% intrest rate 
-      console.log("---- CALCULATION -->" ,loanDetails )
+      console.log("---- CALCULATION -->", loanDetails)
 
       // Sanction data preparation
       const sanctionData = {
