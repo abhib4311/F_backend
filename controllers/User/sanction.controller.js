@@ -29,6 +29,7 @@ import { calculateRepaymentDate } from "../../utils/calculateTenure.js";
 import { sendEncryptedRequest } from "./banking_integration.js";
 import { sendDataToCredgenics } from "./credgenics.contoller.js";
 import logger from "../../utils/logger.js";
+import axios from "axios";
 
 const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
@@ -91,371 +92,6 @@ export const getLoanDetails = asyncHandler(async (req, res) => {
   });
 });
 
-// export const previewSanction = asyncHandler(async (req, res) => {
-//   const userId = req.user.id;
-
-//   // Parallel fetch user and lead details
-//   const [user, lead_detail] = await Promise.all([
-//     prisma.customer.findUnique({ where: { id: userId } }),
-//     prisma.lead.findFirst({
-//       where: { customer_id: userId },
-//       orderBy: { created_at: "desc" },
-//     })
-//   ]);
-
-//   // Validation checks
-//   if (!user) throw new ResponseError(400, "User not found");
-//   if (!lead_detail) throw new ResponseError(400, "Lead not found");
-//   if (lead_detail.is_rejected) throw new ResponseError(400, "Lead is rejected");
-//   if (lead_detail.is_sanction) throw new ResponseError(400, "Sanction already completed");
-//   if (!lead_detail.is_kyc_approved) throw new ResponseError(400, "Verify Your KYC first");
-
-//   // Check existing sanction
-//   const existingSanction = await prisma.sanction.findFirst({
-//     where: { lead_id: lead_detail.id },
-//   });
-//   if (!existingSanction) throw new ResponseError(400, "Sanction not found");
-
-//   // Calculate and update repayment details
-//   const { tenure, repaymentDate } = calculateRepaymentDate(lead_detail.salary_date);
-//   await Promise.all([
-//     prisma.lead.update({
-//       where: { id: lead_detail.id },
-//       data: { tenure: Number(tenure), repayment_date: new Date(repaymentDate) },
-//     }),
-//     prisma.sanction.update({
-//       where: { id: existingSanction.id },
-//       data: { tenure: Number(tenure), repayment_date: new Date(repaymentDate) },
-//     })
-//   ]);
-
-//   // Parallel image processing
-//   const [headerImageBase64, footerImageBase64] = await Promise.all([
-//     convertImageToBase64(path.join(__dirname, '../../public/images/Header.png')),
-//     convertImageToBase64(path.join(__dirname, '../../public/images/Footer.png'))
-//   ]);
-
-//   // Generate PDF and call API
-//   // const base64_encoded = await generatepdf(sanctionpage(
-//   //   existingSanction,
-//   //   lead_detail,
-//   //   headerImageBase64,
-//   //   footerImageBase64
-//   // ));
-//   const sanction_html_page = sanctionpage(
-//     existingSanction,
-//     lead_detail,
-//     headerImageBase64,
-//     footerImageBase64
-//   );
-
-//   const pdfBuffer = await generatepdf(sanction_html_page, { returnBuffer: true });
-
-//   // Create a Blod/File from the buffer
-//   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
-//   // Step 2: Initialize e-Sign session
-//   const initEsignPayload = {
-//     pdf_pre_uploaded: true,
-//     callback_url: "http://localhost:8000/api/user/redirect-url",
-//     config: {
-//       skip_otp: true,
-//       auth_mode: "1",
-//       reason: "Contract",
-//       positions: {
-//         1: [{ x: 10, y: 20 }]
-//       }
-//     },
-//     prefill_options: {
-//       full_name: user.full_name, // lead_detail.full_name,
-//       mobile_number: user.mobile, // lead_detail.mobile,
-//       user_email: user.personal_email // lead_detail.personal_email
-//     }
-//   };
-
-//   // Call first API to initialize e-Sign
-//   const { apiRequest: initRequest, apiResponse: initResponse } = await esignInitAPI(initEsignPayload);
-//   // console.log("initResponse---->", initResponse);
-//   // console.log("initRequest---->", initRequest);
-//   if (initResponse?.status_code !== 200) {
-
-//     handleThirdPartyResponse(initResponse);
-//   }
-
-//   const clientId = initResponse.data.client_id;
-//   const esignUrl = initResponse.data.url;
-//   // console.log("clientId---->", clientId);
-//   // console.log("esignUrl---->", esignUrl);
-
-//   // Step 3: Get upload URL
-//   const { apiRequest: uploadUrlRequest, apiResponse: uploadUrlResponse } = await getUploadUrlAPI({ client_id: clientId });
-//   // console.log("uploadUrlResponse---->", uploadUrlResponse);
-//   // console.log("uploadUrlRequest---->", uploadUrlRequest);
-//   if (uploadUrlResponse?.status_code !== 200) {
-//     handleThirdPartyResponse(uploadUrlResponse);
-//   }
-
-//   // Step 4: Upload PDF to provided S3 URL
-//   const uploadUrl = uploadUrlResponse.data.url;
-//   const uploadFields = uploadUrlResponse.data.fields;
-//   // console.log("uploadUrl---->", uploadUrl);
-//   // console.log("uploadFields---->", uploadFields);
-
-//   // if (pdfFile) {
-//   //   console.log("pdfFile---->");
-//   // }
-
-//   // Step 5: Upload PDF to provided S3 URL
-//   const formData = new FormData();
-//   Object.entries(uploadFields).forEach(([key, value]) => {
-//     formData.append(key, value);
-//   });
-//   formData.append('file', pdfFile);
-//   // Step 6: Upload PDF to provided S3 URL
-//   // console.log("formData---->", formData);
-//   const uploadResponse = await fetch(uploadUrl, {
-//     method: 'POST',
-//     body: formData
-//   });
-//   // console.log("uploadResponse---->", uploadResponse);
-//   if (!uploadResponse.ok) {
-//     throw new ResponseError(400, "Error from Surepass e-Sign(uploadResponse function in sanction.controller.js) API : Failed to upload document");
-//   }
-
-//   // ------------------------------------------------------------
-
-//   const { apiRequest, apiResponse } = await sanctionAPI(
-//     base64_encoded,
-//     lead_detail.full_name,
-//     lead_detail.personal_email,
-//     lead_detail.mobile,
-//     lead_detail.id
-//   );
-
-//   // Handle API response
-//   if (apiResponse?.statusCode != "101") handleThirdPartyResponse(apiResponse);
-//   if (!apiResponse?.result?.documentId) throw new ResponseError(400, "Document ID not found");
-//   if (!apiResponse?.result?.signingDetails[0]?.signUrl) throw new ResponseError(400, "Signed url not found");
-
-//   const signUrl = apiResponse.result.signingDetails[0].signUrl;
-//   const documentId = apiResponse.result.documentId;
-
-//   // Transaction block with batched operations
-//   await prisma.$transaction(async (prisma) => {
-//     await Promise.all([
-//       prisma.sanction.update({
-//         where: { id: existingSanction.id },
-//         data: { is_eSign_pending: true, document_id: documentId },
-//       }),
-//       prisma.api_Logs.create({
-//         data: {
-//           pan: user.pan,
-//           api_type: API_TYPE.ESIGN_API,
-//           api_provider: 1,
-//           api_request: apiRequest,
-//           api_response: apiResponse,
-//           api_status: true,
-//           lead_id: lead_detail.id,
-//           customer_id: userId,
-//         },
-//       }),
-//       prisma.lead.update({
-//         where: { id: lead_detail.id },
-//         data: { lead_stage: LEAD_STAGE.SANCTION_PENDING },
-//       }),
-//       prisma.lead_Logs.create({
-//         data: {
-//           customer_id: userId,
-//           lead_id: lead_detail.id,
-//           pan: user.pan,
-//           remarks: "Sending for e-Sign"
-//         },
-//       })
-//     ]);
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Sent for e-sign successfully!",
-//       document_id: documentId,
-//       signUrl: signUrl,
-//     });
-//   }, { timeout: 50000 });
-// });
-
-// Done
-
-// export const previewSanction = asyncHandler(async (req, res) => {
-//   console.log("user intered in preview sanction---->");
-//   // Step 1: Fetch user details and validate (keeping existing validation)
-//   const user = await prisma.customer.findUnique({
-//     where: { id: req.user.id },
-//   });
-//   if (!user) {
-//     throw new ResponseError(400, "User not found");
-//   }
-
-//   const lead_detail = await prisma.lead.findFirst({
-//     where: { customer_id: user.id },
-//     orderBy: { created_at: "desc" },
-//   });
-
-//   if (!lead_detail) {
-//     throw new ResponseError(400, "Lead not found");
-//   }
-
-//   if (lead_detail.is_rejected) {
-//     throw new ResponseError(400, "Lead is rejected");
-//   }
-
-//   if (lead_detail.is_sanction) {
-//     throw new ResponseError(400, "Sanction already completed");
-//   }
-//   if (!lead_detail.is_kyc_approved) {
-//     throw new ResponseError(400, "Verify Your KYC first");
-//   }
-//   const existingSanction = await prisma.sanction.findFirst({
-//     where: { lead_id: lead_detail.id },
-//   });
-
-//   if (!existingSanction) {
-//     throw new ResponseError(400, "Sanction not found");
-//   }
-//   // const existingSanction = true;
-//   // const lead_detail = true;
-
-//   // Generate PDF content
-//   const headerImagePath = path.join(__dirname, '../../public/images/Header.png');
-//   const footerImagePath = path.join(__dirname, '../../public/images/Footer.png');
-//   const headerImageBase64 = convertImageToBase64(headerImagePath);
-//   const footerImageBase64 = convertImageToBase64(footerImagePath);
-//   const sanction_html_page = sanctionpage(
-//     existingSanction,
-//     lead_detail,
-//     headerImageBase64,
-//     footerImageBase64
-//   );
-
-//     // const pdfBuffer = await generatepdf(sanction_html_page, { returnBuffer: true });
-//     const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
-//   console.log(pdfBuffer);
-
-//   // Create a Blod/File from the buffer
-//   const pdfFile = new File([pdfBuffer], 'sanction_letter.pdf', { type: 'application/pdf' });
-//   // Step 2: Initialize e-Sign session
-//   const initEsignPayload = {
-//     pdf_pre_uploaded: true,
-//     callback_url: "https://www.blinkrloan.com/",
-//     config: {
-//       skip_otp: true,
-//       auth_mode: "1",
-//       reason: "Contract",
-//       positions: {
-//         1: [{ x: 10, y: 20 }]
-//       }
-//     },
-//     prefill_options: {
-//       full_name: user.full_name, // lead_detail.full_name,
-//       mobile_number: user.mobile, // lead_detail.mobile,
-//       user_email: user.personal_email // lead_detail.personal_email
-//     }
-//   };
-
-//   // Call first API to initialize e-Sign
-//   const { apiRequest: initRequest, apiResponse: initResponse } = await esignInitAPI(initEsignPayload);
-//   // console.log("initResponse---->", initResponse);
-//   // console.log("initRequest---->", initRequest);
-//   if (initResponse?.status_code !== 200) {
-
-//     handleThirdPartyResponse(initResponse);
-//   }
-
-//   const clientId = initResponse.data.client_id;
-//   const esignUrl = initResponse.data.url;
-//   // console.log("clientId---->", clientId);
-//   // console.log("esignUrl---->", esignUrl);
-
-//   // Step 3: Get upload URL
-//   const { apiRequest: uploadUrlRequest, apiResponse: uploadUrlResponse } = await getUploadUrlAPI({ client_id: clientId });
-//   // console.log("uploadUrlResponse---->", uploadUrlResponse);
-//   // console.log("uploadUrlRequest---->", uploadUrlRequest);
-//   if (uploadUrlResponse?.status_code !== 200) {
-//     handleThirdPartyResponse(uploadUrlResponse);
-//   }
-
-//   // Step 4: Upload PDF to provided S3 URL
-//   const uploadUrl = uploadUrlResponse.data.url;
-//   const uploadFields = uploadUrlResponse.data.fields;
-//   // console.log("uploadUrl---->", uploadUrl);
-//   // console.log("uploadFields---->", uploadFields);
-
-//   // if (pdfFile) {
-//   //   console.log("pdfFile---->");
-//   // }
-
-//   // Step 5: Upload PDF to provided S3 URL
-//   const formData = new FormData();
-//   Object.entries(uploadFields).forEach(([key, value]) => {
-//     formData.append(key, value);
-//   });
-//   formData.append('file', pdfFile);
-//   // Step 6: Upload PDF to provided S3 URL
-//   // console.log("formData---->", formData);
-//   const uploadResponse = await fetch(uploadUrl, {
-//     method: 'POST',
-//     body: formData
-//   });
-//   // console.log("uploadResponse---->", uploadResponse);
-//   if (!uploadResponse.ok) {
-//     throw new ResponseError(400, "Error from Surepass e-Sign(uploadResponse function in sanction.controller.js) API : Failed to upload document");
-//   }
-
-//   // Update database records
-//   await prisma.$transaction(async (prisma) => {
-//     await prisma.sanction.update({
-//       where: { id: existingSanction.id },
-//       data: {
-//         is_eSign_pending: true,
-//         document_id: clientId,
-//       },
-//     });
-
-//     await prisma.api_Logs.create({
-//       data: {
-//         pan: user.pan,
-//         api_type: API_TYPE.ESIGN_API,
-//         api_provider: 1,
-//         api_request: initRequest,
-//         api_response: initResponse,
-//         api_status: true,
-//         lead_id: lead_detail.id,
-//         customer_id: user.id,
-//       },
-//     });
-
-//     await prisma.lead.update({
-//       where: { id: lead_detail.id },
-//       data: {
-//         lead_stage: LEAD_STAGE.SANCTION_PENDING,
-//       },
-//     });
-
-//     await prisma.lead_Logs.create({
-//       data: {
-//         customer_id: user.id,
-//         lead_id: lead_detail.id,
-//         pan: user.pan,
-//         remarks: "Sending for e-Sign"
-//       },
-//     });
-//   }, { timeout: 30000 });
-
-//   // Return the e-Sign URL to frontend
-//   return res.status(200).json({
-//     success: true,
-//     message: "Sent for e-sign successfully!",
-//     document_id: clientId,
-//     signUrl: esignUrl,
-//   });
-// });
 
 export const previewSanction = asyncHandler(async (req, res) => {
   console.log("user intered in preview sanction---->");
@@ -564,9 +200,9 @@ export const previewSanction = asyncHandler(async (req, res) => {
     await esignInitAPI(initEsignPayload);
   // console.log("initResponse---->", initResponse);
   // console.log("initRequest---->", initRequest);
-  if (initResponse?.status_code !== 200) {
-    handleSurepassResponse(initResponse);
-  }
+  // if (initResponse?.status_code !== 200) {
+  //   handleSurepassResponse(initResponse);
+  // }
 
   const clientId = initResponse.data.client_id;
   const esignUrl = initResponse.data.url;
@@ -580,9 +216,9 @@ export const previewSanction = asyncHandler(async (req, res) => {
     await getUploadUrlAPI({ client_id: clientId });
   // console.log("uploadUrlResponse---->", uploadUrlResponse);
   // console.log("uploadUrlRequest---->", uploadUrlRequest);
-  if (uploadUrlResponse?.status_code != 200) {
-    handleSurepassResponse(uploadUrlResponse);
-  }
+  // if (uploadUrlResponse?.status_code != 200) {
+  //   handleSurepassResponse(uploadUrlResponse);
+  // }
 
   // Step 4: Upload PDF to provided S3 URL
   const uploadUrl = uploadUrlResponse.data.url;
@@ -739,14 +375,21 @@ export const redirectUrl = asyncHandler(async (req, res) => {
   const { apiRequest, apiResponse } = await getSingedDocUrl(
     pendingSanction.document_id
   );
-  if (!apiResponse || apiResponse.status_code !== 200) {
-    handleSurepassResponse(apiResponse);
-  }
+
   console.log("apiResponse---->", apiResponse);
   const fileURL = apiResponse?.data?.url;
   if (!fileURL)
     throw new ResponseError(500, "Signed document URL missing in API response");
 
+  const sanctionBuffer = await axios.get(fileURL, {
+    responseType: 'arraybuffer'
+  });
+
+  // Convert to base64 string
+  const base64String = Buffer.from(sanctionBuffer.data).toString('base64');
+  // console.log("base64String---->", base64String);
+  const S3Url = await uploadSanctionLetterS3(base64String, user.pan, "sanction_letter", "application/pdf");
+  console.log("S3Url---->", S3Url);
   // DB Transaction
   await prisma.$transaction(
     async (tx) => {
@@ -770,7 +413,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
           data: {
             pan,
             document_type: DOCUMENT_TYPE.SANCTION_LETTER,
-            document_url: fileURL,
+            document_url: S3Url,
             customer_id: userId,
             lead_id: leadId,
           },
@@ -786,6 +429,7 @@ export const redirectUrl = asyncHandler(async (req, res) => {
           where: { id: leadId },
           data: {
             is_sanction: true,
+            sanction_id: pendingSanction.id,
             lead_stage: LEAD_STAGE.SANCTION_COMPLETED,
           },
         }),
@@ -804,9 +448,9 @@ export const redirectUrl = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    message: "Sanction letter generated and saved successfully",
+    message: "Sanction letter generated and saved to S3 successfully",
     disburseLoanAmount: pendingSanction.net_disbursal,
-    data: { document_url: fileURL },
+    data: { document_url: S3Url },
   });
 });
 

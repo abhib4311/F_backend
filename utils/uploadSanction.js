@@ -62,7 +62,7 @@ export const uploadSanctionLetterS3 = async (base64String, pan, fileNameWithoutE
     };
 
     const uploadResponse = await s3.upload(params).promise();
-    console.log(`${mimeType} uploaded successfully:`, uploadResponse.Location);
+    console.log(`uploaded ${fileNameWithoutExt} successfully:`, uploadResponse.Location);
     return uploadResponse.Location;
   } catch (error) {
     console.error("Error uploading file to S3:", error);

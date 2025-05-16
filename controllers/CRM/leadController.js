@@ -1509,6 +1509,68 @@ export const getBSAReport = async (req, res) => {
   }
 };
 
+// Update Bank Details
+export const updateBankDetails = async (req, res) => {
+  try {
+    const leadId = parseInt(req.params.id);
+    const { bankName, accountNumber, ifsc, accountHolderName, accountType, branchName } = req.body;
+
+    // Validate leadId
+    if (!leadId || isNaN(leadId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid lead ID. It must be a number.",
+      });
+    }
+
+    // Validate data
+    if (!bankName || !accountNumber || !ifsc || !accountHolderName) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
+    }
+
+    // Check if lead exists 
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+    });
+    if (!lead) {
+      return res.status(404).json({
+        success: false,
+        message: "Lead not found.",
+      });
+    }
+
+    // upidate the bank details
+    const updatedBankDetails = await prisma.bank_Details.update({
+      where: { lead_id: leadId },
+      data: {
+        bank_name: bankName,
+        account_number: accountNumber,
+        ifsc: ifsc,
+        beneficiary_name: accountHolderName,
+        account_type: accountType,
+        branch_name: branchName,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Bank details updated successfully.",
+      data: updatedBankDetails,
+    });
+  } catch (error) {
+    console.error("Error updating bank details:", error);
+    return res.status(500).json({
+      success: false,
+      message: error?.message,
+    });
+  }
+};
+
+
+
 // ============================================================================================================================================
 // ============================================================================================================================================
 // ============================================================================================================================================
@@ -1766,12 +1828,12 @@ export const disbursed = asyncHandler(async (req, res) => {
       // Execute upsert operation
       const disbursement = existingDisbursal
         ? await tx.disbursal.update({
-            where: { id: existingDisbursal.id },
-            data: disbursalData,
-          })
+          where: { id: existingDisbursal.id },
+          data: disbursalData,
+        })
         : await tx.disbursal.create({
-            data: { ...disbursalData, lead_id: leadId },
-          });
+          data: { ...disbursalData, lead_id: leadId },
+        });
 
       // Create transaction history
       const transactionHistory = await tx.transaction_History.create({

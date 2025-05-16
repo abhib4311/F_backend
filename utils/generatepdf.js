@@ -5,9 +5,10 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
   let browser
   try {
     console.log("HTML content received for PDF generation:---->");
+    // use this in production----------------------------------------------------------------->
     browser = await puppeteer.launch({
       executablePath: '/home/ubuntu/.cache/puppeteer/chrome/linux-136.0.7103.92/chrome-linux64/chrome', // or use Puppeteer’s downloaded one
-      headless: true ,
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -17,6 +18,11 @@ const convertHtmlToPdfBase64 = async (htmlContent) => {
         '--no-zygote'
       ]
     });
+    // use this in development----------------------------------------------------------------->
+    // browser = await puppeteer.launch({
+    //   headless: true,
+    //   args: ['--no-sandbox', '--disable-setuid-sandbox']
+    // });
     console.log("Puppeteer browser launched successfully.-->", browser);
     const page = await browser.newPage();
     console.log("New page created successfully.--->", page);

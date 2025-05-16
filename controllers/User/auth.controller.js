@@ -131,10 +131,10 @@ export const verifyOTP = asyncHandler(async (req, res) => {
 
   const otpResponse = await verifyOtpAPI(otp, request_id);
   console.log("--->", otpResponse);
-  if (otpResponse?.["status_code"] != "200") {
-    console.log("error block-->");
-    handleSurepassResponse(otpResponse);
-  }
+  // if (otpResponse?.["status_code"] != "200") {
+  //   console.log("error block-->");
+  //   handleSurepassResponse(otpResponse);
+  // }
 
   // Common response handler
   const sendTokenResponse = (user, token) => {
@@ -181,9 +181,9 @@ export const verifyOTP = asyncHandler(async (req, res) => {
         locationResult;
       const { panResponse, panRequest } = panResult;
 
-      if (panResponse?.status_code != "200") {
-        handleSurepassResponse(panResponse);
-      }
+      // if (panResponse?.status_code != "200") {
+      //   handleSurepassResponse(panResponse);
+      // }
       console.log("------->>>>>", panResponse, panRequest);
 
       // Cache PAN details
@@ -618,10 +618,10 @@ export const addEmployement = asyncHandler(async (req, res) => {
       const { cibilResponse, cibilRequest } = await fetchCibilAPI(
         cibilRequestBody
       );
-      if (cibilResponse?.status_code != "200") {
-        handleSurepassResponse(cibilResponse);
-        console.log("cibilResponse---->>>", cibilResponse);
-      }
+      // if (cibilResponse?.status_code != "200") {
+      //   handleSurepassResponse(cibilResponse);
+      //   console.log("cibilResponse---->>>", cibilResponse);
+      // }
       // const cibilResponse = dummyCIBIL;
       console.log("cibilResponse---->>>", cibilResponse?.data?.credit_score);
       console.log("cibilResponse---->>> type", typeof (cibilResponse?.data?.credit_score));

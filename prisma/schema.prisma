@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRESQL_DATABASE_URL")
+  provider = "mysql"
+  url      = env("MYSQL_DATABASE_URL")
 }
 
 model Lead {
@@ -402,7 +402,6 @@ model Employee_Logs {
   @@index([employee_id]) // Removed map
 }
 
-
 model Counter {
   id             Int      @id @default(autoincrement())
   sequence_name  String?  @unique
@@ -529,9 +528,9 @@ model references {
 }
 
 model whitelisted_users {
-  id Int @id  @default(autoincrement())
-  customer_name String?
-  pan String?
+  id                   Int     @id @default(autoincrement())
+  customer_name        String?
+  pan                  String?
   previous_loan_amount Int?
 }
 

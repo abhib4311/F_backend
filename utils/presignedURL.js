@@ -36,7 +36,7 @@ export const generatePresignedUrl = (s3Url, expiresInSeconds = 900) => {
 };
 
 // Usage example
-// const fileUrl = "https://testing-blinkr.s3.amazonaws.com/ALKPU2305D/sanction_letter-1744630133874.pdf";
+// const fileUrl = "https://testing-blinkr.s3.amazonaws.com/OZBPS5665H/sanction_letter.pdf";
 // const presignedUrl = generatePresignedUrl(fileUrl);
 
 // console.log('Presigned URL:', presignedUrl);

@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import asyncHandler from "../../utils/asyncHandler.js";
-import { handleThirdPartyResponse, handleSurepassResponse } from "../../utils/apiResponse.js";
 import { uploadSanctionLetterS3 } from "../../utils/uploadSanction.js";
 import { ADDRESS_SOURCE, API_TYPE, COUNTRY, DOCUMENT_TYPE, LEAD_STAGE } from "../../constants/constants.js";
 import { ResponseError } from '../../utils/responseError.js'
@@ -335,7 +334,7 @@ const Initiatekyc = asyncHandler(async (req, res) => {
   // API call
   const otpResponse = await sendAadhaarOtpAPISurePass(aadhaarNo);
   console.log("otpResponse---->", otpResponse?.status_code)
-  if (otpResponse?.status_code != '200') handleSurepassResponse(otpResponse);
+  // if (otpResponse?.status_code != '200') handleSurepassResponse(otpResponse);
 
   // Transaction block
   await prisma.$transaction(async (prisma) => {
@@ -367,7 +366,7 @@ const submitotp = asyncHandler(async (req, res) => {
   if (!otp || !accessKey) throw new ResponseError(400, "Missing required fields");
 
   const { aadhaarRequest, aadhaarResponse } = await validateAadhaarOtpAPIsurepass(otp, accessKey);
-  if (aadhaarResponse?.status_code != '200') handleSurepassResponse(aadhaarResponse);
+  // if (aadhaarResponse?.status_code != '200') handleSurepassResponse(aadhaarResponse);
 
   await prisma.$transaction(async (prisma) => {
     // Cache frequently used values

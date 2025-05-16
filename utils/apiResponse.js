@@ -53,7 +53,9 @@ export const handleThirdPartyResponse = (responseData) => {
 
 export const handleSurepassResponse = (responseData) => {
   const httpStatus = responseData?.status_code;
-
+  const responseMessage = responseData?.data?.message || responseData?.message
+  console.log("responseMessage----->", responseMessage)
+  // console.log("httpStatus----->", responseData)
   const errorMappings = {
     http: {
       400: "Bad Request - Malformed request",
@@ -76,7 +78,7 @@ export const handleSurepassResponse = (responseData) => {
   if (errorMappings.http[httpStatus]) {
     throw new ResponseError(
       httpStatus >= 400 && httpStatus < 500 ? httpStatus : 500,
-      `${errorMappings.http[httpStatus]} (HTTP: ${httpStatus})`
+      `${errorMappings.http[httpStatus]} (HTTP: ${httpStatus}) : ${responseMessage}`
     );
   }
 

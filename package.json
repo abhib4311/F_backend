@@ -54,7 +54,7 @@
     "pdfkit": "^0.16.0",
     "pg": "^8.14.0",
     "playwright": "^1.52.0",
-    "puppeteer": "^24.4.0",
+    "puppeteer": "^24.8.2",
     "soundex-code": "^2.0.1",
     "string-similarity": "^4.0.4",
     "twilio": "^5.4.4",

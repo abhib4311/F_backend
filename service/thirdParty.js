@@ -2,6 +2,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import { ResponseError } from "../utils/responseError.js";
 import { API_PATHS } from "../constants/urlConstants.js";
+import { handleSurepassResponse } from "../utils/apiResponse.js";
 dotenv.config();
 
 //  Send OTP API
@@ -30,17 +31,12 @@ export const sendOtpAPI = async (phone_number) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Send OTP API Error:", error);
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || "Third-Party API returned an error"
-      );
+      console.log("Send OTP API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || "Failed to connect to Third-Party API"
-      );
+      console.log("Send OTP API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to send OTP");
     }
   }
 };  // SUREPASS OTP API
@@ -67,23 +63,18 @@ export const verifyOtpAPI = async (otp, request_id) => {
     };
 
     const response = await fetch(
-      API_PATHS.VERIFY_OTP_MOBILE, // Make sure this path is defined properly
+      API_PATHS.VERIFY_OTP_MOBILE,
       requestOptions
     );
     const result = await response.json();
     return result;
   } catch (error) {
     if (error.response) {
-      console.log("Verify OTP error", error);
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || "Third-Party API returned an error"
-      );
+      console.log("Verify OTP API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || "Failed to connect to Third-Party API"
-      );
+      console.log("Verify OTP API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to verify OTP");
     }
   }
 }; // SUREPASS OTP API
@@ -120,7 +111,7 @@ export const fetchMobileDetailsAPI = async (request_id) => {
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to fetch mobile details'
       );
     }
   }
@@ -163,17 +154,12 @@ export const fetchPanDetailsAPI = async (PAN) => {
 
     // return { panResponse: result, panRequest: requestOptions };
   } catch (error) {
-    console.error("Fetch PAN details API Error:", error.message);
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || "Third-Party API returned an error"
-      );
+      console.log("Fetch PAN details API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || "Failed to connect to Third-Party API"
-      );
+      console.log("Fetch PAN details API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to get PAN details");
     }
   }
 }; // SUREPASS PAN API
@@ -220,7 +206,7 @@ export const sendEmailOtpAPI = async (email, employeeName) => {
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to send email OTP'
       );
     }
   }
@@ -258,84 +244,12 @@ export const verifyEmailOtpAPI = async (otp, request_id) => {
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to verify email OTP'
       );
     }
   }
 };  // PERFIOS API
-// };  // PERFIOS API
 
-// validate Office Email API
-// export const validateEmailAPI = async (email) => {
-//   try {
-//     let data = JSON.stringify({
-//       email: email,
-//       consent: "Y",
-//     });
-// export const validateEmailAPI = async (email) => {
-//   try {
-//     let data = JSON.stringify({
-//       email: email,
-//       consent: "Y",
-//     });
-
-//     let config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: process.env.VALIDATE_OFFICE_EMAIL,
-//       headers: {
-//         "x-karza-key": process.env.KARZA_API_KEY,
-//         "Content-Type": "application/json",
-//       },
-//       data: data,
-//     };
-//     let config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: process.env.VALIDATE_OFFICE_EMAIL,
-//       headers: {
-//         "x-karza-key": process.env.KARZA_API_KEY,
-//         "Content-Type": "application/json",
-//       },
-//       data: data,
-//     };
-
-//     const response = await axios.request(config);
-//     return { otpResponse: response.data, otpRequest: config };
-//   } catch (error) {
-//     console.error("Validate Office Email API Error:", error);
-//     if (error.response) {
-//       throw new ResponseError(
-//         error.response.status || 500,
-//         error.response.data?.error || 'Third-Party API returned an error'
-//       );
-//     } else {
-//       throw new ResponseError(
-//         500,
-//         error.message || 'Failed to connect to Third-Party API'
-//       );
-//     }
-//   }
-// };  //PERFIOS API
-//     const response = await axios.request(config);
-//     return { otpResponse: response.data, otpRequest: config };
-//   } catch (error) {
-//     console.error("Validate Office Email API Error:", error);
-//     if (error.response) {
-//       throw new ResponseError(
-//         error.response.status || 500,
-//         error.response.data?.error || 'Third-Party API returned an error'
-//       );
-//     } else {
-//       throw new ResponseError(
-//         500,
-//         error.message || 'Failed to connect to Third-Party API'
-//       );
-//     }
-//   }
-// };  //PERFIOS API
-
-// Send Aadhaar OTP API
 export const sendAadhaarOtpAPI = async (aadhaar) => {
   try {
     let data = JSON.stringify({
@@ -366,7 +280,7 @@ export const sendAadhaarOtpAPI = async (aadhaar) => {
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to send Aadhaar OTP'
       );
     }
   }
@@ -405,7 +319,7 @@ export const validateAadhaarOtpAPI = async (otp, accessKey, aadhaarNo) => {
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to validate Aadhaar OTP'
       );
     }
   }
@@ -495,19 +409,14 @@ export const fetchCibilAPI = async (cibilRequestBody) => {
     console.log("cibilResponseData->", cibilResponse.data)
 
     return { cibilRequest: cibilRequestBody, cibilResponse: cibilResponse.data };
-  } catch (error) {
-    console.log("CIBIL API Error:", error);
-
+  }
+  catch (error) {
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("CIBIL API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("CIBIL API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to get CIBIL details");
     }
   }
 };  // SUREPASS CIBIL API
@@ -559,7 +468,7 @@ export const sanctionAPI = async (base64_encoded, full_name, personal_email, mob
     } else {
       throw new ResponseError(
         500,
-        error.message || 'Failed to connect to Third-Party API'
+        error.message || 'Failed to connect to the third party API to sanction loan'
       );
     }
 
@@ -658,7 +567,7 @@ export const fetchLocationAPI = async (lat, lng) => {
     }
 
     // Wrap unexpected errors in a ResponseError
-    throw new ResponseError(500, error.message || "Internal Server Error: Unable to fetch location details");
+    throw new ResponseError(500, error.message || "Failed to connect to the third party API to fetch location details");
   };
 }// GOOGLE MAPS API
 // }// GOOGLE MAPS API
@@ -684,17 +593,12 @@ export const sendAadhaarOtpAPISurePass = async (aadhaar) => {
     return data;
   }
   catch (error) {
-    console.log("Send Aadhaar API Error : ", error?.message);
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("Submit Aadhaar OTP API Error : ", error.response?.data?.message)
+      handleSurepassResponse(error.response.data)
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("Submit Aadhaar OTP API Error : ", error.message)
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to submit Aadhaar OTP");
     }
   }
 };
@@ -721,20 +625,16 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
     };
 
     const response = await axios.request(config)
+    // console.log("response----->", response.data.status_code)
     return { aadhaarResponse: response.data, aadhaarRequest: config };
   }
   catch (error) {
-    console.log("Submit Aadhaar OTP API Error : ", error)
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("Submit Aadhaar OTP API Error : ", error.response?.data?.message)
+      handleSurepassResponse(error.response.data)
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("Submit Aadhaar OTP API Error : ", error.message)
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to validate Aadhaar OTP");
     }
   }
 
@@ -745,20 +645,14 @@ export const validateAadhaarOtpAPIsurepass = async (otp, accessKey) => {
 // e-Sign Step 1
 export const esignInitAPI = async (payload) => {
   try {
-    // console.log("esignInitAPI payload", payload)
-    // console.log("esignInitAPI payload", payload)
     const response = await fetch(process.env.ESIGN_INIT_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Add any required authorization headers
-        'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });
-    // console.log("esignInitAPI response", response.status)
-    // console.log("esignInitAPI response", response.status)
 
     const apiResponse = await response.json();
     return {
@@ -766,17 +660,12 @@ export const esignInitAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("Submit Aadhaar OTP API Error : ", error)
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("e-Sign Init API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("e-Sign Init API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to initialize e-sign");
     }
   }
 }; //SUREPASS API
@@ -789,9 +678,7 @@ export const getUploadUrlAPI = async (payload) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Add any required authorization headers
         'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
-        // 'Authorization': process.env.SURE_PASS_ACCESS_TOKEN_PRODUCTION_PRODUCTION,
       },
       body: JSON.stringify(payload)
     });
@@ -802,25 +689,18 @@ export const getUploadUrlAPI = async (payload) => {
       apiResponse
     };
   } catch (error) {
-    console.log("Submit Aadhaar OTP API Error : ", error)
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("Get Upload URL API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("Get Upload URL API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to get upload URL");
     }
   }
 }; //SUREPASS API
 
 export const getSingedDocUrl = async (document_id) => {
   try {
-    // Prepare request payload (if required by API body)
-    // Construct full URL with path parameter
     const url = `${process.env.ESIGN_DOWNLOAD_FILE_SUREPASS}/${document_id}`;
     let config = {
       method: 'get',
@@ -833,20 +713,14 @@ export const getSingedDocUrl = async (document_id) => {
     };
     const response = await axios.request(config);
     return { apiRequest: config, apiResponse: response.data };
-
   } catch (error) {
-    console.log("esign Doc API Error : ", error)
     if (error.response) {
-      throw new ResponseError(
-        error.response.status || 500,
-        error.response.data?.error || 'Third-Party API returned an error'
-      );
+      console.log("Get Signed Doc URL API Error:", error.response?.data?.message);
+      handleSurepassResponse(error.response?.data);
     } else {
-      throw new ResponseError(
-        500,
-        error.message || 'Failed to connect to Third-Party API'
-      );
+      console.log("Get Signed Doc URL API Error:", error.message);
+      throw new ResponseError(500, error.message || "Failed to connect to the third party API to get signed document URL");
     }
-  }
 
+  }
 };// PERFIOS API
