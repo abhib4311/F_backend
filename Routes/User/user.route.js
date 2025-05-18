@@ -26,6 +26,7 @@ import {
 import {
   applyReloan,
   getLoanStatus,
+  getMaxElegibleloanAmount,
 } from "../../controllers/User/reloan.controller.js";
 import {
   sendFeedback,
@@ -65,15 +66,13 @@ router.post(
   verifyStaticToken,
   callbackBankStatement
 );
-router.get("/request-loan-amount" ,authenticateUser , requestLoanAmount)
+router.get("/request-loan-amount", authenticateUser, requestLoanAmount)
 router.post("/request-loan", authenticateUser, requestLoan); // Done
 
 // ---------------------------------------------------------------------------------//
 // E-KYC (Step:3)
 router.post("/initiate-kyc", authenticateUser, Initiatekyc); // Done
-// router.post("/initiate-kyc", Initiatekyc); // Done
 router.post("/submit-aadhar-otp", authenticateUser, submitotp); // Done
-router.post("/face-match", authenticateUser, faceMatchHandler);
 
 // ---------------------------------------------------------------------------------//
 // Preview Sanction (Step:4)
@@ -96,6 +95,8 @@ router.post("/apply-reloan", authenticateUser, applyReloan); // Don
 router.get("/get-journey", authenticateUser, getJourney); // Done
 router.post("/logout", authenticateUser, logout); // Done
 router.get("/profile", authenticateUser, getUserProfile); // Done
+router.get("/getMaxElegibleloanAmount", authenticateUser, getMaxElegibleloanAmount)
+
 // router.post("/auto-payment", sendEncryptedRequest)
 // router.post("/status-check", status_check)
 

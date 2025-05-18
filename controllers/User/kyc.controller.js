@@ -405,7 +405,7 @@ const submitotp = asyncHandler(async (req, res) => {
     };
 
     // Parallel database operations
-    const [aadharDetails] = await Promise.all([
+    await Promise.all([
       prisma.api_Logs.create({
         data: {
           pan,

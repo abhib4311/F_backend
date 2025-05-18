@@ -643,6 +643,14 @@ const uploadBankStatement = asyncHandler(async (req, res) => {
           },
         });
     */
+    await prisma.customer.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        monthly_income: averageSalary,
+      },
+    })
     console.log("Performing Fraud Check");
     await prisma.bank_Details.create({
       data: {

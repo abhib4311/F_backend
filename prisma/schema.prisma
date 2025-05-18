@@ -26,7 +26,6 @@ model Lead {
   personal_email           String?
   office_email             String?
   allocated_to             Int?
-  assigned_to              Int?
   lead_stage               String?      @default("PENDING_LEAD")
   remarks                  String?
   is_lead_completed        Boolean      @default(false)
@@ -35,10 +34,11 @@ model Lead {
   repayment_date           DateTime?
   is_kyc_approved          Boolean      @default(false)
   is_kyc_reject            Boolean      @default(false)
-  kyc_rejected_by          Int?
+  kyc_reject_assigned_to   Int?
   is_bre_complete          Boolean?     @default(false)
   is_bsa_complete          Boolean?     @default(false)
   is_bre_reject            Boolean?     @default(false)
+  bre_reject_assigned_to   Int?
   is_personal_email_verify Boolean?     @default(false)
   is_office_email_verify   Boolean?     @default(false)
   is_employee_type_filled  Boolean?     @default(false)
@@ -59,8 +59,7 @@ model Lead {
   is_hold                  Boolean?     @default(false)
   is_rejected              Boolean?     @default(false)
   rejected_by              Int?
-  approved_by              Int?
-  rejection_remarks        String?
+  rejection_remarks        String? //------------------ 
   credit_score             Int?
   is_person_salaried       Boolean?     @default(true)
   created_at               DateTime     @default(now())
@@ -279,17 +278,18 @@ model Payment {
 }
 
 model Api_Logs {
-  id           Int      @id @default(autoincrement())
-  pan          String?
-  api_type     String?
-  api_provider Int?
-  api_request  Json?
-  api_response Json?
-  api_status   Boolean?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  customer_id  Int?
-  lead_id      Int?
+  id             Int      @id @default(autoincrement())
+  pan            String?
+  is_reloan_case Boolean? @default(false)
+  api_type       String?
+  api_provider   Int?
+  api_request    Json?
+  api_response   Json?
+  api_status     Boolean?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  customer_id    Int?
+  lead_id        Int?
 
   @@index([pan])
   @@index([customer_id])

@@ -11,7 +11,6 @@ import {
     fetchUnassignedBreRejectedLeads,
     fetchMyBreRejectedLeads,
     assignMultipleBreRejectedLeadsToSelf,
-    rejectBreRejectedLeadManually,
     approveBreRejectedLeadManually,
     fetchMyManuallyRejectedLeads,
     fetchMyManuallyApprovedLeads,
@@ -31,7 +30,12 @@ import {
     getLeadLogs,
     disbursed,
     uploadDocument,
-    getBSAReport
+    getBSAReport,
+    fetchUnassignedKycRejectedLeads,
+    fetchMyKycRejectedLeads,
+    assignMultipleKycRejectedLeadsToSelf,
+    approveKycRejectedLeadManually,
+    rejectLeadManually
 } from '../../controllers/CRM/leadController.js';
 import { authenticateEmployee, authorizeRoles } from '../../Middlewares/employee.js';
 import upload, { handleMulterError } from '../../Middlewares/multer.js';
@@ -79,23 +83,38 @@ router.get('/bre-rejected/manual-approved', authorizeRoles('ADMIN', 'CREDIT-ANAL
 // // Get leads that were manually rejected by the current employee
 router.get('/bre-rejected/manual-rejected', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), fetchMyManuallyRejectedLeads);
 // // Manually reject a BRE rejected lead after review
-router.post('/bre-rejected/manual-reject/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), rejectBreRejectedLeadManually);
+router.post('/bre-rejected/manual-reject/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), rejectLeadManually);
 // // Manually approve a BRE rejected lead after review
 router.post('/bre-rejected/manual-approve/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), approveBreRejectedLeadManually);
 // // My Disbursed leads
 router.get('/my-approved-disbursed-lead', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), fetchMyDisbursedLeadsAsCreditAnalyst)
 
-// // ======================================================================
-// // ====================== Lead Status Management ======================
-// // ======================================================================
+// ======================================================================
+// ====================== KYC Rejected Lead Management ======================
+// ======================================================================
+
+// Get unassigned KYC rejected leads
+router.get('/kyc-rejected', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), fetchUnassignedKycRejectedLeads);
+// Get KYC rejected leads allocated to current employee
+router.get('/kyc-rejected/employee', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), fetchMyKycRejectedLeads);
+// Self-assign multiple KYC rejected leads to credit analyst
+router.post('/kyc-rejected/assign', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), assignMultipleKycRejectedLeadsToSelf);
+// Manually approve a KYC rejected lead after review
+router.post('/kyc-rejected/manual-approve/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), approveKycRejectedLeadManually);
+// Manually reject a KYC rejected lead after review
+router.post('/kyc-rejected/manual-reject/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST'), rejectLeadManually);
+
+// ======================================================================
+// ====================== Lead Status Management ======================
+// ======================================================================
 
 router.get('/disbursed', fetchAllDisbursedLeadsWithDetails);
 // Get all leads that have been closed
 router.get('/closed', fetchAllClosedLeadsWithDetails);
 
-// // ======================================================================
-// // ====================== Lead Details & Utilities ======================
-// // ======================================================================
+// ======================================================================
+// ====================== Lead Details & Utilities ======================
+// ======================================================================
 
 router.get('/customer-detail/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-ANALYST'), getCustomerDetails);
 router.get('/loan-details/:id', authorizeRoles('ADMIN', 'CREDIT-ANALYST', 'SALES-OPS', 'DISBURSAL-HEAD'), getLoanDetails);

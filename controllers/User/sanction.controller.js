@@ -159,7 +159,7 @@ export const previewSanction = asyncHandler(async (req, res) => {
     user?.address
   );
 
-  console.log("sanction_html_page---->", sanction_html_page);
+  // console.log("sanction_html_page---->", sanction_html_page);
   const pdfBuffer = await generatepdf(sanction_html_page);
   // const pdfBuffer = Buffer.from(sanction_html_page, 'utf-8').toString('base64');
   // console.log(pdfBuffer);
@@ -167,13 +167,13 @@ export const previewSanction = asyncHandler(async (req, res) => {
   if (!pdfBuffer) {
     return res.status(400).json({ message: "pdfBuffer is not generated" });
   }
-  console.log("---------------- PDF BUFFER", pdfBuffer);
+  // console.log("---------------- PDF BUFFER", pdfBuffer);
 
   // Create a Blod/File from the buffer
   const pdfFile = new File([pdfBuffer], "sanction_letter.pdf", {
     type: "application/pdf",
   });
-  console.log("pdfFile---->", pdfFile);
+  console.log("pdfFile---->GENERATED");
   // Step 2: Initialize e-Sign session
   const initEsignPayload = {
     pdf_pre_uploaded: true,

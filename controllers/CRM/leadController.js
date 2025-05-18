@@ -406,7 +406,7 @@ export const fetchUnassignedBreRejectedLeads = async (req, res) => {
     // Base filter for BRE rejected and unassigned leads
     const baseFilter = {
       is_bre_reject: true,
-      assigned_to: null,
+      bre_reject_assigned_to: null,
       is_rejected: false,
       is_disbursed: false,
     };
@@ -440,6 +440,48 @@ export const fetchUnassignedBreRejectedLeads = async (req, res) => {
   }
 };
 
+export const fetchUnassignedKycRejectedLeads = async (req, res) => {
+  try {
+    const { page, limit, skip } = getPaginationParams(req);
+
+    // Base filter for KYC rejected and unassigned leads
+    const baseFilter = {
+      is_kyc_reject: true,
+      kyc_reject_assigned_to: null,
+      is_rejected: false,
+      is_disbursed: false,
+    };
+
+    // Use Promise.all for parallel execution of queries
+    const [leads, totalLeads] = await Promise.all([
+      prisma.lead.findMany({
+        where: baseFilter,
+        // select: leadSelect,
+        skip,
+        take: limit,
+        orderBy: { created_at: "desc" },
+      }),
+      prisma.lead.count({ where: baseFilter }),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      leads,
+      message: totalLeads
+        ? "Unassigned KYC rejected leads fetched successfully"
+        : "No unassigned KYC rejected leads found",
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalLeads / limit),
+        totalItems: totalLeads,
+      },
+    });
+  } catch (error) {
+    return handleError(res, error, "fetch unassigned KYC rejected leads");
+  }
+};
+// NEW REJECTED LEAD MANAGEMENT CONTROLLERS
+
 export const assignMultipleBreRejectedLeadsToSelf = async (req, res) => {
   try {
     const { leadIds } = req.body;
@@ -447,7 +489,7 @@ export const assignMultipleBreRejectedLeadsToSelf = async (req, res) => {
 
     const baseFilter = {
       is_bre_reject: true,
-      assigned_to: null,
+      bre_reject_assigned_to: null,
       is_rejected: false,
       is_disbursed: false,
     };
@@ -493,7 +535,7 @@ export const assignMultipleBreRejectedLeadsToSelf = async (req, res) => {
       // Update leads
       await tx.lead.updateMany({
         where: { id: { in: numericIds } },
-        data: { assigned_to: employeeId },
+        data: { bre_reject_assigned_to: employeeId },
       });
 
       // Prepare logs data
@@ -501,12 +543,12 @@ export const assignMultipleBreRejectedLeadsToSelf = async (req, res) => {
         customer_id: lead.customer_id,
         lead_id: lead.id,
         pan: lead.pan,
-        remarks: `Assigned to employee ${employeeId}`,
+        remarks: `Assigned to employee ${employeeId} stage: BRE Rejected`,
       }));
 
       const employeeLogs = validLeads.map((lead) => ({
         employee_id: employeeId,
-        remarks: `Lead ${lead.id} allocated`,
+        remarks: `Lead ${lead.id} allocated stage: BRE Rejected`,
       }));
 
       // Create logs in parallel
@@ -526,13 +568,101 @@ export const assignMultipleBreRejectedLeadsToSelf = async (req, res) => {
   }
 };
 
+export const assignMultipleKycRejectedLeadsToSelf = async (req, res) => {
+  try {
+    const { leadIds } = req.body;
+    const employeeId = req.employee.id;
+
+    const baseFilter = {
+      is_kyc_reject: true,
+      kyc_reject_assigned_to: null,
+      is_rejected: false,
+      is_disbursed: false,
+    };
+
+    if (!Array.isArray(leadIds) || leadIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or empty lead IDs format",
+      });
+    }
+
+    // Convert and validate numeric IDs
+    const numericIds = leadIds
+      .map((id) => parseInt(id))
+      .filter((id) => !isNaN(id));
+    if (numericIds.length !== leadIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Contains non-numeric lead IDs",
+      });
+    }
+
+    // Get valid leads that can be assigned
+    const validLeads = await prisma.lead.findMany({
+      where: {
+        id: { in: numericIds },
+        ...baseFilter,
+      },
+    });
+
+    // Check if all leads are valid
+    if (validLeads.length !== numericIds.length) {
+      const invalidIds = numericIds.filter(
+        (id) => !validLeads.some((lead) => lead.id === id)
+      );
+      return res.status(400).json({
+        success: false,
+        message: `Invalid or unavailable leads: ${invalidIds.join(", ")}`,
+      });
+    }
+
+    // Transaction with proper error handling
+    await prisma.$transaction(async (tx) => {
+      // Update leads
+      await tx.lead.updateMany({
+        where: { id: { in: numericIds } },
+        data: { kyc_reject_assigned_to: employeeId },
+      });
+
+      // Prepare logs data
+      const leadLogs = validLeads.map((lead) => ({
+        customer_id: lead.customer_id,
+        lead_id: lead.id,
+        pan: lead.pan,
+        remarks: `Assigned to employee ${employeeId} stage: KYC Rejected`,
+      }));
+
+      const employeeLogs = validLeads.map((lead) => ({
+        employee_id: employeeId,
+        remarks: `Lead ${lead.id} allocated stage: KYC Rejected`,
+      }));
+
+      // Create logs in parallel
+      await Promise.all([
+        tx.lead_Logs.createMany({ data: leadLogs }),
+        tx.employee_Logs.createMany({ data: employeeLogs }),
+      ]);
+    });
+
+    return res.json({
+      success: true,
+      message: `${validLeads.length} leads assigned successfully`,
+      count: validLeads.length,
+    });
+  } catch (error) {
+    return handleError(res, error, "assign leads");
+  }
+};
+// ASSIGNED NEW REJECTED LEADS CONTROLLERS
+
 export const fetchMyBreRejectedLeads = async (req, res) => {
   try {
     const employeeId = req.employee.id;
     const { page, limit, skip } = getPaginationParams(req);
     const baseFilter = {
       is_bre_reject: true,
-      assigned_to: employeeId,
+      bre_reject_assigned_to: employeeId,
       is_rejected: false,
       is_disbursed: false,
     };
@@ -562,6 +692,45 @@ export const fetchMyBreRejectedLeads = async (req, res) => {
     return handleError(res, error, "fetch pending leads");
   }
 };
+
+export const fetchMyKycRejectedLeads = async (req, res) => {
+  try {
+    const employeeId = req.employee.id;
+    const { page, limit, skip } = getPaginationParams(req);
+    const baseFilter = {
+      is_kyc_reject: true,
+      kyc_reject_assigned_to: employeeId,
+      is_rejected: false,
+      is_disbursed: false,
+    };
+    const [leads, totalLeads] = await Promise.all([
+      prisma.lead.findMany({
+        where: baseFilter,
+        // select: leadSelect,
+        skip,
+        take: limit,
+        orderBy: { created_at: "desc" },
+      }),
+      prisma.lead.count({ where: baseFilter }),
+    ]);
+    return res.status(200).json({
+      success: true,
+      leads,
+      message: totalLeads
+        ? "Assigned KYC rejected leads fetched successfully"
+        : "No assigned KYC rejected leads found",
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalLeads / limit),
+        totalItems: totalLeads,
+      },
+    });
+  } catch (error) {
+    return handleError(res, error, "fetch KYC rejected leads");
+  }
+};
+// GET MY assigned LEADS CONTROLLERS
+
 export const approveBreRejectedLeadManually = async (req, res) => {
   try {
     const { id } = req.params;
@@ -605,7 +774,7 @@ export const approveBreRejectedLeadManually = async (req, res) => {
     await prisma.$transaction(async (tx) => {
       // Prepare lead update data
       const leadUpdateData = {
-        approved_by: employeeId,
+        // approved_by: employeeId,
         is_bre_reject: false,
         lead_stage: LEAD_STAGE.BRE_APPROVED,
       };
@@ -649,14 +818,14 @@ export const approveBreRejectedLeadManually = async (req, res) => {
           customer_id: customerId,
           lead_id: leadId,
           pan: lead.pan,
-          remarks: `Approved by ${emp_name}`,
+          remarks: `BRE Approved by ${emp_name}`,
         },
       });
 
       await tx.employee_Logs.create({
         data: {
           employee_id: employeeId,
-          remarks: `Approved the Lead ${leadId}`,
+          remarks: `BRE Approved the Lead ${leadId}`,
         },
       });
     });
@@ -669,7 +838,117 @@ export const approveBreRejectedLeadManually = async (req, res) => {
     return handleError(res, error, "approve lead");
   }
 };
-export const rejectBreRejectedLeadManually = async (req, res) => {
+
+export const approveKycRejectedLeadManually = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const leadId = parseInt(id);
+    const employeeId = req.employee.id;
+    const {
+      calculated_loan_amount,
+      remarks,
+      ifsc_code,
+      salary_date,
+      bank_acc_no,
+    } = req.body;
+
+    // Validation check
+    if (!leadId || isNaN(leadId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid lead ID",
+      });
+    }
+
+    // Check if the lead exists
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId },
+    });
+    if (!lead) {
+      return res.status(404).json({
+        success: false,
+        message: "Lead not found",
+      });
+    }
+
+    // Check if the lead is already rejected
+    if (lead.is_rejected) {
+      return res.status(400).json({
+        success: false,
+        message: "Lead is rejected",
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Prepare lead update data
+      const leadUpdateData = {
+        is_kyc_reject: false,
+        is_kyc_approved: true,
+        lead_stage: LEAD_STAGE.KYC_APPROVED,
+      };
+
+      // Conditionally add loan amount and remarks to lead
+      if (calculated_loan_amount !== undefined) {
+        leadUpdateData.elegible_loan_amount = Number(calculated_loan_amount);
+      }
+      if (remarks !== undefined) {
+        leadUpdateData.rejection_remarks = remarks;
+      }
+      if (salary_date !== undefined) {
+        leadUpdateData.salary_date = new Date(salary_date);
+      }
+
+      // Update lead
+      await tx.lead.update({
+        where: { id: leadId },
+        data: leadUpdateData,
+      });
+
+      // Handle bank details
+      if (ifsc_code !== undefined || bank_acc_no !== undefined) {
+        const bankUpdateData = {};
+        if (ifsc_code !== undefined) bankUpdateData.ifsc_code = ifsc_code;
+        if (bank_acc_no !== undefined) bankUpdateData.bank_acc_no = bank_acc_no;
+
+        // Upsert bank details
+        await tx.bank_Details.updateMany({
+          where: { lead_id: leadId },
+          data: bankUpdateData,
+        });
+      }
+
+      // Prepare logs
+      const customerId = lead.customer_id;
+      const emp_name = `${req.employee.f_name} ${req.employee.l_name}`;
+
+      await tx.lead_Logs.create({
+        data: {
+          customer_id: customerId,
+          lead_id: leadId,
+          pan: lead.pan,
+          remarks: `KYC Approved by ${emp_name}`,
+        },
+      });
+
+      await tx.employee_Logs.create({
+        data: {
+          employee_id: employeeId,
+          remarks: `KYC Approved the Lead ${leadId}`,
+        },
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Lead KYC Approved successfully",
+    });
+  } catch (error) {
+    return handleError(res, error, "approve KYC lead");
+  }
+};
+// APPROVE NEW REJECTED LEADS CONTROLLERS
+
+export const rejectLeadManually = async (req, res) => {
   try {
     const { id } = req.params;
     const leadId = parseInt(id);
@@ -748,7 +1027,7 @@ export const rejectBreRejectedLeadManually = async (req, res) => {
   } catch (error) {
     return handleError(res, error, "reject lead");
   }
-};
+};  //GLOBAL
 export const fetchMyManuallyRejectedLeads = async (req, res) => {
   try {
     const employeeId = req.employee.id;
@@ -785,15 +1064,23 @@ export const fetchMyManuallyRejectedLeads = async (req, res) => {
   } catch (error) {
     return handleError(res, error, "fetch rejected leads");
   }
-};
+};   //GLOBAL
 export const fetchMyManuallyApprovedLeads = async (req, res) => {
   try {
     const employeeId = req.employee.id;
     const { page, limit, skip } = getPaginationParams(req);
 
     const baseFilter = {
-      approved_by: employeeId,
-      is_bre_reject: false,
+      OR: [
+        {
+          bre_reject_assigned_to: employeeId,
+          is_bre_reject: false,
+        },
+        {
+          kyc_reject_assigned_to: employeeId,
+          is_kyc_approved: true,
+        },
+      ],
       is_rejected: false,
     };
 
@@ -823,7 +1110,10 @@ export const fetchMyManuallyApprovedLeads = async (req, res) => {
   } catch (error) {
     return handleError(res, error, "fetch rejected leads");
   }
-};
+};  //GLOBAL
+
+
+
 export const fetchMyDisbursedLeadsAsCreditAnalyst = async (req, res) => {
   try {
     const employeeId = req.employee.id;
@@ -831,7 +1121,7 @@ export const fetchMyDisbursedLeadsAsCreditAnalyst = async (req, res) => {
     const baseFilter = {
       approved_by: employeeId,
       is_rejected: false,
-      assigned_to: employeeId,
+      bre_reject_assigned_to: employeeId,
     };
     const [leads, totalLeads] = await Promise.all([
       prisma.lead.findMany({

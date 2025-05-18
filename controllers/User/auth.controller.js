@@ -615,14 +615,11 @@ export const addEmployement = asyncHandler(async (req, res) => {
 
       console.log("cibilRequestBody---->>>", cibilRequestBody)
       // CIBIL API handling
-      const { cibilResponse, cibilRequest } = await fetchCibilAPI(
-        cibilRequestBody
-      );
-      // if (cibilResponse?.status_code != "200") {
-      //   handleSurepassResponse(cibilResponse);
-      //   console.log("cibilResponse---->>>", cibilResponse);
-      // }
-      // const cibilResponse = dummyCIBIL;
+      // const { cibilResponse, cibilRequest } = await fetchCibilAPI(
+      //   cibilRequestBody
+      // );
+
+      const cibilResponse = dummyCIBIL;
       console.log("cibilResponse---->>>", cibilResponse?.data?.credit_score);
       console.log("cibilResponse---->>> type", typeof (cibilResponse?.data?.credit_score));
 
@@ -900,6 +897,15 @@ export const getJourney = asyncHandler(async (req, res) => {
   const lead = await prisma.lead.findFirst({
     where: { customer_id: user.id },
     orderBy: { created_at: "desc" },
+    include: {
+      sanction: {
+        select: {
+
+          is_eSign_pending: true,
+          is_eSigned: true,
+        }
+      }
+    }
   });
   // console.log("____________lead", lead);
   const journey = {
@@ -910,14 +916,18 @@ export const getJourney = asyncHandler(async (req, res) => {
     is_office_email_verify: lead?.is_office_email_verify,
     is_employee_type_filled: lead?.is_employee_type_filled,
     is_loan_requested: lead?.is_loan_requested,
-
+    is_reference_added: lead?.is_reference_added,
+    is_feedback_submitted: lead?.is_feedback_submitted,
+    is_active: lead?.is_active,
+    is_closed: lead?.is_closed,
     is_bre_complete: lead?.is_bre_complete,
     is_bsa_complete: lead?.is_bsa_complete,
     is_bre_reject: lead?.is_bre_reject,
     is_sanction: lead?.is_sanction,
+    is_eSign_pending: lead?.sanction?.is_eSign_pending || false,
+    is_eSigned: lead?.sanction?.is_eSigned || false,
     is_disbursed: lead?.is_disbursed,
     is_rejected: lead?.is_rejected,
-    is_closed: lead?.is_closed,
     lead_stage: lead?.lead_stage,
   };
 
