@@ -460,9 +460,9 @@ const submitotp = asyncHandler(async (req, res) => {
     ]);
 
     // const bankDummyData = { beneficiary_name: "Mr. Uvesh" }
-    console.log("panDetails.api_response, aadharDetails.api_response", panDetails.api_response, aadharDetails.api_response, bankDetails);
+    console.log("panDetails.api_response, aadharDetails.api_response", panDetails.api_response, aadhaarData, bankDetails);
     // Validation logic
-    const validateData = validatePANwithAadhaar(panDetails.api_response, aadharDetails.api_response, bankDetails);
+    const validateData = validatePANwithAadhaar(panDetails.api_response, aadhaarData, bankDetails);
     if (!validateData.isValid) {
       await Promise.all([
         prisma.lead_Logs.create({

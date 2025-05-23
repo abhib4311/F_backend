@@ -34,11 +34,9 @@ model Lead {
   repayment_date           DateTime?
   is_kyc_approved          Boolean      @default(false)
   is_kyc_reject            Boolean      @default(false)
-  kyc_reject_assigned_to   Int?
   is_bre_complete          Boolean?     @default(false)
   is_bsa_complete          Boolean?     @default(false)
   is_bre_reject            Boolean?     @default(false)
-  bre_reject_assigned_to   Int?
   is_personal_email_verify Boolean?     @default(false)
   is_office_email_verify   Boolean?     @default(false)
   is_employee_type_filled  Boolean?     @default(false)
@@ -59,7 +57,7 @@ model Lead {
   is_hold                  Boolean?     @default(false)
   is_rejected              Boolean?     @default(false)
   rejected_by              Int?
-  rejection_remarks        String? //------------------ 
+  rejection_remarks        String?
   credit_score             Int?
   is_person_salaried       Boolean?     @default(true)
   created_at               DateTime     @default(now())
@@ -73,6 +71,8 @@ model Lead {
   is_reference_added       Boolean?     @default(false)
   salary_date              DateTime?
   is_face_matched          Boolean?     @default(false)
+  bre_reject_assigned_to   Int?
+  kyc_reject_assigned_to   Int?
   collection               Collection[]
   disbursal                Disbursal?
   sanction                 Sanction?
@@ -108,7 +108,6 @@ model Customer {
   pincode                  String?
   city                     String?
   employement_type         String?
-  monthly_income           Decimal?  @db.Decimal(10, 2)
   loan_count               Int       @default(0)
   credit_score             Int?
   recent_credit_score_date DateTime?
@@ -121,6 +120,7 @@ model Customer {
   company_name             String?
   net_monthly_salary       Int?
   salary_date              DateTime?
+  monthly_income           Decimal?  @db.Decimal(10, 2)
 
   @@index([mobile])
   @@index([personal_email])
@@ -183,7 +183,6 @@ model Disbursal {
   payment_mode           String
   amount                 Decimal?  @db.Decimal(10, 2)
   utr                    String?
-  status                 String?
   transaction_history_id Int?
   disbursal_date         DateTime?
   is_active              Boolean   @default(true)
@@ -204,6 +203,7 @@ model Disbursal {
   disbursed_by           Int?
   channel                String?
   remarks                String?
+  status                 String?
   lead                   Lead      @relation(fields: [lead_id], references: [id])
 
   @@index([lead_id])
@@ -280,7 +280,6 @@ model Payment {
 model Api_Logs {
   id             Int      @id @default(autoincrement())
   pan            String?
-  is_reloan_case Boolean? @default(false)
   api_type       String?
   api_provider   Int?
   api_request    Json?
@@ -290,6 +289,7 @@ model Api_Logs {
   updated_at     DateTime @updatedAt
   customer_id    Int?
   lead_id        Int?
+  is_reloan_case Boolean? @default(false)
 
   @@index([pan])
   @@index([customer_id])
@@ -388,7 +388,7 @@ model Employee_Role {
   role        Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
   @@id([employee_id, role_id])
-  @@index([role_id]) // Removed map
+  @@index([role_id])
 }
 
 model Employee_Logs {
@@ -399,7 +399,7 @@ model Employee_Logs {
   updated_at  DateTime @updatedAt
   employee    Employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
 
-  @@index([employee_id]) // Removed map
+  @@index([employee_id])
 }
 
 model Counter {

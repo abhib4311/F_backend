@@ -90,19 +90,19 @@ export const applyReloan = asyncHandler(async (req, res) => {
   }
 
   const serviceablePincode = locationData?.locationResponse?.pincode;
-  if (!serviceablePincode) {
-    throw new ResponseError(400, "PIN code not found related to this location",
-      `Failed to fetch pincode from coordinates (lat: ${lat}, lng: ${lng}) for user with PAN: ${user.pan}`);
-  }
+  // if (!serviceablePincode) {
+  //   throw new ResponseError(400, "PIN code not found related to this location",
+  //     `Failed to fetch pincode from coordinates (lat: ${lat}, lng: ${lng}) for user with PAN: ${user.pan}`);
+  // }
 
   const pincodeCheck = await prisma.serviceable_pin_code.findFirst({
     where: { pincode: serviceablePincode }
   });
 
-  if (!pincodeCheck) {
-    throw new ResponseError(400, "Area not serviceable",
-      `Non-serviceable pincode ${serviceablePincode} for user with PAN: ${user.pan}`);
-  }
+  // if (!pincodeCheck) {
+  //   throw new ResponseError(400, "Area not serviceable",
+  //     `Non-serviceable pincode ${serviceablePincode} for user with PAN: ${user.pan}`);
+  // }
 
   // CIBIL age calculation
   const cibilLog = await prisma.api_Logs.findFirst({
@@ -117,7 +117,7 @@ export const applyReloan = asyncHandler(async (req, res) => {
   const cibilAgeDays = cibilLog ?
     Math.floor((Date.now() - cibilLog.created_at.getTime()) / 86400000) :
     CREDIT_REPORT_DAYS + 1;
-
+ 
   const locationResponse = locationData.locationResponse;
   let newLead;
   console.log(cibilAgeDays)
@@ -327,7 +327,8 @@ export const getLoanStatus = asyncHandler(
         id: true,
         is_rejected: true,
         full_name: true,
-        credit_score: true
+        credit_score: true,
+        is_closed: true,
       }
     });
 
@@ -366,7 +367,8 @@ export const getLoanStatus = asyncHandler(
       repayment_amount: sanctionDetails?.repayment_amount ?? 0,
       full_name: lead.full_name,
       credit_score: lead.credit_score,
-      loyalty_point: 250 // later it will be dynamic
+      loyalty_point: 250, // later it will be dynamic,
+      is_closed: lead.is_closed
     };
 
     return res.status(200).json({
